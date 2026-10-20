@@ -4,12 +4,13 @@
  * (to keep mock-platforms dependency-free from the shared package at runtime).
  */
 export interface ListingValues {
+  id?: string;
   name?: string;
   address?: string;
   phone?: string;
   website?: string;
   regularHours?: Record<string, unknown>;
-  holidayHours?: unknown[];
+  holidayHours?: Record<string, unknown> | unknown[];
   description?: string;
   categories?: string[];
   [key: string]: unknown;

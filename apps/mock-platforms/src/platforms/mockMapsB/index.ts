@@ -14,7 +14,7 @@ export function createMockMapsBApp(): express.Express {
   app.use(cors());
   app.use(express.json());
 
-  const store = new Store(seedData as Record<string, ListingValues>);
+  const store = new Store(seedData as unknown as Record<string, ListingValues>);
 
   app.use('/', buildListingRouter(store, mockMapsBPermissions));
 
