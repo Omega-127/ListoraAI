@@ -14,7 +14,6 @@
       "saturday": "08:00-20:00",
       "sunday": "09:00-16:00"
     },
-<<<<<<< HEAD
     "holidayHours": {},
     "description": "Artisan coffee and pastries in Springfield.",
     "categories": ["Café", "Coffee"]
@@ -37,8 +36,5 @@
     "holidayHours": {},
     "description": "Artisan coffee and pastries in Springfield.",
     "categories": ["Café", "Coffee"]
-=======
-    "holidayHours": {}
->>>>>>> d180802c4c2ddc23ddf2f8123f75e6f21fc6ee74
   }
 }

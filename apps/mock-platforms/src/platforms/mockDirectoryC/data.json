@@ -17,7 +17,6 @@
     "holidayHours": {
       "2026-12-25": "closed",
       "2026-11-28": "closed"
-<<<<<<< HEAD
     },
     "description": "Artisan coffee and pastries in Springfield.",
     "categories": ["Café", "Coffee"]
@@ -43,8 +42,5 @@
     },
     "description": "Artisan coffee and pastries in Springfield.",
     "categories": ["Café", "Coffee"]
-=======
-    }
->>>>>>> d180802c4c2ddc23ddf2f8123f75e6f21fc6ee74
   }
 }

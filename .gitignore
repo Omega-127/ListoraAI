@@ -15,12 +15,9 @@ out/
 .env.local
 .env.*.local
 *.env
-<<<<<<< HEAD
-=======
 apps/*/.env
 apps/*/.env.local
 packages/*/.env
->>>>>>> d180802c4c2ddc23ddf2f8123f75e6f21fc6ee74
 
 # Logs
 logs/
@@ -53,15 +50,9 @@ playwright-report/
 test-results/
 .playwright/
 
-<<<<<<< HEAD
-# Prisma
-prisma/migrations/
-*.db
-=======
 # Database & Prisma
 *.db
 apps/api/prisma/migrations/*.sql
->>>>>>> d180802c4c2ddc23ddf2f8123f75e6f21fc6ee74
 
 # TypeScript build info
 *.tsbuildinfo

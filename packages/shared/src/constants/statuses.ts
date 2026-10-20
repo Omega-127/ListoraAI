@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-// Status constants shared between api and web
-=======
 /**
  * Status constants shared between API, mock platforms, and frontend.
  * These values mirror the Prisma enums in the database layer.
@@ -26,7 +23,6 @@ export const VERIFICATION_STATUS = {
 export const VERIFICATION_STATUSES = STATUSES;
 export type VerificationStatus = (typeof VERIFICATION_STATUS)[keyof typeof VERIFICATION_STATUS];
 export type VerificationStatusValue = (typeof VERIFICATION_STATUSES)[keyof typeof VERIFICATION_STATUSES];
->>>>>>> d180802c4c2ddc23ddf2f8123f75e6f21fc6ee74
 
 // Classification of a detected mismatch between profile and listing
 export const MISMATCH_KIND = {
@@ -77,9 +73,6 @@ export const UPDATE_OUTCOMES = {
   BLOCKED: 'blocked',
 } as const;
 
-<<<<<<< HEAD
-export type VerificationStatus = (typeof VERIFICATION_STATUS)[keyof typeof VERIFICATION_STATUS];
-=======
 export type UpdateOutcome = (typeof UPDATE_OUTCOME)[keyof typeof UPDATE_OUTCOME];
 export type UpdateOutcomeValue = (typeof UPDATE_OUTCOMES)[keyof typeof UPDATE_OUTCOMES];
 
@@ -91,4 +84,3 @@ export const USER_ROLES = {
 } as const;
 
 export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
->>>>>>> d180802c4c2ddc23ddf2f8123f75e6f21fc6ee74
