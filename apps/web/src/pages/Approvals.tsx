@@ -1,8 +1,10 @@
 import { useState, useMemo } from "react";
-import { Check, X, Sparkles, CheckCircle2 } from "lucide-react";
+import { Check, X, Sparkles, CheckCircle2, Eye, Lock } from "lucide-react";
 import { Tabs } from "@animate-ui/react/primitives/base-ui/tabs";
 import { cn } from "../lib/cn";
 import { focus, muted } from "../lib/styles";
+import { getStoredUser } from "../lib/api";
+
 
 export type ProposalItem = {
   id: string;
@@ -107,7 +109,11 @@ export default function Approvals() {
     );
   };
 
+  const user = getStoredUser();
+  const isViewer = user?.role === "VIEWER";
+
   const handleApproveAllPending = async () => {
+    if (isViewer) return;
     setBatchActionRunning(true);
     await new Promise((r) => setTimeout(r, 600));
     setProposals((prev) =>
@@ -126,7 +132,7 @@ export default function Approvals() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {pendingCount > 0 && (
+          {pendingCount > 0 && !isViewer && (
             <button
               type="button"
               disabled={batchActionRunning}
@@ -142,6 +148,16 @@ export default function Approvals() {
           )}
         </div>
       </div>
+
+      {isViewer && (
+        <div className="flex items-center gap-2.5 rounded-lg border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-xs text-blue-300">
+          <Eye className="h-4 w-4 shrink-0 text-blue-400" />
+          <span>
+            <strong>Viewer Role (Read-Only):</strong> You can inspect all proposed diffs, risk calculations, and agent rationales. Approval and rejection actions require an <strong>Operator</strong> or <strong>Admin</strong> role.
+          </span>
+        </div>
+      )}
+
 
       {/* Tabs Filter */}
       <Tabs.Root value={filter} onValueChange={setFilter} className="flex flex-col gap-4">
@@ -254,30 +270,36 @@ export default function Approvals() {
                 {/* Status or Action Buttons */}
                 <div className="flex md:flex-col items-center justify-end gap-2 shrink-0 pt-2 md:pt-0">
                   {item.status === "PENDING_APPROVAL" ? (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => handleApprove(item.id)}
-                        className={cn(
-                          "inline-flex items-center gap-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 px-3 py-1.5 text-xs font-medium text-emerald-300 hover:bg-emerald-500/25",
-                          focus
-                        )}
-                      >
-                        <Check className="h-3.5 w-3.5" />
-                        Approve
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleReject(item.id)}
-                        className={cn(
-                          "inline-flex items-center gap-1.5 rounded-lg border border-neutral-800 bg-neutral-900/60 px-3 py-1.5 text-xs font-medium text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800",
-                          focus
-                        )}
-                      >
-                        <X className="h-3.5 w-3.5" />
-                        Reject
-                      </button>
-                    </>
+                    isViewer ? (
+                      <span className="inline-flex items-center gap-1.5 rounded-lg border border-blue-500/20 bg-blue-500/10 px-3 py-1.5 text-xs font-medium text-blue-300">
+                        <Lock className="h-3 w-3" /> Read-Only
+                      </span>
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => handleApprove(item.id)}
+                          className={cn(
+                            "inline-flex items-center gap-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 px-3 py-1.5 text-xs font-medium text-emerald-300 hover:bg-emerald-500/25",
+                            focus
+                          )}
+                        >
+                          <Check className="h-3.5 w-3.5" />
+                          Approve
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleReject(item.id)}
+                          className={cn(
+                            "inline-flex items-center gap-1.5 rounded-lg border border-neutral-800 bg-neutral-900/60 px-3 py-1.5 text-xs font-medium text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800",
+                            focus
+                          )}
+                        >
+                          <X className="h-3.5 w-3.5" />
+                          Reject
+                        </button>
+                      </>
+                    )
                   ) : item.status === "APPROVED" ? (
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400 border border-emerald-500/20">
                       <Check className="h-3 w-3" /> Approved
@@ -288,6 +310,7 @@ export default function Approvals() {
                     </span>
                   )}
                 </div>
+
               </div>
             </div>
           ))

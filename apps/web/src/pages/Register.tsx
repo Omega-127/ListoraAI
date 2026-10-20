@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthShell, fieldClass, labelClass, primaryBtnClass } from "../components/AuthShell";
-import { login } from "../lib/api";
+import { register, type UserRole } from "../lib/api";
 import { focus, muted } from "../lib/styles";
+import { ShieldCheck, UserCheck, Eye } from "lucide-react";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [role, setRole] = useState<UserRole>("OPERATOR");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -21,8 +23,8 @@ export default function Register() {
       setError("Enter your name.");
       return;
     }
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters.");
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
       return;
     }
     if (password !== confirm) {
@@ -32,8 +34,12 @@ export default function Register() {
 
     setPending(true);
     try {
-      // Temporary: no register API yet — authenticate with the owner login endpoint.
-      await login({ email: email.trim(), password });
+      await register({
+        name: name.trim(),
+        email: email.trim(),
+        password,
+        role,
+      });
       navigate("/dashboard", { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not create account");
@@ -45,7 +51,7 @@ export default function Register() {
   return (
     <AuthShell
       title="Create your account"
-      subtitle="Start checking listings against the profile you approve."
+      subtitle="Select your organizational role to start collaborating."
       footer={
         <>
           Already have an account?{" "}
@@ -69,7 +75,7 @@ export default function Register() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             className={fieldClass}
-            placeholder="Alex Owner"
+            placeholder="Alex Rivers"
           />
         </div>
         <div>
@@ -85,9 +91,56 @@ export default function Register() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className={fieldClass}
-            placeholder="you@business.com"
+            placeholder="alex@business.com"
           />
         </div>
+
+        {/* Role Selector */}
+        <div>
+          <label className={labelClass}>Select Role</label>
+          <div className="grid grid-cols-3 gap-2 mt-1">
+            <button
+              type="button"
+              onClick={() => setRole("ADMIN")}
+              className={`flex flex-col items-center justify-center gap-1 rounded-lg border p-2 text-xs transition-colors ${
+                role === "ADMIN"
+                  ? "border-[var(--primary)] bg-[var(--primary)]/10 text-emerald-300"
+                  : "border-white/10 bg-white/5 text-neutral-400 hover:bg-white/10"
+              }`}
+            >
+              <ShieldCheck className="h-4 w-4" />
+              <span className="font-medium">Admin</span>
+              <span className="text-[10px] opacity-70">Full Access</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setRole("OPERATOR")}
+              className={`flex flex-col items-center justify-center gap-1 rounded-lg border p-2 text-xs transition-colors ${
+                role === "OPERATOR"
+                  ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
+                  : "border-white/10 bg-white/5 text-neutral-400 hover:bg-white/10"
+              }`}
+            >
+              <UserCheck className="h-4 w-4" />
+              <span className="font-medium">Operator</span>
+              <span className="text-[10px] opacity-70">Approve & Sync</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setRole("VIEWER")}
+              className={`flex flex-col items-center justify-center gap-1 rounded-lg border p-2 text-xs transition-colors ${
+                role === "VIEWER"
+                  ? "border-blue-500/50 bg-blue-500/10 text-blue-300"
+                  : "border-white/10 bg-white/5 text-neutral-400 hover:bg-white/10"
+              }`}
+            >
+              <Eye className="h-4 w-4" />
+              <span className="font-medium">Viewer</span>
+              <span className="text-[10px] opacity-70">Read-Only</span>
+            </button>
+          </div>
+        </div>
+
         <div>
           <label htmlFor="register-password" className={labelClass}>
             Password
@@ -98,11 +151,11 @@ export default function Register() {
             type="password"
             autoComplete="new-password"
             required
-            minLength={8}
+            minLength={6}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className={fieldClass}
-            placeholder="At least 8 characters"
+            placeholder="At least 6 characters"
           />
         </div>
         <div>
@@ -123,18 +176,19 @@ export default function Register() {
         </div>
 
         {error && (
-          <p role="alert" className="rounded-lg bg-white/10 px-3 py-2 text-sm text-[#a3a3a3]">
+          <p role="alert" className="rounded-lg bg-rose-500/10 border border-rose-500/20 px-3 py-2 text-sm text-rose-300">
             {error}
           </p>
         )}
 
         <button type="submit" disabled={pending} className={primaryBtnClass}>
-          {pending ? "Creating account…" : "Create account"}
+          {pending ? "Creating account…" : `Create ${role.toLowerCase()} account`}
         </button>
 
-        <p className={`text-xs leading-relaxed ${muted}`}>
-          Account creation API is coming soon. For the demo, use the owner credentials — this form signs you in with the
-          existing login endpoint.
+        <p className={`text-xs leading-relaxed text-center ${muted}`}>
+          Role permissions: <span className="text-emerald-400 font-medium">Admin</span> (manage profile & users),{" "}
+          <span className="text-amber-400 font-medium">Operator</span> (approvals & sync),{" "}
+          <span className="text-blue-400 font-medium">Viewer</span> (read-only audit & reports).
         </p>
       </form>
     </AuthShell>

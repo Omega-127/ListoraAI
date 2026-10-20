@@ -10,6 +10,8 @@ import Alerts from "./pages/Alerts";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Users from "./pages/Users";
+
 
 export default function App() {
   return (
@@ -25,8 +27,10 @@ export default function App() {
         <Route path="score" element={<Score />} />
         <Route path="audit" element={<Audit />} />
         <Route path="alerts" element={<Alerts />} />
+        <Route path="users" element={<Users />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
+

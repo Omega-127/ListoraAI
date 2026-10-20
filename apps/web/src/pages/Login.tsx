@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthShell, fieldClass, labelClass, primaryBtnClass } from "../components/AuthShell";
-import { login } from "../lib/api";
-import { focus } from "../lib/styles";
+import { login, type UserRole } from "../lib/api";
+import { focus, muted } from "../lib/styles";
+import { ShieldCheck, UserCheck, Eye } from "lucide-react";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -22,6 +23,19 @@ export default function Login() {
       setError(err instanceof Error ? err.message : "Invalid credentials");
     } finally {
       setPending(false);
+    }
+  }
+
+  function fillDemo(role: UserRole) {
+    if (role === "ADMIN") {
+      setEmail("admin@listora.ai");
+      setPassword("password123");
+    } else if (role === "OPERATOR") {
+      setEmail("operator@listora.ai");
+      setPassword("password123");
+    } else {
+      setEmail("viewer@listora.ai");
+      setPassword("password123");
     }
   }
 
@@ -72,8 +86,41 @@ export default function Login() {
           />
         </div>
 
+        {/* Demo Role Presets */}
+        <div className="rounded-lg border border-[var(--border)] bg-black/40 p-3">
+          <p className={`text-[11px] font-medium uppercase tracking-wider mb-2 ${muted}`}>
+            Quick Demo Role Login:
+          </p>
+          <div className="grid grid-cols-3 gap-1.5 text-xs">
+            <button
+              type="button"
+              onClick={() => fillDemo("ADMIN")}
+              className="flex items-center justify-center gap-1.5 rounded border border-white/10 bg-white/5 py-1.5 px-2 hover:bg-white/15 transition-colors"
+            >
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+              <span>Admin</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => fillDemo("OPERATOR")}
+              className="flex items-center justify-center gap-1.5 rounded border border-white/10 bg-white/5 py-1.5 px-2 hover:bg-white/15 transition-colors"
+            >
+              <UserCheck className="h-3.5 w-3.5 text-amber-400" />
+              <span>Operator</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => fillDemo("VIEWER")}
+              className="flex items-center justify-center gap-1.5 rounded border border-white/10 bg-white/5 py-1.5 px-2 hover:bg-white/15 transition-colors"
+            >
+              <Eye className="h-3.5 w-3.5 text-blue-400" />
+              <span>Viewer</span>
+            </button>
+          </div>
+        </div>
+
         {error && (
-          <p role="alert" className="rounded-lg bg-white/10 px-3 py-2 text-sm text-[#a3a3a3]">
+          <p role="alert" className="rounded-lg bg-rose-500/10 border border-rose-500/20 px-3 py-2 text-sm text-rose-300">
             {error}
           </p>
         )}

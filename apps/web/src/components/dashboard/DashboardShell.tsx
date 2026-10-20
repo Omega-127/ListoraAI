@@ -1,5 +1,5 @@
-import type { CSSProperties } from "react";
-import { NavLink, Outlet, Link } from "react-router-dom";
+import { useState, useEffect, type CSSProperties } from "react";
+import { NavLink, Outlet, Link, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   UserRound,
@@ -8,14 +8,19 @@ import {
   Gauge,
   ScrollText,
   BellRing,
+  Users as UsersIcon,
   PanelLeftClose,
   PanelLeftOpen,
   LogOut,
+  ShieldCheck,
+  UserCheck,
+  Eye,
 } from "lucide-react";
 import * as Sidebar from "@animate-ui/react/primitives/sidebar";
 import { Bell } from "../animate-ui/icons/bell";
 import { cn } from "../../lib/cn";
 import { focus, muted } from "../../lib/styles";
+import { getStoredUser, logout, type UserRole, type UserProfile } from "../../lib/api";
 
 const NAV: {
   to: string;
@@ -30,7 +35,33 @@ const NAV: {
   { to: "/dashboard/score", label: "Score", icon: Gauge },
   { to: "/dashboard/audit", label: "Audit", icon: ScrollText },
   { to: "/dashboard/alerts", label: "Alerts", icon: BellRing },
+  { to: "/dashboard/users", label: "Users & Roles", icon: UsersIcon },
 ];
+
+function RoleBadge({ role }: { role: UserRole }) {
+  if (role === "ADMIN") {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-400">
+        <ShieldCheck className="h-3 w-3" />
+        Admin
+      </span>
+    );
+  }
+  if (role === "OPERATOR") {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-400">
+        <UserCheck className="h-3 w-3" />
+        Operator
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full border border-blue-500/20 bg-blue-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-blue-400">
+      <Eye className="h-3 w-3" />
+      Viewer
+    </span>
+  );
+}
 
 function NavItems({ onNavigate }: { onNavigate?: () => void }) {
   return (
@@ -60,12 +91,27 @@ function NavItems({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
+  const navigate = useNavigate();
+  const [user, setUser] = useState<UserProfile | null>(getStoredUser());
+
+  useEffect(() => {
+    setUser(getStoredUser());
+  }, []);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
+
+  const activeRole: UserRole = user?.role || "ADMIN";
+
   return (
     <>
-      <div className="flex h-14 items-center gap-2 border-b border-[var(--border)] px-4">
+      <div className="flex h-14 items-center justify-between border-b border-[var(--border)] px-4">
         <Link to="/" className={cn("text-base font-semibold tracking-tight", focus)}>
           ListoraAI
         </Link>
+        <RoleBadge role={activeRole} />
       </div>
       <div className="flex-1 overflow-y-auto py-3">
         <p className={cn("mb-2 px-5 text-[11px] font-medium uppercase tracking-wider", muted)}>
@@ -73,20 +119,29 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
         </p>
         <NavItems onNavigate={onNavigate} />
       </div>
-      <div className="border-t border-[var(--border)] p-2">
-        <Link
-          to="/login"
-          data-sidebar="menu-button"
+
+      {/* User profile & Logout */}
+      <div className="border-t border-[var(--border)] p-3 space-y-2">
+        <div className="flex items-center justify-between px-2">
+          <div className="min-w-0">
+            <p className="text-xs font-medium text-neutral-200 truncate">{user?.name || "Active Session"}</p>
+            <p className={`text-[11px] truncate ${muted}`}>{user?.email || "admin@listora.ai"}</p>
+          </div>
+          <RoleBadge role={activeRole} />
+        </div>
+        <button
+          type="button"
+          onClick={handleLogout}
           className={cn(
-            "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium",
+            "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium",
             muted,
-            "hover:text-[var(--foreground)]",
+            "hover:text-[var(--foreground)] hover:bg-white/5",
             focus,
           )}
         >
           <LogOut className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={1.75} />
           <span>Log out</span>
-        </Link>
+        </button>
       </div>
     </>
   );
@@ -126,6 +181,8 @@ function DesktopSidebar() {
 
 function ShellChrome() {
   const { toggleSidebar, isMobile, openMobile } = Sidebar.useSidebar();
+  const [user] = useState<UserProfile | null>(getStoredUser());
+  const activeRole: UserRole = user?.role || "ADMIN";
 
   return (
     <>
@@ -146,7 +203,12 @@ function ShellChrome() {
               closed={<PanelLeftOpen className="h-4 w-4" strokeWidth={1.75} />}
             />
           </button>
-          <div className="ml-auto flex items-center gap-2">
+
+          <div className="ml-auto flex items-center gap-3">
+            <Link to="/dashboard/users" className="hover:opacity-80 transition-opacity">
+              <RoleBadge role={activeRole} />
+            </Link>
+
             <NavLink
               to="/dashboard/alerts"
               className={cn(

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { verifyProposal, verifyAllUpdatedProposals, getVerifications } from '../services/verify.service';
 import { z } from 'zod';
 import { validate } from '../middleware/validate';
+import { requireRole } from '../middleware/auth';
 
 const router = Router();
 
@@ -9,7 +10,7 @@ const VerifySchema = z.object({
   proposalId: z.string().uuid().optional(),
 });
 
-router.post('/', validate({ body: VerifySchema }), async (req, res, next) => {
+router.post('/', requireRole('ADMIN', 'OPERATOR'), validate({ body: VerifySchema }), async (req, res, next) => {
   try {
     const { proposalId } = req.body as z.infer<typeof VerifySchema>;
 
@@ -24,6 +25,7 @@ router.post('/', validate({ body: VerifySchema }), async (req, res, next) => {
     next(err);
   }
 });
+
 
 router.get('/', async (_req, res, next) => {
   try {

@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { Building2, MapPin, Phone, Clock, Calendar, Check, Save, RotateCcw } from "lucide-react";
+import { Building2, MapPin, Phone, Clock, Calendar, Check, Save, RotateCcw, Lock, ShieldAlert } from "lucide-react";
 import { cn } from "../lib/cn";
 import { focus, muted } from "../lib/styles";
+import { getStoredUser } from "../lib/api";
+
 
 interface BusinessProfileData {
   name: string;
@@ -89,7 +91,11 @@ export default function Profile() {
     setTimeout(() => setSaved(false), 3000);
   };
 
+  const user = getStoredUser();
+  const isAdmin = user?.role === "ADMIN";
+
   const handleReset = () => {
+    if (!isAdmin) return;
     setProfile(INITIAL_PROFILE);
   };
 
@@ -103,31 +109,49 @@ export default function Profile() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={handleReset}
-            className={cn(
-              "inline-flex items-center gap-1.5 rounded-lg border border-[var(--border)] px-3 py-2 text-sm font-medium hover:bg-white/5",
-              focus
-            )}
-          >
-            <RotateCcw className="h-4 w-4" />
-            Reset
-          </button>
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={isSubmitting}
-            className={cn(
-              "inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-[var(--primary-foreground)] hover:brightness-110 disabled:opacity-60",
-              focus
-            )}
-          >
-            {saved ? <Check className="h-4 w-4 text-emerald-600" /> : <Save className="h-4 w-4" />}
-            {isSubmitting ? "Saving…" : saved ? "Changes Saved" : "Save Canonical Profile"}
-          </button>
+          {isAdmin ? (
+            <>
+              <button
+                type="button"
+                onClick={handleReset}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-lg border border-[var(--border)] px-3 py-2 text-sm font-medium hover:bg-white/5",
+                  focus
+                )}
+              >
+                <RotateCcw className="h-4 w-4" />
+                Reset
+              </button>
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={isSubmitting}
+                className={cn(
+                  "inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-[var(--primary-foreground)] hover:brightness-110 disabled:opacity-60",
+                  focus
+                )}
+              >
+                {saved ? <Check className="h-4 w-4 text-emerald-600" /> : <Save className="h-4 w-4" />}
+                {isSubmitting ? "Saving…" : saved ? "Changes Saved" : "Save Canonical Profile"}
+              </button>
+            </>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-neutral-400">
+              <Lock className="h-3.5 w-3.5" /> Read-Only Mode
+            </span>
+          )}
         </div>
       </div>
+
+      {!isAdmin && (
+        <div className="flex items-center gap-2.5 rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-xs text-amber-300">
+          <ShieldAlert className="h-4 w-4 shrink-0 text-amber-400" />
+          <span>
+            <strong>Admin Access Required:</strong> You are signed in as an <strong>{user?.role || "Operator"}</strong>. Modifying canonical business information (NAP, regular operating hours, or holiday schedules) is restricted to Administrators.
+          </span>
+        </div>
+      )}
+
 
       <form onSubmit={handleSave} className="flex flex-col gap-6">
         {/* Core NAP Details */}
