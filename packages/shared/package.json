@@ -4,7 +4,6 @@
   "private": true,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-<<<<<<< HEAD
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -19,20 +18,9 @@
   },
   "devDependencies": {
     "rimraf": "^5.0.5",
-    "typescript": "^5.4.2"
-  },
-  "dependencies": {
-    "zod": "^3.22.4"
-=======
-  "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch"
-  },
-  "devDependencies": {
     "typescript": "^5.4.5"
   },
   "dependencies": {
     "zod": "^3.23.8"
->>>>>>> 6d768f43304f1e607cd016ddcba2b8a70ef97568
   }
 }
