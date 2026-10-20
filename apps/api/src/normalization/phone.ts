@@ -12,7 +12,7 @@ import { parsePhoneNumberFromString } from 'libphonenumber-js';
 export function normalizePhone(raw: string, defaultCountry: 'US' | 'GB' = 'US'): string | null {
   if (!raw || typeof raw !== 'string') return null;
   const parsed = parsePhoneNumberFromString(raw.trim(), defaultCountry);
-  if (!parsed || !parsed.isValid()) return null;
+  if (!parsed || !parsed.isPossible()) return null;
   return parsed.format('E.164');
 }
 
