@@ -1,11 +1,10 @@
-<<<<<<< HEAD
 import express from 'express';
 import cors from 'cors';
-import { Store } from '../../shared/store.js';
-import { buildListingRouter } from '../../shared/routes.js';
-import { mockMapsAPermissions } from './permissions.js';
-import seedData from './data.json' assert { type: 'json' };
-import { ListingValues } from '../../shared/types.js';
+import { Store } from '../../shared/store';
+import { buildListingRouter } from '../../shared/routes';
+import { mockMapsAPermissions } from './permissions';
+import seedData from './data.json';
+import { ListingValues } from '../../shared/types';
 
 /**
  * mockMapsA — a fully read-write listing platform.
@@ -38,20 +37,3 @@ export function createMockMapsAApp(): express.Express {
 
   return app;
 }
-=======
-/**
- * mock-maps-a — Full read-write platform.
- * All PATCH requests are allowed.
- */
-import { createStore } from '../../shared/store';
-import { buildRoutes } from '../../shared/routes';
-import seedData from './data.json';
-
-const store = createStore(seedData as Record<string, Record<string, unknown>>);
-
-export const mockMapsARouter = buildRoutes(
-  store,
-  () => true, // always permitted
-  'Write not permitted', // never returned
-);
->>>>>>> 6d768f43304f1e607cd016ddcba2b8a70ef97568

@@ -13,10 +13,12 @@
     "test:coverage": "vitest run --coverage",
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
+    "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
     "db:generate": "prisma generate",
-    "job:recheck": "tsx src/jobs/scheduledRecheck.ts"
+    "job:recheck": "tsx src/jobs/scheduledRecheck.ts",
+    "job:recheck:prod": "node dist/jobs/scheduledRecheck.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.3",
@@ -28,6 +30,7 @@
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "libphonenumber-js": "^1.11.4",
+    "prisma": "^5.16.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -39,7 +42,6 @@
     "@types/node": "^20.14.0",
     "@types/supertest": "^6.0.2",
     "@vitest/coverage-v8": "^1.6.0",
-    "prisma": "^5.16.0",
     "supertest": "^7.0.0",
     "tsx": "^4.15.6",
     "typescript": "^5.4.5",

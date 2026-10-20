@@ -1,11 +1,10 @@
-<<<<<<< HEAD
 import express from 'express';
 import cors from 'cors';
-import { Store } from '../../shared/store.js';
-import { buildListingRouter } from '../../shared/routes.js';
-import { mockMapsBPermissions } from './permissions.js';
-import seedData from './data.json' assert { type: 'json' };
-import { ListingValues } from '../../shared/types.js';
+import { Store } from '../../shared/store';
+import { buildListingRouter } from '../../shared/routes';
+import { mockMapsBPermissions } from './permissions';
+import seedData from './data.json';
+import { ListingValues } from '../../shared/types';
 
 /**
  * mockMapsB — a read-only listing platform.
@@ -38,20 +37,3 @@ export function createMockMapsBApp(): express.Express {
 
   return app;
 }
-=======
-/**
- * mock-maps-b — Read-only platform.
- * All PATCH requests are blocked with 403.
- */
-import { createStore } from '../../shared/store';
-import { buildRoutes } from '../../shared/routes';
-import seedData from './data.json';
-
-const store = createStore(seedData as Record<string, Record<string, unknown>>);
-
-export const mockMapsBRouter = buildRoutes(
-  store,
-  () => false, // never permitted
-  'This platform is read-only. Updates are not accepted.',
-);
->>>>>>> 6d768f43304f1e607cd016ddcba2b8a70ef97568

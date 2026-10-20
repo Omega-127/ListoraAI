@@ -1,7 +1,6 @@
-<<<<<<< HEAD
 import { Router, Request, Response } from 'express';
-import { Store } from './store.js';
-import { PlatformPermissions, PatchResponse } from './types.js';
+import { Store } from './store';
+import { PlatformPermissions, PatchResponse } from './types';
 
 /**
  * Builds a shared Express router that implements:
@@ -79,48 +78,6 @@ export function buildListingRouter(store: Store, permissions: PlatformPermission
       listing: { id: req.params.id, ...updated } as typeof updated,
     };
     res.json(response);
-=======
-import { Router } from 'express';
-import type { PlatformStore } from './store';
-
-/**
- * Builds GET /listing/:id and PATCH /listing/:id handlers.
- *
- * @param store       - In-memory data store for this platform.
- * @param canWrite    - Function returning true when the write is permitted.
- * @param blockedMsg  - Message to include in the 403 body when writes are denied.
- */
-export function buildRoutes(
-  store: PlatformStore,
-  canWrite: (id: string, fields: Record<string, unknown>) => boolean,
-  blockedMsg: string,
-): Router {
-  const router = Router();
-
-  router.get('/listing/:id', (req, res) => {
-    const listing = store.get(req.params.id);
-    if (!listing) {
-      return res.status(404).json({ error: 'Listing not found' });
-    }
-    return res.json(listing);
-  });
-
-  router.patch('/listing/:id', (req, res) => {
-    const { id } = req.params;
-    const fields = req.body as Record<string, unknown>;
-
-    const existing = store.get(id);
-    if (!existing) {
-      return res.status(404).json({ error: 'Listing not found' });
-    }
-
-    if (!canWrite(id, fields)) {
-      return res.status(403).json({ error: blockedMsg });
-    }
-
-    const updated = store.patch(id, fields);
-    return res.json(updated);
->>>>>>> 6d768f43304f1e607cd016ddcba2b8a70ef97568
   });
 
   return router;

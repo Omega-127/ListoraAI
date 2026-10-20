@@ -50,7 +50,14 @@ export const PLATFORM_LISTING_IDS: Record<string, string> = {
 };
 
 function getBaseUrl(): string {
-  return mockPlatformUrls[0]; // single base URL in the MVP
+  const raw = (mockPlatformUrls[0] || 'http://localhost:4100').trim().replace(/\/+$/, '');
+  if (!raw.startsWith('http://') && !raw.startsWith('https://')) {
+    // If it's localhost or an IP, default to http, otherwise https
+    return raw.includes('localhost') || raw.startsWith('127.0.0.1')
+      ? `http://${raw}`
+      : `https://${raw}`;
+  }
+  return raw;
 }
 
 async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs = 8000): Promise<Response> {

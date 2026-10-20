@@ -1,39 +1,10 @@
 {
-<<<<<<< HEAD
-  "listing-001": {
-    "name": "Bella Cucina Ristorante",
-    "address": "742 Evergreen Terrace, Springfield, IL 62701",
-    "phone": "(555) 010-2234",
-    "website": "https://bellacucina.example.com",
-    "regularHours": {
-      "monday": { "open": true, "openTime": "11:00", "closeTime": "22:00" },
-      "tuesday": { "open": true, "openTime": "11:00", "closeTime": "22:00" },
-      "wednesday": { "open": true, "openTime": "11:00", "closeTime": "22:00" },
-      "thursday": { "open": true, "openTime": "11:00", "closeTime": "22:00" },
-      "friday": { "open": true, "openTime": "11:00", "closeTime": "23:00" },
-      "saturday": { "open": true, "openTime": "10:00", "closeTime": "23:00" },
-      "sunday": { "open": true, "openTime": "10:00", "closeTime": "21:00" }
-    },
-    "holidayHours": [
-      {
-        "date": "2026-12-25",
-        "label": "Christmas Day",
-        "closed": true
-      },
-      {
-        "date": "2026-01-01",
-        "label": "New Year's Day",
-        "closed": true
-      }
-    ],
-    "description": "Authentic Italian cuisine in the heart of Springfield.",
-    "categories": ["Restaurant", "Italian", "Dine-in"]
-=======
   "listing_003": {
     "id": "listing_003",
     "name": "Brew and Bloom Cafe",
     "address": "42 Maple Street, Springfield, Illinois",
     "phone": "555-010-2234",
+    "website": "https://brewandbloom.example.com",
     "regularHours": {
       "monday": "7am-6pm",
       "tuesday": "7am-6pm",
@@ -46,7 +17,30 @@
     "holidayHours": {
       "2026-12-25": "closed",
       "2026-11-28": "closed"
-    }
->>>>>>> 6d768f43304f1e607cd016ddcba2b8a70ef97568
+    },
+    "description": "Artisan coffee and pastries in Springfield.",
+    "categories": ["Café", "Coffee"]
+  },
+  "listing-001": {
+    "id": "listing-001",
+    "name": "Brew and Bloom Cafe",
+    "address": "42 Maple Street, Springfield, Illinois",
+    "phone": "555-010-2234",
+    "website": "https://brewandbloom.example.com",
+    "regularHours": {
+      "monday": "7am-6pm",
+      "tuesday": "7am-6pm",
+      "wednesday": "7am-6pm",
+      "thursday": "7am-6pm",
+      "friday": "7am-8pm",
+      "saturday": "8am-8pm",
+      "sunday": "9am-4pm"
+    },
+    "holidayHours": {
+      "2026-12-25": "closed",
+      "2026-11-28": "closed"
+    },
+    "description": "Artisan coffee and pastries in Springfield.",
+    "categories": ["Café", "Coffee"]
   }
 }
