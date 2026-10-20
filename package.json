@@ -1,0 +1,28 @@
+{
+  "name": "listora-ai",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/api",
+    "apps/mock-platforms",
+    "packages/shared"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,mock \"npm run dev --workspace apps/api\" \"npm run dev --workspace apps/mock-platforms\"",
+    "build": "npm run build --workspace packages/shared && npm run build --workspace apps/api && npm run build --workspace apps/mock-platforms",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspace apps/api",
+    "db:migrate": "npm run db:migrate --workspace apps/api",
+    "db:seed": "npm run db:seed --workspace apps/api"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "allowScripts": {
+    "@prisma/client@5.22.0": true,
+    "prisma@5.22.0": true,
+    "@prisma/engines@5.22.0": true,
+    "esbuild@0.28.2": true,
+    "esbuild@0.21.5": true
+  }
+}
