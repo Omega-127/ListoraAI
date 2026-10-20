@@ -92,3 +92,15 @@ export const BusinessProfileUpdateSchema = z.object({
   regularHours: RegularHoursSchema.optional(),
   holidayHours: HolidayHoursSchema.optional(),
 });
+
+// ---- Multi-user Roles & Auth ----
+export type { UserRole } from '../constants/statuses';
+
+export interface UserSummary {
+  id: string;
+  email: string;
+  name?: string | null;
+  role: import('../constants/statuses').UserRole;
+  createdAt: string;
+}
+

@@ -1,7 +1,10 @@
-/**
- * Environment variable validation using Zod.
- * All required variables are checked at startup; the process exits if any are missing.
- */
+import path from 'path';
+import dotenv from 'dotenv';
+
+// Load apps/api/.env or root .env
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+dotenv.config();
+
 import { z } from 'zod';
 
 const EnvSchema = z.object({

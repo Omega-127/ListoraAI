@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
   "name": "@bizlisting/mock-platforms",
+=======
+  "name": "mock-platforms",
+>>>>>>> d180802c4c2ddc23ddf2f8123f75e6f21fc6ee74
   "version": "1.0.0",
   "private": true,
   "main": "dist/server.js",

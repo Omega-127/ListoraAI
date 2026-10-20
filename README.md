@@ -345,12 +345,13 @@ The seeded data is set up so each status appears at least once: verified (on `mo
 - [x] AI listing conflict investigator
 - [x] Holiday and temporary-hours agent
 - [x] What-if correction simulator
-- [ ] Consistency score with full breakdown
-- [ ] Change history and audit log
-- [ ] Smart alerts and reminders
-- [ ] Multi-user roles (viewer, operator, admin)
+- [x] Consistency score with full breakdown
+- [x] Change history and audit log
+- [x] Smart alerts and reminders
+- [x] Multi-user roles (viewer, operator, admin)
 - [ ] Real platform integrations, where permitted and authorized
 - [ ] Live updates over WebSockets
+
 
 ---
 

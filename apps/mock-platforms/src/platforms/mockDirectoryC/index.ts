@@ -1,33 +1,20 @@
 import express from 'express';
+<<<<<<< HEAD
 import cors from 'cors';
 import { Store } from '../../shared/store';
 import { buildListingRouter } from '../../shared/routes';
 import { mockDirectoryCPermissions } from './permissions';
 import seedData from './data.json';
 import { ListingValues } from '../../shared/types';
+=======
+import { createStore } from '../../shared/store.js';
+import { buildRoutes } from '../../shared/routes.js';
+import seedData from './data.json' with { type: 'json' };
+>>>>>>> d180802c4c2ddc23ddf2f8123f75e6f21fc6ee74
 
-/**
- * mockDirectoryC — a listing directory that blocks updates on holiday dates.
- *
- * Demo purpose: shows that the system correctly records "blocked" outcomes
- * due to a schedule-based platform restriction, and that the holiday agent
- * can detect and explain why updates are unavailable on specific dates.
- *
- * Endpoints:
- *   GET  /listing/:id  → always works
- *   PATCH /listing/:id → works on normal dates; 403 on blockedDates
- *
- * To trigger the holiday block in a live demo:
- *   Add today's date string (YYYY-MM-DD) to mockDirectoryCPermissions.blockedDates
- *   in permissions.ts and restart.
- */
-export function createMockDirectoryCApp(): express.Express {
-  const app = express();
-  app.use(cors());
-  app.use(express.json());
 
-  const store = new Store(seedData as Record<string, ListingValues>);
 
+<<<<<<< HEAD
   app.use('/', buildListingRouter(store, mockDirectoryCPermissions));
 
   app.get('/health', (_req, res) => {
@@ -42,10 +29,43 @@ export function createMockDirectoryCApp(): express.Express {
     });
   });
 
+=======
+const HOLIDAY_LOCK_DATES = ['2026-12-25', '2027-01-01', '2026-11-28'];
+
+const store = createStore(seedData as Record<string, Record<string, unknown>>);
+
+function isHolidayBlocked(): boolean {
+  const today = new Date().toISOString().slice(0, 10);
+  return HOLIDAY_LOCK_DATES.includes(today);
+}
+
+export const mockDirectoryCRouter = buildRoutes(
+  store,
+  () => !isHolidayBlocked(),
+  'Updates are blocked on holiday dates (holiday schedule locked).',
+);
+
+export function createMockDirectoryCApp(): express.Express {
+  const app = express();
+  app.use(express.json());
+  app.use('/', mockDirectoryCRouter);
+  app.get('/health', (_req, res) => {
+    res.json({
+      platform: 'mockDirectoryC',
+      status: 'ok',
+      mode: isHolidayBlocked() ? 'holiday-blocked' : 'writable',
+      blockedDates: HOLIDAY_LOCK_DATES,
+      listings: store.ids(),
+    });
+  });
+>>>>>>> d180802c4c2ddc23ddf2f8123f75e6f21fc6ee74
   app.post('/reset', (_req, res) => {
     store.reset();
     res.json({ message: 'mockDirectoryC data reset to seed state.' });
   });
+<<<<<<< HEAD
 
+=======
+>>>>>>> d180802c4c2ddc23ddf2f8123f75e6f21fc6ee74
   return app;
 }

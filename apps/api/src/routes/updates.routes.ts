@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { applyAllApprovedProposals, applyProposal, getUpdateResults } from '../services/update.service';
 import { z } from 'zod';
 import { validate } from '../middleware/validate';
+import { requireRole } from '../middleware/auth';
 
 const router = Router();
 
@@ -10,7 +11,7 @@ const ApplySchema = z.object({
 });
 
 /** POST /api/v1/updates — apply approved proposals */
-router.post('/', validate({ body: ApplySchema }), async (req, res, next) => {
+router.post('/', requireRole('ADMIN', 'OPERATOR'), validate({ body: ApplySchema }), async (req, res, next) => {
   try {
     const { proposalId } = req.body as z.infer<typeof ApplySchema>;
 
@@ -25,6 +26,7 @@ router.post('/', validate({ body: ApplySchema }), async (req, res, next) => {
     next(err);
   }
 });
+
 
 /** GET /api/v1/updates — list update results */
 router.get('/', async (_req, res, next) => {
