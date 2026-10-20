@@ -1,0 +1,33 @@
+name: Deploy Check
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-check:
+    name: Verify Production Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build shared package
+        run: npm run build --workspace=packages/shared
+
+      - name: Build mock-platforms (production)
+        run: npm run build --workspace=apps/mock-platforms
+
+      - name: Confirm build output exists
+        run: |
+          test -f apps/mock-platforms/dist/server.js && echo "✓ mock-platforms build OK"
+          test -d packages/shared/dist && echo "✓ shared build OK"
