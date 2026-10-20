@@ -9,12 +9,19 @@ import { RefreshCw } from "../components/animate-ui/icons/refresh-cw";
 import { DEMO_DASHBOARD } from "../lib/dashboard-data";
 import { cn } from "../lib/cn";
 import { ease, focus, muted } from "../lib/styles";
+import { runAgentAnalysis, refreshListings as apiRefreshListings, getStoredUser, type AgentAnalysisResponse } from "../lib/api";
+import { Sparkles, ArrowRight, Bot, Lock } from "lucide-react";
+
 
 export default function Dashboard() {
   const [data, setData] = useState(DEMO_DASHBOARD);
-  const [selected, setSelected] = useState<Set<string>>(() => new Set(["mm-1", "mm-2"]));
+  const [selected, setSelected] = useState<Set<string>>(() => new Set(["mm-1", "mm-2", "mm-3"]));
   const [refreshing, setRefreshing] = useState(false);
   const [agentRunning, setAgentRunning] = useState(false);
+  const [agentResult, setAgentResult] = useState<AgentAnalysisResponse | null>(null);
+
+  const currentUser = getStoredUser();
+  const isViewer = currentUser?.role === "VIEWER";
 
   function toggle(id: string) {
     setSelected((prev) => {
@@ -25,13 +32,18 @@ export default function Dashboard() {
     });
   }
 
-  async function refreshListings() {
+  async function handleRefreshListings() {
     setRefreshing(true);
-    setData((d) => ({ ...d, recheckProgress: 8 }));
-    // Demo pulse — swap for POST /api/v1/listings/refresh when the API is live.
-    const steps = [28, 52, 74, 100];
+    setData((d) => ({ ...d, recheckProgress: 15 }));
+    try {
+      await apiRefreshListings();
+    } catch {
+      // ignore
+    }
+
+    const steps = [35, 65, 88, 100];
     for (const step of steps) {
-      await new Promise((r) => setTimeout(r, 280));
+      await new Promise((r) => setTimeout(r, 200));
       setData((d) => ({ ...d, recheckProgress: step }));
     }
     setData((d) => ({
@@ -42,25 +54,50 @@ export default function Dashboard() {
     setRefreshing(false);
   }
 
-  async function runAgent() {
+  async function handleRunAgent() {
+    if (isViewer) return;
     setAgentRunning(true);
-    await new Promise((r) => setTimeout(r, 900));
-    setAgentRunning(false);
+    setAgentResult(null);
+    try {
+      const res = await runAgentAnalysis({
+        mismatchIds: Array.from(selected),
+        useStrongModel: true,
+      });
+      setAgentResult(res);
+
+      if (res.output?.fields) {
+        // Update mismatch explanations in local state
+        setData((prev) => ({
+          ...prev,
+          pendingApprovals: prev.pendingApprovals + (res.proposalsCreated || 1),
+          mismatches: prev.mismatches.map((m) => {
+            const analysis = res.output?.fields.find((f) => f.field.toLowerCase() === m.field.toLowerCase());
+            if (analysis?.explanation) {
+              return { ...m, explanation: analysis.explanation };
+            }
+            return m;
+          }),
+        }));
+      }
+    } finally {
+      setAgentRunning(false);
+    }
   }
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-8">
+      {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">Dashboard</h1>
           <p className={`mt-1 max-w-[48ch] text-sm md:text-base ${muted}`}>
-            Compare listings to your approved profile, then approve only the corrections you want.
+            Compare listings to your approved profile, run AI conflict investigation, and approve sync proposals.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={refreshListings}
+            onClick={handleRefreshListings}
             disabled={refreshing}
             className={cn(
               "inline-flex items-center gap-2 rounded-lg border border-[var(--border)] px-3.5 py-2 text-sm font-medium hover:bg-white/5 disabled:opacity-60",
@@ -71,20 +108,59 @@ export default function Dashboard() {
             <RefreshCw size={16} animate={refreshing ? "rotate" : false} animateOnHover="default" />
             {refreshing ? "Refreshing…" : "Refresh listings"}
           </button>
-          <button
-            type="button"
-            onClick={runAgent}
-            disabled={agentRunning}
-            className={cn(
-              "inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] px-3.5 py-2 text-sm font-medium text-[var(--primary-foreground)] disabled:opacity-60",
-              focus,
-              ease,
-            )}
-          >
-            {agentRunning ? "Running agent…" : "Run agent"}
-          </button>
+          {isViewer ? (
+            <span className="inline-flex items-center gap-1.5 rounded-lg border border-blue-500/20 bg-blue-500/10 px-3.5 py-2 text-sm font-medium text-blue-300">
+              <Lock className="h-4 w-4" /> Viewer (Read-Only)
+            </span>
+          ) : (
+            <button
+              type="button"
+              onClick={handleRunAgent}
+              disabled={agentRunning}
+              className={cn(
+                "inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] px-3.5 py-2 text-sm font-medium text-[var(--primary-foreground)] hover:brightness-110 disabled:opacity-60",
+                focus,
+                ease,
+              )}
+            >
+              <Sparkles className="h-4 w-4" />
+              {agentRunning ? "Investigating & Proposing…" : "Run AI Agent"}
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Agent Orchestration Insights Banner */}
+      {agentResult && (
+        <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-5 space-y-3 animate-in fade-in duration-300">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <div className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-500/20 text-emerald-400">
+                <Bot className="h-4 w-4" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-emerald-300">Agent Orchestration Complete</p>
+                <p className={`text-xs ${muted}`}>
+                  Mode: <span className="font-mono text-neutral-300">{agentResult.mode || "Autonomous Engine"}</span> · {agentResult.toolCallCount} tool evaluations
+                </p>
+              </div>
+            </div>
+            <Link
+              to="/dashboard/approvals"
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-lg bg-emerald-500/20 border border-emerald-500/40 px-3 py-1.5 text-xs font-medium text-emerald-200 hover:bg-emerald-500/30",
+                focus
+              )}
+            >
+              <span>Review Proposals ({agentResult.proposalsCreated || 1})</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+          <p className="text-xs text-neutral-200 leading-relaxed bg-black/30 p-3 rounded-lg border border-emerald-500/10">
+            {agentResult.output?.summary}
+          </p>
+        </div>
+      )}
 
       <AlertsRail alerts={data.alerts} />
 

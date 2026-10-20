@@ -19,7 +19,7 @@ export const applyUpdateToolDefinition = {
   },
 };
 
-const InputSchema = z.object({ proposalId: z.string().uuid() });
+const InputSchema = z.object({ proposalId: z.string().min(1) });
 
 export async function executeApplyUpdate(input: unknown): Promise<unknown> {
   const { proposalId } = InputSchema.parse(input);
