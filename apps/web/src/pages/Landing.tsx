@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { focus } from "../lib/styles";
+import { Sparkles, ShieldCheck, CheckCircle2, ArrowRight, Database, RefreshCw, Bot, Lock } from "lucide-react";
 
 
 type Outcome = "verified" | "blocked";
@@ -423,24 +424,261 @@ function Features() {
   return scene ? <Scene /> : <FlatGrid />;
 }
 
+const STEPS = [
+  {
+    step: "01",
+    title: "Approved Business Profile",
+    subtitle: "Your canonical ground truth",
+    desc: "Define your verified business name, postal address, E.164 phone number, standard opening hours, and holiday schedules. Every cross-directory comparison anchors strictly to this approved baseline.",
+    icon: Database,
+    badge: "Source of Truth",
+    color: "border-blue-500/30 text-blue-400 bg-blue-500/10",
+  },
+  {
+    step: "02",
+    title: "Continuous Crawl & Smart Normalization",
+    subtitle: "Filters out formatting noise",
+    desc: "Platform connectors fetch live listing snapshots across Google Maps, Apple Maps, Yelp, and regional directories. Built-in phone, text, and hours normalizers eliminate false alarms (like '(555) 010-2234' vs '+15550102234').",
+    icon: RefreshCw,
+    badge: "Noise Reduction",
+    color: "border-cyan-500/30 text-cyan-400 bg-cyan-500/10",
+  },
+  {
+    step: "03",
+    title: "AI Conflict Investigation",
+    subtitle: "Explains customer & SEO impact",
+    desc: "Powered by Claude 3.5 & autonomous heuristic engines, ListoraAI evaluates discrepancies, explains why they hurt customer visits or map rankings, and formulates structured diff proposals. Ambiguous conflicts are never guessed.",
+    icon: Bot,
+    badge: "Guardrail Rule 2",
+    color: "border-purple-500/30 text-purple-400 bg-purple-500/10",
+  },
+  {
+    step: "04",
+    title: "Owner Sign-Off & Closed-Loop Verification",
+    subtitle: "Zero unapproved writes",
+    desc: "Nothing touches an external platform without your sign-off. Once approved, changes dispatch to write-enabled directories. The agent then re-reads the live page to verify the update took effect.",
+    icon: ShieldCheck,
+    badge: "Closed-Loop Verify",
+    color: "border-emerald-500/30 text-emerald-400 bg-emerald-500/10",
+  },
+];
+
+function HowItWorks() {
+  return (
+    <section id="how-it-works" className="scroll-mt-16 border-t border-[var(--border)] px-6 py-24 md:px-[8vw]">
+      <div className="mx-auto max-w-5xl">
+        <div className="flex flex-col items-center text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] bg-white/5 px-3 py-1 text-xs font-medium uppercase tracking-wider text-[var(--muted-foreground)]">
+            <Sparkles className="h-3.5 w-3.5 text-[var(--primary)]" />
+            The Closed-Loop Orchestration
+          </span>
+          <h2 className="mt-4 text-3xl font-semibold tracking-tight md:text-5xl">
+            How ListoraAI Works
+          </h2>
+          <p className="mt-3 max-w-[54ch] text-base text-[var(--muted-foreground)] md:text-lg">
+            From discovering outdated directories to certified, verified listings in 4 guarded steps.
+          </p>
+        </div>
+
+        <div className="mt-16 grid gap-6 md:grid-cols-2">
+          {STEPS.map((s) => {
+            const Icon = s.icon;
+            return (
+              <div
+                key={s.step}
+                className="group relative flex flex-col justify-between rounded-2xl border border-[var(--border)] bg-[#0d0d0d] p-6 transition-all duration-300 hover:border-white/20 hover:bg-[#121212]"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono text-2xl font-bold tracking-tight text-white/40 group-hover:text-white/80 transition-colors">
+                      {s.step}
+                    </span>
+                    <span
+                      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${s.color}`}
+                    >
+                      {s.badge}
+                    </span>
+                  </div>
+
+                  <div className="mt-6 flex items-center gap-3">
+                    <div className="grid h-10 w-10 place-items-center rounded-xl bg-white/5 border border-white/10 text-white">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-white tracking-tight">{s.title}</h3>
+                      <p className="text-xs text-[var(--muted-foreground)]">{s.subtitle}</p>
+                    </div>
+                  </div>
+
+                  <p className="mt-4 text-sm leading-relaxed text-[var(--muted-foreground)]">
+                    {s.desc}
+                  </p>
+                </div>
+
+                <div className="mt-6 flex items-center gap-2 border-t border-[var(--border)] pt-4 text-xs font-medium text-white/70">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                  <span>Enforced by built-in security guardrails</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Guardrail callout banner */}
+        <div className="mt-8 rounded-2xl border border-white/10 bg-gradient-to-r from-white/[0.03] to-white/[0.01] p-6 md:p-8">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="space-y-1">
+              <h4 className="text-base font-semibold text-white flex items-center gap-2">
+                <Lock className="h-4 w-4 text-[var(--primary)]" />
+                The Zero-Bypass Guarantee
+              </h4>
+              <p className="text-sm text-[var(--muted-foreground)] max-w-[62ch]">
+                The AI agent cannot execute directory writes directly. All modifications require human operator approval, permission verification, and post-update re-fetching.
+              </p>
+            </div>
+            <Link
+              to="/register"
+              className={`shrink-0 inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] px-4 py-2 text-sm font-medium hover:brightness-110 ${focus}`}
+            >
+              <span>Start Free Audit</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="border-t border-[var(--border)] bg-[#070707] text-[var(--muted-foreground)]">
+      <div className="mx-auto max-w-6xl px-6 py-16 md:px-[8vw]">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-5">
+          {/* Brand info */}
+          <div className="lg:col-span-2 space-y-4">
+            <Link to="/" className={`inline-block text-xl font-bold tracking-tight text-white ${focus}`}>
+              ListoraAI
+            </Link>
+            <p className="text-sm leading-relaxed max-w-[36ch]">
+              Autonomous business listing consistency engine with human-in-the-loop verification, multi-user roles, and live platform sync.
+            </p>
+            <div className="flex items-center gap-2 pt-2">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span className="text-xs font-medium text-emerald-400">All Platforms Monitored & Operational</span>
+            </div>
+          </div>
+
+          {/* Product links */}
+          <div className="space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-white">Product</p>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
+              </li>
+              <li>
+                <Link to="/dashboard/profile" className="hover:text-white transition-colors">Business Profile</Link>
+              </li>
+              <li>
+                <Link to="/dashboard/approvals" className="hover:text-white transition-colors">Approvals Queue</Link>
+              </li>
+              <li>
+                <Link to="/dashboard/report" className="hover:text-white transition-colors">Before/After Report</Link>
+              </li>
+              <li>
+                <Link to="/dashboard/score" className="hover:text-white transition-colors">Consistency Score</Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Core capabilities */}
+          <div className="space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-white">Platform</p>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <a href="#how-it-works" className="hover:text-white transition-colors">How it works</a>
+              </li>
+              <li>
+                <a href="#features" className="hover:text-white transition-colors">Live checks demo</a>
+              </li>
+              <li>
+                <Link to="/dashboard/users" className="hover:text-white transition-colors">Multi-User Roles (RBAC)</Link>
+              </li>
+              <li>
+                <Link to="/dashboard/alerts" className="hover:text-white transition-colors">Alerts & Reminders</Link>
+              </li>
+              <li>
+                <Link to="/dashboard/audit" className="hover:text-white transition-colors">Audit Trail Logs</Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Technology & Guardrails */}
+          <div className="space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-white">Technology</p>
+            <ul className="space-y-2 text-sm">
+              <li className="flex items-center gap-1.5">
+                <span>Claude 3.5 Sonnet & Haiku</span>
+              </li>
+              <li>
+                <span>Autonomous Heuristic Engine</span>
+              </li>
+              <li>
+                <span>E.164 Phone Normalization</span>
+              </li>
+              <li>
+                <span>Holiday Hours Protection</span>
+              </li>
+              <li>
+                <span>Closed-Loop Verification</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom bar */}
+        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-[var(--border)] pt-8 text-xs sm:flex-row">
+          <p>© {new Date().getFullYear()} ListoraAI Inc. All rights reserved.</p>
+          <div className="flex flex-wrap items-center gap-6">
+            <Link to="/login" className="hover:text-white transition-colors">Sign In</Link>
+            <Link to="/register" className="hover:text-white transition-colors">Register</Link>
+            <a href="#how-it-works" className="hover:text-white transition-colors">Documentation</a>
+            <span className="font-mono text-[10px] text-white/30">v1.0.0-orchestrated</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
 export default function Landing() {
   const [applied, setApplied] = useState(false);
   const matched = applied ? 8 : 6;
 
   return (
     <div className="bg-[var(--background)] text-[var(--foreground)] min-h-screen">
-      <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-[var(--border)] bg-[var(--background)] px-6 md:px-[8vw]">
-        <Link to="/" className={`text-lg font-semibold ${focus}`}>ListoraAI</Link>
+      <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-[var(--border)] bg-[var(--background)]/90 backdrop-blur px-6 md:px-[8vw]">
+        <Link to="/" className={`text-lg font-semibold tracking-tight ${focus}`}>ListoraAI</Link>
         <nav className="flex items-center gap-6 text-sm text-[var(--muted-foreground)]">
           <a href="#features" className={`hover:text-[var(--foreground)] ${focus}`}>Features</a>
+          <a href="#how-it-works" className={`hover:text-[var(--foreground)] ${focus}`}>How it works</a>
           <Link to="/login" className={`hover:text-[var(--foreground)] ${focus}`}>Log in</Link>
+          <Link
+            to="/register"
+            className={`hidden sm:inline-flex rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] px-3 py-1.5 text-xs font-medium hover:brightness-110 ${focus}`}
+          >
+            Get started
+          </Link>
         </nav>
       </header>
 
       <section className="px-6 pt-16 md:pt-24 pb-24 flex flex-col items-center text-center">
-        <a href="#holiday-hours" className={`inline-flex items-center gap-2 rounded-full border border-[var(--border)] px-3 py-1 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] ${focus}`}>
+        <a href="#how-it-works" className={`inline-flex items-center gap-2 rounded-full border border-[var(--border)] px-3 py-1 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] ${focus}`}>
           <span className="rounded-full bg-white/10 px-2 text-xs text-[var(--foreground)]">New</span>
-          Checks holiday hours too
+          Checks holiday hours & temporary closures
         </a>
 
         <h1
@@ -456,7 +694,7 @@ export default function Landing() {
 
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link to="/register" className={`rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] font-medium px-5 py-2.5 ${focus}`}>Check my listings</Link>
-          <a href="#features" className={`rounded-lg border border-[var(--border)] font-medium px-5 py-2.5 hover:bg-white/5 ${focus}`}>See how it works</a>
+          <a href="#how-it-works" className={`rounded-lg border border-[var(--border)] font-medium px-5 py-2.5 hover:bg-white/5 ${focus}`}>See how it works</a>
         </div>
 
         <div className="mt-16 w-full max-w-2xl rounded-xl border border-[var(--border)] text-left">
@@ -491,6 +729,8 @@ export default function Landing() {
       </section>
 
       <Features />
+      <HowItWorks />
+      <Footer />
     </div>
   );
 }
