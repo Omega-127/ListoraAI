@@ -34,7 +34,7 @@ export default function Register() {
     try {
       // Temporary: no register API yet — authenticate with the owner login endpoint.
       await login({ email: email.trim(), password });
-      navigate("/", { replace: true });
+      navigate("/dashboard", { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not create account");
     } finally {

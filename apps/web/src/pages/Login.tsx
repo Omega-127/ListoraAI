@@ -17,7 +17,7 @@ export default function Login() {
     setPending(true);
     try {
       await login({ email: email.trim(), password });
-      navigate("/", { replace: true });
+      navigate("/dashboard", { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Invalid credentials");
     } finally {
