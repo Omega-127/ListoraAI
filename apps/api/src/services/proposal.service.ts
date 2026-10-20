@@ -11,7 +11,7 @@ import { recordAudit } from './audit.service';
 import { AppError } from '../middleware/errorHandler';
 
 export const CreateProposalSchema = z.object({
-  mismatchId: z.string().uuid(),
+  mismatchId: z.string().min(1),
   platform: z.string().min(1),
   field: z.string().min(1),
   oldValue: z.unknown().optional(),

@@ -1,10 +1,9 @@
-<<<<<<< HEAD
 /**
- * Status constants shared between the API and frontend.
+ * Status constants shared between API, mock platforms, and frontend.
  * These values mirror the Prisma enums in the database layer.
  */
 
-/** Verification statuses for listings after an update is applied */
+// Verification statuses for listings after an update is applied
 export const STATUSES = {
   VERIFIED: 'verified',
   PENDING: 'pending',
@@ -14,48 +13,18 @@ export const STATUSES = {
 
 export type Status = (typeof STATUSES)[keyof typeof STATUSES];
 
-/** Classification of a detected mismatch between profile and listing */
-export const MISMATCH_KINDS = {
-  MISSING: 'missing',
-  OUTDATED: 'outdated',
-  CONFLICTING: 'conflicting',
-  NEEDS_REVIEW: 'needs_review',
-  OK: 'ok',
+export const VERIFICATION_STATUS = {
+  VERIFIED: 'VERIFIED',
+  PENDING: 'PENDING',
+  FAILED: 'FAILED',
+  BLOCKED: 'BLOCKED',
 } as const;
 
-export type MismatchKindValue = (typeof MISMATCH_KINDS)[keyof typeof MISMATCH_KINDS];
+export const VERIFICATION_STATUSES = STATUSES;
+export type VerificationStatus = (typeof VERIFICATION_STATUS)[keyof typeof VERIFICATION_STATUS];
+export type VerificationStatusValue = (typeof VERIFICATION_STATUSES)[keyof typeof VERIFICATION_STATUSES];
 
-/** Lifecycle statuses for an owner-approval proposal */
-export const PROPOSAL_STATUSES = {
-  PENDING_APPROVAL: 'pending_approval',
-  APPROVED: 'approved',
-  REJECTED: 'rejected',
-} as const;
-
-export type ProposalStatusValue = (typeof PROPOSAL_STATUSES)[keyof typeof PROPOSAL_STATUSES];
-
-/** Outcomes when the agent attempts to push an update to a mock platform */
-export const UPDATE_OUTCOMES = {
-  SUCCESS: 'success',
-  FAILED: 'failed',
-  BLOCKED: 'blocked',
-} as const;
-
-export type UpdateOutcomeValue = (typeof UPDATE_OUTCOMES)[keyof typeof UPDATE_OUTCOMES];
-
-/** Verification outcome after re-reading a listing post-update */
-export const VERIFICATION_STATUSES = {
-  VERIFIED: 'verified',
-  PENDING: 'pending',
-  FAILED: 'failed',
-  BLOCKED: 'blocked',
-} as const;
-
-export type VerificationStatusValue =
-  (typeof VERIFICATION_STATUSES)[keyof typeof VERIFICATION_STATUSES];
-=======
-// Status constants shared between api and web
-
+// Classification of a detected mismatch between profile and listing
 export const MISMATCH_KIND = {
   MISSING: 'MISSING',
   OUTDATED: 'OUTDATED',
@@ -64,30 +33,54 @@ export const MISMATCH_KIND = {
   OK: 'OK',
 } as const;
 
-export type MismatchKind = (typeof MISMATCH_KIND)[keyof typeof MISMATCH_KIND];
+export const MISMATCH_KINDS = {
+  MISSING: 'missing',
+  OUTDATED: 'outdated',
+  CONFLICTING: 'conflicting',
+  NEEDS_REVIEW: 'needs_review',
+  OK: 'ok',
+} as const;
 
+export type MismatchKind = (typeof MISMATCH_KIND)[keyof typeof MISMATCH_KIND];
+export type MismatchKindValue = (typeof MISMATCH_KINDS)[keyof typeof MISMATCH_KINDS];
+
+// Lifecycle statuses for an owner-approval proposal
 export const PROPOSAL_STATUS = {
   PENDING_APPROVAL: 'PENDING_APPROVAL',
   APPROVED: 'APPROVED',
   REJECTED: 'REJECTED',
 } as const;
 
-export type ProposalStatus = (typeof PROPOSAL_STATUS)[keyof typeof PROPOSAL_STATUS];
+export const PROPOSAL_STATUSES = {
+  PENDING_APPROVAL: 'pending_approval',
+  APPROVED: 'approved',
+  REJECTED: 'rejected',
+} as const;
 
+export type ProposalStatus = (typeof PROPOSAL_STATUS)[keyof typeof PROPOSAL_STATUS];
+export type ProposalStatusValue = (typeof PROPOSAL_STATUSES)[keyof typeof PROPOSAL_STATUSES];
+
+// Outcomes when the agent attempts to push an update to a mock platform
 export const UPDATE_OUTCOME = {
   SUCCESS: 'SUCCESS',
   FAILED: 'FAILED',
   BLOCKED: 'BLOCKED',
 } as const;
 
-export type UpdateOutcome = (typeof UPDATE_OUTCOME)[keyof typeof UPDATE_OUTCOME];
-
-export const VERIFICATION_STATUS = {
-  VERIFIED: 'VERIFIED',
-  PENDING: 'PENDING',
-  FAILED: 'FAILED',
-  BLOCKED: 'BLOCKED',
+export const UPDATE_OUTCOMES = {
+  SUCCESS: 'success',
+  FAILED: 'failed',
+  BLOCKED: 'blocked',
 } as const;
 
-export type VerificationStatus = (typeof VERIFICATION_STATUS)[keyof typeof VERIFICATION_STATUS];
->>>>>>> 6d768f43304f1e607cd016ddcba2b8a70ef97568
+export type UpdateOutcome = (typeof UPDATE_OUTCOME)[keyof typeof UPDATE_OUTCOME];
+export type UpdateOutcomeValue = (typeof UPDATE_OUTCOMES)[keyof typeof UPDATE_OUTCOMES];
+
+// Multi-user roles
+export const USER_ROLES = {
+  ADMIN: 'ADMIN',
+  OPERATOR: 'OPERATOR',
+  VIEWER: 'VIEWER',
+} as const;
+
+export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];

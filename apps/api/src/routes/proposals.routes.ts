@@ -7,6 +7,8 @@ import {
 } from '../services/proposal.service';
 import { runAgent } from '../agent/agent';
 
+import { requireRole } from '../middleware/auth';
+
 const router = Router();
 
 router.get('/', async (req, res, next) => {
@@ -29,7 +31,7 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
-router.post('/:id/approve', async (req, res, next) => {
+router.post('/:id/approve', requireRole('ADMIN', 'OPERATOR'), async (req, res, next) => {
   try {
     const updated = await approveProposal(req.params.id, req.user!.email);
     res.json(updated);
@@ -38,7 +40,7 @@ router.post('/:id/approve', async (req, res, next) => {
   }
 });
 
-router.post('/:id/reject', async (req, res, next) => {
+router.post('/:id/reject', requireRole('ADMIN', 'OPERATOR'), async (req, res, next) => {
   try {
     const updated = await rejectProposal(req.params.id, req.user!.email);
     res.json(updated);
@@ -51,7 +53,7 @@ router.post('/:id/reject', async (req, res, next) => {
  * POST /api/v1/proposals/analyze
  * Triggers the AI agent to investigate mismatches and create proposals.
  */
-router.post('/analyze', async (req, res, next) => {
+router.post('/analyze', requireRole('ADMIN', 'OPERATOR'), async (req, res, next) => {
   try {
     const { mismatchIds, useStrongModel } = req.body as {
       mismatchIds?: string[];
@@ -65,3 +67,4 @@ router.post('/analyze', async (req, res, next) => {
 });
 
 export default router;
+

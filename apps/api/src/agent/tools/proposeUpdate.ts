@@ -24,7 +24,7 @@ export const proposeUpdateToolDefinition = {
 };
 
 const InputSchema = z.object({
-  mismatchId: z.string().uuid(),
+  mismatchId: z.string().min(1),
   platform: z.string(),
   field: z.string(),
   oldValue: z.unknown().optional(),
