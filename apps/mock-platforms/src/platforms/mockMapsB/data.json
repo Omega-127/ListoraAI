@@ -1,0 +1,18 @@
+{
+  "listing_002": {
+    "id": "listing_002",
+    "name": "Brew & Bloom Café",
+    "address": "42 Maple St, Springfield, IL 62701",
+    "phone": "(555) 010-2234",
+    "regularHours": {
+      "monday": "07:00-18:00",
+      "tuesday": "07:00-18:00",
+      "wednesday": "07:00-18:00",
+      "thursday": "07:00-18:00",
+      "friday": "07:00-20:00",
+      "saturday": "08:00-20:00",
+      "sunday": "09:00-16:00"
+    },
+    "holidayHours": {}
+  }
+}
