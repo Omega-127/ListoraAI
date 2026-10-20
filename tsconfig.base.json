@@ -1,9 +1,15 @@
 {
+<<<<<<< HEAD
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+=======
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+>>>>>>> 6d768f43304f1e607cd016ddcba2b8a70ef97568
     "lib": ["ES2022"],
     "strict": true,
     "esModuleInterop": true,
@@ -12,6 +18,7 @@
     "resolveJsonModule": true,
     "declaration": true,
     "declarationMap": true,
+<<<<<<< HEAD
     "sourceMap": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -19,4 +26,8 @@
     "noFallthroughCasesInSwitch": true
   },
   "exclude": ["node_modules", "dist", "build", "coverage"]
+=======
+    "sourceMap": true
+  }
+>>>>>>> 6d768f43304f1e607cd016ddcba2b8a70ef97568
 }

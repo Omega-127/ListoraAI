@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "@bizlisting/mock-platforms",
   "version": "1.0.0",
   "private": true,
@@ -22,5 +23,24 @@
     "rimraf": "^5.0.5",
     "tsx": "^4.7.0",
     "typescript": "^5.4.2"
+=======
+  "name": "mock-platforms",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "lint": "eslint src --ext .ts"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.0",
+    "tsx": "^4.15.6",
+    "typescript": "^5.4.5"
+>>>>>>> 6d768f43304f1e607cd016ddcba2b8a70ef97568
   }
 }

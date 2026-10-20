@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Dependencies
 node_modules/
 .pnp
@@ -60,3 +61,16 @@ apps/api/prisma/migrations/*.sql
 .cache/
 tmp/
 temp/
+=======
+node_modules/
+dist/
+.env
+.env.local
+*.env
+*.log
+.DS_Store
+coverage/
+.nyc_output/
+prisma/migrations/
+*.db
+>>>>>>> 6d768f43304f1e607cd016ddcba2b8a70ef97568

@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "listing-001": {
     "name": "Bella Cucina Ristorante",
     "address": "742 Evergreen Terrace, Springfield, IL 62701",
@@ -27,5 +28,25 @@
     ],
     "description": "Authentic Italian cuisine in the heart of Springfield.",
     "categories": ["Restaurant", "Italian", "Dine-in"]
+=======
+  "listing_003": {
+    "id": "listing_003",
+    "name": "Brew and Bloom Cafe",
+    "address": "42 Maple Street, Springfield, Illinois",
+    "phone": "555-010-2234",
+    "regularHours": {
+      "monday": "7am-6pm",
+      "tuesday": "7am-6pm",
+      "wednesday": "7am-6pm",
+      "thursday": "7am-6pm",
+      "friday": "7am-8pm",
+      "saturday": "8am-8pm",
+      "sunday": "9am-4pm"
+    },
+    "holidayHours": {
+      "2026-12-25": "closed",
+      "2026-11-28": "closed"
+    }
+>>>>>>> 6d768f43304f1e607cd016ddcba2b8a70ef97568
   }
 }

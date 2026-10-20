@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import express from 'express';
 import cors from 'cors';
 import { Store } from '../../shared/store.js';
@@ -37,3 +38,20 @@ export function createMockMapsAApp(): express.Express {
 
   return app;
 }
+=======
+/**
+ * mock-maps-a — Full read-write platform.
+ * All PATCH requests are allowed.
+ */
+import { createStore } from '../../shared/store';
+import { buildRoutes } from '../../shared/routes';
+import seedData from './data.json';
+
+const store = createStore(seedData as Record<string, Record<string, unknown>>);
+
+export const mockMapsARouter = buildRoutes(
+  store,
+  () => true, // always permitted
+  'Write not permitted', // never returned
+);
+>>>>>>> 6d768f43304f1e607cd016ddcba2b8a70ef97568

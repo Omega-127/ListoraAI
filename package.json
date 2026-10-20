@@ -1,15 +1,23 @@
 {
+<<<<<<< HEAD
   "name": "business-listing-consistency-agent",
+=======
+  "name": "listora-ai",
+>>>>>>> 6d768f43304f1e607cd016ddcba2b8a70ef97568
   "version": "1.0.0",
   "private": true,
   "workspaces": [
     "apps/api",
+<<<<<<< HEAD
     "apps/web",
     "apps/e2e",
+=======
+>>>>>>> 6d768f43304f1e607cd016ddcba2b8a70ef97568
     "apps/mock-platforms",
     "packages/shared"
   ],
   "scripts": {
+<<<<<<< HEAD
     "dev": "concurrently \"npm run dev --workspace=apps/api\" \"npm run dev --workspace=apps/web\" \"npm run dev --workspace=apps/mock-platforms\"",
     "build": "npm run build --workspace=packages/shared && npm run build --workspace=apps/api && npm run build --workspace=apps/web && npm run build --workspace=apps/mock-platforms",
     "lint": "eslint . --ext .ts,.tsx",
@@ -31,5 +39,23 @@
   },
   "engines": {
     "node": ">=20.0.0"
+=======
+    "dev": "concurrently -n api,mock \"npm run dev --workspace apps/api\" \"npm run dev --workspace apps/mock-platforms\"",
+    "build": "npm run build --workspace packages/shared && npm run build --workspace apps/api && npm run build --workspace apps/mock-platforms",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspace apps/api",
+    "db:migrate": "npm run db:migrate --workspace apps/api",
+    "db:seed": "npm run db:seed --workspace apps/api"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "allowScripts": {
+    "@prisma/client@5.22.0": true,
+    "prisma@5.22.0": true,
+    "@prisma/engines@5.22.0": true,
+    "esbuild@0.28.2": true,
+    "esbuild@0.21.5": true
+>>>>>>> 6d768f43304f1e607cd016ddcba2b8a70ef97568
   }
 }
