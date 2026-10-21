@@ -1,3 +1,5 @@
+import { ListingValues } from './types';
+
 /**
  * Shared in-memory store for a mock platform.
  * Accepts the seed data on startup; resets are applied by restarting the service.
@@ -29,26 +31,38 @@ export function createStore(seedData: Record<string, Record<string, unknown>>) {
 
 export type PlatformStore = ReturnType<typeof createStore>;
 
+/**
+ * In-memory store for listing data on a single mock platform.
+ * Supports both class-based and function-based access.
+ */
 export class Store {
-  private store: PlatformStore;
+  private data: Map<string, ListingValues>;
+  private readonly seed: Record<string, ListingValues>;
 
-  constructor(seedData: Record<string, any>) {
-    this.store = createStore(seedData);
+  constructor(seedData: Record<string, ListingValues>) {
+    this.seed = seedData;
+    this.data = new Map(Object.entries(seedData));
   }
 
-  get(id: string) {
-    return this.store.get(id);
+  get(id: string): ListingValues | undefined {
+    return this.data.get(id);
   }
 
-  patch(id: string, fields: Record<string, unknown>) {
-    return this.store.patch(id, fields);
+  patch(id: string, fields: Partial<ListingValues>): ListingValues | null {
+    const existing = this.data.get(id);
+    if (!existing) {
+      return null;
+    }
+    const updated: ListingValues = { ...existing, ...fields };
+    this.data.set(id, updated);
+    return updated;
   }
 
-  ids() {
-    return this.store.ids();
+  reset(): void {
+    this.data = new Map(Object.entries(this.seed));
   }
 
-  reset() {
-    this.store.reset();
+  ids(): string[] {
+    return Array.from(this.data.keys());
   }
 }

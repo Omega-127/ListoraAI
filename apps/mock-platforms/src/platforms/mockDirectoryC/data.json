@@ -4,6 +4,7 @@
     "name": "Brew and Bloom Cafe",
     "address": "42 Maple Street, Springfield, Illinois",
     "phone": "555-010-2234",
+    "website": "https://brewandbloom.example.com",
     "regularHours": {
       "monday": "7am-6pm",
       "tuesday": "7am-6pm",
@@ -16,6 +17,30 @@
     "holidayHours": {
       "2026-12-25": "closed",
       "2026-11-28": "closed"
-    }
+    },
+    "description": "Artisan coffee and pastries in Springfield.",
+    "categories": ["Café", "Coffee"]
+  },
+  "listing-001": {
+    "id": "listing-001",
+    "name": "Brew and Bloom Cafe",
+    "address": "42 Maple Street, Springfield, Illinois",
+    "phone": "555-010-2234",
+    "website": "https://brewandbloom.example.com",
+    "regularHours": {
+      "monday": "7am-6pm",
+      "tuesday": "7am-6pm",
+      "wednesday": "7am-6pm",
+      "thursday": "7am-6pm",
+      "friday": "7am-8pm",
+      "saturday": "8am-8pm",
+      "sunday": "9am-4pm"
+    },
+    "holidayHours": {
+      "2026-12-25": "closed",
+      "2026-11-28": "closed"
+    },
+    "description": "Artisan coffee and pastries in Springfield.",
+    "categories": ["Café", "Coffee"]
   }
 }

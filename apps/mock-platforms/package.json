@@ -1,12 +1,11 @@
 {
-  "name": "mock-platforms",
+  "name": "@bizlisting/mock-platforms",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc --project tsconfig.json",
+    "build": "tsc --project tsconfig.json && node scripts/copy-data.js",
     "start": "node dist/server.js",
     "lint": "eslint src --ext .ts",
     "clean": "rimraf dist"

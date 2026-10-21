@@ -1,28 +1,32 @@
 import express from 'express';
-import { createStore } from '../../shared/store.js';
-import { buildRoutes } from '../../shared/routes.js';
-import seedData from './data.json' with { type: 'json' };
+import cors from 'cors';
+import { Store } from '../../shared/store';
+import { buildListingRouter } from '../../shared/routes';
+import { mockMapsAPermissions } from './permissions';
+import seedData from './data.json';
+import { ListingValues } from '../../shared/types';
 
-
-
-const store = createStore(seedData as Record<string, Record<string, unknown>>);
-
-export const mockMapsARouter = buildRoutes(
-  store,
-  () => true, // always permitted
-  'Write not permitted',
-);
-
+/**
+ * mockMapsA — a fully read-write listing platform.
+ */
 export function createMockMapsAApp(): express.Express {
   const app = express();
+  app.use(cors());
   app.use(express.json());
-  app.use('/', mockMapsARouter);
+
+  const store = new Store(seedData as unknown as Record<string, ListingValues>);
+
+  app.use('/', buildListingRouter(store, mockMapsAPermissions));
+
   app.get('/health', (_req, res) => {
     res.json({ platform: 'mockMapsA', status: 'ok', listings: store.ids() });
   });
+
+  // Reset endpoint for use in E2E tests
   app.post('/reset', (_req, res) => {
     store.reset();
     res.json({ message: 'mockMapsA data reset to seed state.' });
   });
+
   return app;
 }

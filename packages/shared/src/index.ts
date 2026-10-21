@@ -1,19 +1,19 @@
 // Main entry point for @bizlisting/shared
 
 // Constants & Enums
-export * from './constants/statuses.js';
+export * from './constants/statuses';
 
 // Types
-export * from './types/index.js';
-export type { BusinessProfile } from './types/profile.js';
-export type { Listing, ListingValues } from './types/listing.js';
-export type { Mismatch } from './types/mismatch.js';
-export type { Proposal } from './types/proposal.js';
-export type { AuditLog, AuditActor } from './types/audit.js';
+export * from './types/index';
+export type { BusinessProfile } from './types/profile';
+export type { Listing, ListingValues } from './types/listing';
+export type { Mismatch } from './types/mismatch';
+export type { Proposal } from './types/proposal';
+export type { AuditLog, AuditActor } from './types/audit';
 
 // Schemas
-export { BusinessProfileSchema, UpdateProfileSchema } from './schemas/profile.schema.js';
-export { ListingSchema, ListingValuesSchema } from './schemas/listing.schema.js';
-export { MismatchSchema, MismatchKindEnum } from './schemas/mismatch.schema.js';
-export { ProposalSchema, ProposalStatusEnum } from './schemas/proposal.schema.js';
-export { AuditLogSchema, AuditActorEnum } from './schemas/audit.schema.js';
+export { BusinessProfileSchema, UpdateProfileSchema } from './schemas/profile.schema';
+export { ListingSchema, ListingValuesSchema } from './schemas/listing.schema';
+export { MismatchSchema, MismatchKindEnum } from './schemas/mismatch.schema';
+export { ProposalSchema, ProposalStatusEnum } from './schemas/proposal.schema';
+export { AuditLogSchema, AuditActorEnum } from './schemas/audit.schema';
