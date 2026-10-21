@@ -50,22 +50,18 @@ export const PLATFORM_LISTING_IDS: Record<string, string> = {
 };
 
 function getBaseUrl(): string {
-<<<<<<< HEAD
-  let url = mockPlatformUrls[0] || 'http://localhost:4100';
-  if (!url.startsWith('http://') && !url.startsWith('https://')) {
-    url = url.includes(':') ? `http://${url}` : `http://${url}:10000`;
-  }
-  return url;
-=======
   const raw = (mockPlatformUrls[0] || 'http://localhost:4100').trim().replace(/\/+$/, '');
   if (!raw.startsWith('http://') && !raw.startsWith('https://')) {
-    // If it's localhost or an IP, default to http, otherwise https
-    return raw.includes('localhost') || raw.startsWith('127.0.0.1')
-      ? `http://${raw}`
-      : `https://${raw}`;
+    if (raw.includes('onrender.com')) {
+      return `https://${raw}`;
+    }
+    // If it's an internal Render host without port (e.g. listora-mock-platforms), add default port 10000
+    if (!raw.includes(':') && !raw.includes('.')) {
+      return `http://${raw}:10000`;
+    }
+    return `http://${raw}`;
   }
   return raw;
->>>>>>> c2fe82e4aec163a4c69993ab581e2465fa41cd20
 }
 
 async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs = 8000): Promise<Response> {
