@@ -5,7 +5,7 @@ import { requireRole } from '../middleware/auth';
 
 const router = Router();
 
-router.get('/', async (req, res, next) => {
+router.get('/', async (_req, res, next) => {
   try {
     const profile = await getProfile();
     res.json(profile);

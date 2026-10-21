@@ -14,7 +14,7 @@ interface ValidationTargets {
 }
 
 export function validate(schemas: ValidationTargets) {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     try {
       if (schemas.body) req.body = schemas.body.parse(req.body);
       if (schemas.params) req.params = schemas.params.parse(req.params);

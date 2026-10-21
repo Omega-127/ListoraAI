@@ -33,7 +33,7 @@ export async function assertProposalApproved(proposalId: string): Promise<void> 
  * the approved profile and the source of truth is ambiguous triggers review.
  */
 export function requiresHumanReview(
-  profileValue: unknown,
+  _profileValue: unknown,
   listingValues: unknown[],
 ): boolean {
   // If all listing values agree but differ from profile → CONFLICTING (profile wins)

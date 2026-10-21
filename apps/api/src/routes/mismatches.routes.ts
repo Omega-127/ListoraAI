@@ -20,8 +20,11 @@ router.get('/', async (req, res, next) => {
 router.get('/:id', async (req, res, next) => {
   try {
     const mismatch = await getMismatchById(req.params.id);
-    if (!mismatch) return res.status(404).json({ error: 'Mismatch not found' });
-    return res.json(mismatch);
+    if (!mismatch) {
+      res.status(404).json({ error: 'Mismatch not found' });
+      return;
+    }
+    res.json(mismatch);
   } catch (err) {
     next(err);
   }

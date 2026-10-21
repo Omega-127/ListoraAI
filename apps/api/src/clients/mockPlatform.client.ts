@@ -50,6 +50,13 @@ export const PLATFORM_LISTING_IDS: Record<string, string> = {
 };
 
 function getBaseUrl(): string {
+<<<<<<< HEAD
+  let url = mockPlatformUrls[0] || 'http://localhost:4100';
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    url = url.includes(':') ? `http://${url}` : `http://${url}:10000`;
+  }
+  return url;
+=======
   const raw = (mockPlatformUrls[0] || 'http://localhost:4100').trim().replace(/\/+$/, '');
   if (!raw.startsWith('http://') && !raw.startsWith('https://')) {
     // If it's localhost or an IP, default to http, otherwise https
@@ -58,6 +65,7 @@ function getBaseUrl(): string {
       : `https://${raw}`;
   }
   return raw;
+>>>>>>> c2fe82e4aec163a4c69993ab581e2465fa41cd20
 }
 
 async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs = 8000): Promise<Response> {
