@@ -16,13 +16,16 @@ router.post('/', requireRole('ADMIN', 'OPERATOR'), validate({ body: VerifySchema
 
     if (proposalId) {
       const result = await verifyProposal(proposalId);
-      return res.json(result);
+      res.json(result);
+      return;
     }
 
     const results = await verifyAllUpdatedProposals();
-    return res.json(results);
+    res.json(results);
+    return;
   } catch (err) {
     next(err);
+    return;
   }
 });
 
