@@ -19,7 +19,8 @@ services:
     plan: free
     region: oregon
     rootDir: .
-    buildCommand: npm install && npm run build --workspace=packages/shared && npm run db:generate --workspace=apps/api && npx --workspace=apps/api prisma migrate deploy && npm run build --workspace=apps/api
+    buildCommand: npm install && npm run build --workspace=packages/shared && npm run db:generate --workspace=apps/api && npm run build --workspace=apps/api
+    preDeployCommand: npx --workspace=apps/api prisma migrate deploy
     startCommand: node apps/api/dist/server.js
     healthCheckPath: /health
     envVars:
@@ -71,7 +72,7 @@ services:
   - type: cron
     name: listora-cron-recheck
     runtime: node
-    plan: free
+    plan: starter
     region: oregon
     rootDir: .
     schedule: "0 */6 * * *"
