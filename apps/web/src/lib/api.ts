@@ -452,6 +452,9 @@ export async function updateBusinessProfile(profile: BusinessProfileData): Promi
   // Save locally right away so user edits always persist seamlessly
   try {
     localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("listora_profile_updated", { detail: profile }));
+    }
   } catch {
     // ignore
   }

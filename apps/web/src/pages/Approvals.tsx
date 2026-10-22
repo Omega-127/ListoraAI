@@ -194,8 +194,25 @@ export default function Approvals() {
       }
     }
     loadBackendProposals();
+
+    const handleProfileChange = (e: Event) => {
+      const custom = e as CustomEvent;
+      if (custom.detail) {
+        setProposals((prev) => {
+          const dynamic = createProposalsForProfile(custom.detail);
+          const statusMap = new Map(prev.map((p) => [p.id, p.status]));
+          return dynamic.map((d) => ({
+            ...d,
+            status: statusMap.get(d.id) || d.status,
+          }));
+        });
+      }
+    };
+    window.addEventListener("listora_profile_updated", handleProfileChange);
+
     return () => {
       cancelled = true;
+      window.removeEventListener("listora_profile_updated", handleProfileChange);
     };
   }, []);
 

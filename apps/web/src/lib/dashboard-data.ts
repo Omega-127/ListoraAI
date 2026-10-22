@@ -139,9 +139,9 @@ export function buildDashboardSnapshot(profile: {
         label: "Maps B",
         writable: false,
         values: {
-          name: profileName.includes(" ") ? profileName.split(" ").slice(0, 2).join(" ") : profileName,
+          name: profileName.includes(" ") ? profileName.split(" ").slice(0, -1).join(" ") || profileName : profileName,
           phone: "555 0124",
-          hours: formattedProfileHours,
+          hours: "Mon–Sat 7–5",
           holiday: "—",
         },
         mismatchCount: 2,
