@@ -17,13 +17,16 @@ router.post('/', requireRole('ADMIN', 'OPERATOR'), validate({ body: ApplySchema 
 
     if (proposalId) {
       const result = await applyProposal(proposalId);
-      return res.json(result);
+      res.json(result);
+      return;
     }
 
     const results = await applyAllApprovedProposals();
-    return res.json(results);
+    res.json(results);
+    return;
   } catch (err) {
     next(err);
+    return;
   }
 });
 

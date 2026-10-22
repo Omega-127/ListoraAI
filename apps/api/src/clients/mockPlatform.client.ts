@@ -52,10 +52,14 @@ export const PLATFORM_LISTING_IDS: Record<string, string> = {
 function getBaseUrl(): string {
   const raw = (mockPlatformUrls[0] || 'http://localhost:4100').trim().replace(/\/+$/, '');
   if (!raw.startsWith('http://') && !raw.startsWith('https://')) {
-    // If it's localhost or an IP, default to http, otherwise https
-    return raw.includes('localhost') || raw.startsWith('127.0.0.1')
-      ? `http://${raw}`
-      : `https://${raw}`;
+    if (raw.includes('onrender.com')) {
+      return `https://${raw}`;
+    }
+    // If it's an internal Render host without port (e.g. listora-mock-platforms), add default port 10000
+    if (!raw.includes(':') && !raw.includes('.')) {
+      return `http://${raw}:10000`;
+    }
+    return `http://${raw}`;
   }
   return raw;
 }

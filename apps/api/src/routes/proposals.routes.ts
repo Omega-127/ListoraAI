@@ -24,8 +24,11 @@ router.get('/', async (req, res, next) => {
 router.get('/:id', async (req, res, next) => {
   try {
     const proposal = await getProposalById(req.params.id);
-    if (!proposal) return res.status(404).json({ error: 'Proposal not found' });
-    return res.json(proposal);
+    if (!proposal) {
+      res.status(404).json({ error: 'Proposal not found' });
+      return;
+    }
+    res.json(proposal);
   } catch (err) {
     next(err);
   }
