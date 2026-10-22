@@ -301,7 +301,7 @@ business-listing-consistency-agent/
 │       │       └── store.ts               # In-memory state, reset on restart
 │       ├── .env.example
 │       ├── package.json
-│       └── tsconfig.json
+│       └── t   sconfig.json
 │
 ├── packages/
 │   └── shared/                            # Code shared by web and api (@bizlisting/shared)
