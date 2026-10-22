@@ -19,7 +19,7 @@ services:
     region: oregon
     rootDir: .
     buildCommand: npm install --include=dev && npm run build:api
-    startCommand: npx prisma db push --schema=apps/api/prisma/schema.prisma && npx tsx apps/api/prisma/seed.ts && node apps/api/dist/server.js
+    startCommand: npx prisma migrate deploy --schema=apps/api/prisma/schema.prisma && npx tsx apps/api/prisma/seed.ts && node apps/api/dist/server.js
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
@@ -33,18 +33,22 @@ services:
       - key: ANTHROPIC_API_KEY
         sync: false
       - key: SESSION_SECRET
-        generateValue: true
+        sync: false
       - key: OWNER_EMAIL
         value: owner@example.com
       - key: OWNER_PASSWORD_HASH
         value: '$2a$10$wT3wW8R1x55mQ2K1v1F6OuK7YtK0b4zY6R1x55mQ2K1v1F6OuK7Yt'
       - key: CORS_ORIGINS
+<<<<<<< HEAD
         value: https://listora-ai.vercel.app,https://listora-tau.vercel.app
+=======
+        value: https://listora-tau.vercel.app,https://listora-ai.vercel.app
+>>>>>>> 6de7ecfca4ff40c7054ca2646d58b095d1eeb109
       - key: MOCK_PLATFORM_URLS
         fromService:
           type: web
           name: listora-mock-platforms
-          property: host
+          property: hostport
 
   # ---------------------------------------------------------------------------
   # 2. Mock Listing Platforms
