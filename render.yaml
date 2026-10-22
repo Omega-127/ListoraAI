@@ -39,7 +39,11 @@ services:
       - key: OWNER_PASSWORD_HASH
         value: '$2a$10$wT3wW8R1x55mQ2K1v1F6OuK7YtK0b4zY6R1x55mQ2K1v1F6OuK7Yt'
       - key: CORS_ORIGINS
+<<<<<<< HEAD
+        value: https://listora-ai.vercel.app,https://listora-tau.vercel.app
+=======
         value: https://listora-tau.vercel.app,https://listora-ai.vercel.app
+>>>>>>> 6de7ecfca4ff40c7054ca2646d58b095d1eeb109
       - key: MOCK_PLATFORM_URLS
         fromService:
           type: web
