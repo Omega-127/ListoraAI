@@ -244,20 +244,24 @@ export async function runAgentAnalysis(options?: {
     return await res.json();
   } catch (err) {
     // Demo fallback when running without backend API
+    const stored = typeof window !== "undefined" ? localStorage.getItem(PROFILE_STORAGE_KEY) : null;
+    const currentProfile: BusinessProfileData = stored ? JSON.parse(stored) : DEFAULT_BUSINESS_PROFILE;
+    const profilePhone = currentProfile.phone || "+15550102234";
+
     return {
       success: true,
       mode: "heuristic-engine",
       toolCallCount: 3,
       proposalsCreated: 3,
       output: {
-        summary: "Investigated 3 open platform mismatches across Maps A, Maps B, and Directory C. Discovered phone formatting discrepancies, operating hours contradictions, and holiday schedule overrides.",
+        summary: `Investigated 3 open platform mismatches across Maps A, Maps B, and Directory C against ${currentProfile.name}. Discovered phone formatting discrepancies, operating hours contradictions, and holiday schedule overrides.`,
         fields: [
           {
             field: "phone",
             mismatch_kind: "OUTDATED",
-            explanation: "Format difference: Normalizing to canonical international E.164 (+15550102234) eliminates click-to-call dialing errors on mobile search and maps.",
+            explanation: `Format difference: Normalizing to canonical international E.164 (${profilePhone}) eliminates click-to-call dialing errors on mobile search and maps.`,
             confidence: "high",
-            proposed_value: "+15550102234",
+            proposed_value: profilePhone,
           },
           {
             field: "hours",
@@ -374,5 +378,152 @@ export async function refreshListings() {
     return { success: true };
   }
 }
+
+// ---- Business Profile Management ----
+
+export type BusinessProfileData = {
+  name: string;
+  address: string;
+  phone: string;
+  regularHours: Record<string, string>;
+  holidayHours: Record<string, string>;
+};
+
+export const DEFAULT_BUSINESS_PROFILE: BusinessProfileData = {
+  name: "Brew & Bloom Café",
+  address: "42 Maple Street, Springfield, IL 62701",
+  phone: "+15550102234",
+  regularHours: {
+    monday: "07:00-18:00",
+    tuesday: "07:00-18:00",
+    wednesday: "07:00-18:00",
+    thursday: "07:00-18:00",
+    friday: "07:00-20:00",
+    saturday: "08:00-20:00",
+    sunday: "09:00-16:00",
+  },
+  holidayHours: {
+    "2026-12-25": "closed",
+    "2026-01-01": "closed",
+    "2026-07-04": "08:00-14:00",
+  },
+};
+
+const PROFILE_STORAGE_KEY = "listora_canonical_business_profile";
+
+export async function getBusinessProfile(): Promise<BusinessProfileData> {
+  // First attempt backend fetch
+  try {
+    const res = await fetch(`${baseUrl}/api/v1/profile`, {
+      credentials: "include",
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.name) {
+        const canonical: BusinessProfileData = {
+          name: data.name,
+          address: data.address || "",
+          phone: data.phone || "",
+          regularHours: (data.regularHours as Record<string, string>) || DEFAULT_BUSINESS_PROFILE.regularHours,
+          holidayHours: (data.holidayHours as Record<string, string>) || DEFAULT_BUSINESS_PROFILE.holidayHours,
+        };
+        localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(canonical));
+        return canonical;
+      }
+    }
+  } catch {
+    // Backend offline or unreachable
+  }
+
+  // Fallback to local storage
+  try {
+    const stored = localStorage.getItem(PROFILE_STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch {
+    // ignore
+  }
+
+  return DEFAULT_BUSINESS_PROFILE;
+}
+
+export async function updateBusinessProfile(profile: BusinessProfileData): Promise<BusinessProfileData> {
+  // Save locally right away so user edits always persist seamlessly
+  try {
+    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
+  } catch {
+    // ignore
+  }
+
+  // Also record an audit event locally
+  try {
+    const rawLogs = localStorage.getItem("listora_audit_logs");
+    const logs = rawLogs ? JSON.parse(rawLogs) : [];
+    logs.unshift({
+      id: "aud-" + Date.now(),
+      eventType: "PROFILE_UPDATED",
+      actor: "owner",
+      actorEmail: getStoredUser()?.email || "admin@listora.ai",
+      timestamp: new Date().toISOString().replace("T", " ").slice(0, 19),
+      summary: `Updated canonical business profile (${profile.name})`,
+      payload: {
+        name: profile.name,
+        address: profile.address,
+        phone: profile.phone,
+      },
+    });
+    localStorage.setItem("listora_audit_logs", JSON.stringify(logs.slice(0, 50)));
+  } catch {
+    // ignore
+  }
+
+  // Attempt backend update
+  try {
+    const res = await fetch(`${baseUrl}/api/v1/profile`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(profile),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return {
+        name: data.name,
+        address: data.address || profile.address,
+        phone: data.phone || profile.phone,
+        regularHours: (data.regularHours as Record<string, string>) || profile.regularHours,
+        holidayHours: (data.holidayHours as Record<string, string>) || profile.holidayHours,
+      };
+    }
+  } catch {
+    // Backend offline
+  }
+
+  return profile;
+}
+
+export async function fetchAuditLogs(): Promise<any[]> {
+  try {
+    const res = await fetch(`${baseUrl}/api/v1/audit`, { credentials: "include" });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data)) return data;
+      if (data?.data && Array.isArray(data.data)) return data.data;
+    }
+  } catch {
+    // backend offline
+  }
+
+  try {
+    const raw = localStorage.getItem("listora_audit_logs");
+    if (raw) return JSON.parse(raw);
+  } catch {
+    // ignore
+  }
+
+  return [];
+}
+
 
 

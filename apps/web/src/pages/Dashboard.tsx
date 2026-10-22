@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Progress } from "@animate-ui/react/primitives/base-ui/progress";
 import { AlertsRail } from "../components/dashboard/AlertsRail";
@@ -6,10 +6,16 @@ import { ListingsGrid } from "../components/dashboard/ListingsGrid";
 import { MismatchPanel } from "../components/dashboard/MismatchPanel";
 import { ScoreHero } from "../components/dashboard/ScoreHero";
 import { RefreshCw } from "../components/animate-ui/icons/refresh-cw";
-import { DEMO_DASHBOARD } from "../lib/dashboard-data";
+import { DEMO_DASHBOARD, buildDashboardSnapshot } from "../lib/dashboard-data";
 import { cn } from "../lib/cn";
 import { ease, focus, muted } from "../lib/styles";
-import { runAgentAnalysis, refreshListings as apiRefreshListings, getStoredUser, type AgentAnalysisResponse } from "../lib/api";
+import {
+  runAgentAnalysis,
+  refreshListings as apiRefreshListings,
+  getStoredUser,
+  getBusinessProfile,
+  type AgentAnalysisResponse,
+} from "../lib/api";
 import { Sparkles, ArrowRight, Bot, Lock } from "lucide-react";
 
 
@@ -19,6 +25,24 @@ export default function Dashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const [agentRunning, setAgentRunning] = useState(false);
   const [agentResult, setAgentResult] = useState<AgentAnalysisResponse | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function syncProfile() {
+      try {
+        const profile = await getBusinessProfile();
+        if (!cancelled && profile) {
+          setData(buildDashboardSnapshot(profile));
+        }
+      } catch {
+        // ignore
+      }
+    }
+    syncProfile();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const currentUser = getStoredUser();
   const isViewer = currentUser?.role === "VIEWER";

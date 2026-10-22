@@ -4,10 +4,15 @@ import { Check, X, Sparkles, CheckCircle2, Eye, Lock, UploadCloud } from "lucide
 import { Tabs } from "@animate-ui/react/primitives/base-ui/tabs";
 import { cn } from "../lib/cn";
 import { focus, muted } from "../lib/styles";
-import { getStoredUser, approveProposal, rejectProposal, applyUpdates, getProposals, verifyUpdates } from "../lib/api";
-
-
-
+import {
+  getStoredUser,
+  approveProposal,
+  rejectProposal,
+  applyUpdates,
+  getProposals,
+  verifyUpdates,
+  getBusinessProfile,
+} from "../lib/api";
 
 export type ProposalItem = {
   id: string;
@@ -22,71 +27,77 @@ export type ProposalItem = {
   createdAt: string;
 };
 
-const INITIAL_PROPOSALS: ProposalItem[] = [
-  {
-    id: "prop-1",
-    platform: "mockMapsA",
-    field: "phone",
-    oldValue: "(555) 010-2234",
-    newValue: "+15550102234",
-    status: "PENDING_APPROVAL",
-    confidence: 99,
-    reason: "Standardize formatting to E.164 canonical telephone protocol.",
-    riskLevel: "low",
-    createdAt: "10 mins ago",
-  },
-  {
-    id: "prop-2",
-    platform: "mockMapsB",
-    field: "hours",
-    oldValue: "Mon–Sat 7–5",
-    newValue: "Mon–Fri 07:00-18:00, Sat 08:00-20:00, Sun 09:00-16:00",
-    status: "PENDING_APPROVAL",
-    confidence: 96,
-    reason: "Saturday and Sunday operating schedules contradict approved hours.",
-    riskLevel: "medium",
-    createdAt: "22 mins ago",
-  },
-  {
-    id: "prop-3",
-    platform: "mockDirectoryC",
-    field: "name",
-    oldValue: "Bella Cucina (Downtown)",
-    newValue: "Bella Cucina Ristorante",
-    status: "PENDING_APPROVAL",
-    confidence: 92,
-    reason: "Removes unauthorized location qualifier to align with legal branding.",
-    riskLevel: "high",
-    createdAt: "1 hour ago",
-  },
-  {
-    id: "prop-4",
-    platform: "mockMapsA",
-    field: "holidayHours",
-    oldValue: "Open Dec 25",
-    newValue: "closed",
-    status: "APPROVED",
-    confidence: 98,
-    reason: "Store is marked closed on Christmas Day in canonical profile.",
-    riskLevel: "low",
-    createdAt: "3 hours ago",
-  },
-  {
-    id: "prop-5",
-    platform: "mockDirectoryC",
-    field: "address",
-    oldValue: "42 Maple St Suite B",
-    newValue: "42 Maple Street, Springfield, IL 62701",
-    status: "REJECTED",
-    confidence: 84,
-    reason: "Suite unit discrepancy flagged as unsafe without human verification.",
-    riskLevel: "high",
-    createdAt: "Yesterday",
-  },
-];
+function createProposalsForProfile(profile: any): ProposalItem[] {
+  const profileName = profile?.name || "Brew & Bloom Café";
+  const profilePhone = profile?.phone || "+15550102234";
+  const formattedHours = profile?.regularHours?.monday ? `Mon-Fri ${profile.regularHours.monday}` : "Mon–Fri 07:00-18:00, Sat 08:00-20:00, Sun 09:00-16:00";
+
+  return [
+    {
+      id: "prop-1",
+      platform: "mockMapsA",
+      field: "phone",
+      oldValue: "(555) 010-2234",
+      newValue: profilePhone,
+      status: "PENDING_APPROVAL",
+      confidence: 99,
+      reason: `Standardize telephone to canonical international E.164 protocol (${profilePhone}).`,
+      riskLevel: "low",
+      createdAt: "10 mins ago",
+    },
+    {
+      id: "prop-2",
+      platform: "mockMapsB",
+      field: "hours",
+      oldValue: "Mon–Sat 7–5",
+      newValue: formattedHours,
+      status: "PENDING_APPROVAL",
+      confidence: 96,
+      reason: `Operating schedule on listing contradicts approved canonical hours (${formattedHours}).`,
+      riskLevel: "medium",
+      createdAt: "22 mins ago",
+    },
+    {
+      id: "prop-3",
+      platform: "mockDirectoryC",
+      field: "name",
+      oldValue: `${profileName} (Downtown)`,
+      newValue: profileName,
+      status: "PENDING_APPROVAL",
+      confidence: 92,
+      reason: `Standardizes listing to match registered trade name (${profileName}).`,
+      riskLevel: "high",
+      createdAt: "1 hour ago",
+    },
+    {
+      id: "prop-4",
+      platform: "mockMapsA",
+      field: "holidayHours",
+      oldValue: "Open Dec 25",
+      newValue: "closed",
+      status: "APPROVED",
+      confidence: 98,
+      reason: "Store is marked closed on Christmas Day in canonical profile.",
+      riskLevel: "low",
+      createdAt: "3 hours ago",
+    },
+    {
+      id: "prop-5",
+      platform: "mockDirectoryC",
+      field: "address",
+      oldValue: "42 Maple St Suite B",
+      newValue: profile?.address || "42 Maple Street, Springfield, IL 62701",
+      status: "REJECTED",
+      confidence: 84,
+      reason: "Suite unit discrepancy flagged as unsafe without human verification.",
+      riskLevel: "high",
+      createdAt: "Yesterday",
+    },
+  ];
+}
 
 export default function Approvals() {
-  const [proposals, setProposals] = useState<ProposalItem[]>(INITIAL_PROPOSALS);
+  const [proposals, setProposals] = useState<ProposalItem[]>(() => createProposalsForProfile(null));
   const [filter, setFilter] = useState("all");
   const [batchActionRunning, setBatchActionRunning] = useState(false);
 
@@ -145,6 +156,18 @@ export default function Approvals() {
     let cancelled = false;
     async function loadBackendProposals() {
       try {
+        const profile = await getBusinessProfile();
+        if (!cancelled && profile) {
+          setProposals((prev) => {
+            const dynamic = createProposalsForProfile(profile);
+            const statusMap = new Map(prev.map((p) => [p.id, p.status]));
+            return dynamic.map((d) => ({
+              ...d,
+              status: statusMap.get(d.id) || d.status,
+            }));
+          });
+        }
+
         const data = await getProposals();
         if (data && Array.isArray(data) && data.length > 0 && !cancelled) {
           const mapped: ProposalItem[] = data.map((item: any) => ({
@@ -167,7 +190,7 @@ export default function Approvals() {
           });
         }
       } catch {
-        // use initial proposals fallback
+        // use fallback
       }
     }
     loadBackendProposals();
