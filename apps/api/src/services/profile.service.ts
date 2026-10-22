@@ -20,12 +20,37 @@ export type ProfileUpdateInput = z.infer<typeof ProfileUpdateSchema>;
 
 const PROFILE_ID = 'profile-seed-001';
 
+const DEFAULT_PROFILE = {
+  id: PROFILE_ID,
+  name: 'Brew & Bloom Café',
+  address: '42 Maple Street, Springfield, IL 62701',
+  phone: '+15550102234',
+  regularHours: {
+    monday: '07:00-18:00',
+    tuesday: '07:00-18:00',
+    wednesday: '07:00-18:00',
+    thursday: '07:00-18:00',
+    friday: '07:00-20:00',
+    saturday: '08:00-20:00',
+    sunday: '09:00-16:00',
+  },
+  holidayHours: {
+    '2026-12-25': 'closed',
+    '2026-01-01': 'closed',
+  },
+};
+
 /**
- * Returns the single business profile, or throws 404 if not yet seeded.
+ * Returns the single business profile.
+ * If the profile has never been seeded, auto-creates it so the API is
+ * immediately usable without running `db:seed` separately.
  */
 export async function getProfile() {
-  const profile = await prisma.businessProfile.findUnique({ where: { id: PROFILE_ID } });
-  if (!profile) throw new AppError(404, 'Business profile not found. Run db:seed first.');
+  const profile = await prisma.businessProfile.upsert({
+    where: { id: PROFILE_ID },
+    update: {},
+    create: DEFAULT_PROFILE,
+  });
   return profile;
 }
 
