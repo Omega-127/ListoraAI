@@ -7,7 +7,7 @@ import { requireRole } from '../middleware/auth';
 const router = Router();
 
 const VerifySchema = z.object({
-  proposalId: z.string().uuid().optional(),
+  proposalId: z.string().min(1).optional(),
 });
 
 router.post('/', requireRole('ADMIN', 'OPERATOR'), validate({ body: VerifySchema }), async (req, res, next) => {
