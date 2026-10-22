@@ -17,9 +17,20 @@
  * NOTE: Tests that hit the database will fail gracefully in CI without a DB.
  * Tests that only test auth guards work without a DB connection.
  */
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll, vi } from 'vitest';
 import request from 'supertest';
 import { createApp } from '../../src/app';
+import * as agentModule from '../../src/agent/agent';
+
+// Mock runAgent so analyze route test does not perform real network calls or DB lookups
+vi.spyOn(agentModule, 'runAgent').mockResolvedValue({
+  agentRunId: 'test-run-mock',
+  mode: 'heuristic',
+  durationMs: 5,
+  proposalsCreated: 0,
+  proposals: [],
+  summary: 'Mock test run completed',
+});
 
 // Provide minimal env vars before the app is created
 process.env.DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://test:test@localhost:5432/test';
