@@ -87,15 +87,26 @@ export default function Report() {
     await new Promise((r) => setTimeout(r, 300));
     setProgressVal(100);
 
+    let phone = "+15550102234";
+    try {
+      const stored = localStorage.getItem("listora_canonical_business_profile");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.phone) phone = parsed.phone;
+      }
+    } catch {
+      // ignore
+    }
+
     const newEntry: ReportRow = {
       id: `rep-${Date.now()}`,
-      platform: "mockMapsB",
+      platform: "mockMapsA",
       field: "phone",
-      beforeValue: "555 0124",
-      afterValue: "+15550102234",
+      beforeValue: "(555) 010-2234",
+      afterValue: phone,
       appliedAt: "Just now",
       verificationStatus: "VERIFIED",
-      apiLatencyMs: 165,
+      apiLatencyMs: 145,
     };
     setReports((prev) => [newEntry, ...prev]);
     setIsApplying(false);

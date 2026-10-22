@@ -34,6 +34,7 @@ export function ListingsGrid({ listings }: ListingsGridProps) {
           <dl className="mt-4 space-y-2 text-xs">
             {(
               [
+                ["Name", listing.values.name],
                 ["Phone", listing.values.phone],
                 ["Hours", listing.values.hours],
                 ["Holiday", listing.values.holiday],
@@ -41,7 +42,7 @@ export function ListingsGrid({ listings }: ListingsGridProps) {
             ).map(([label, value]) => (
               <div key={label} className="flex items-baseline justify-between gap-3 border-t border-[var(--border)] pt-2 first:border-t-0 first:pt-0">
                 <dt className={muted}>{label}</dt>
-                <dd className="truncate tabular-nums text-right">{value}</dd>
+                <dd className="truncate tabular-nums text-right font-mono max-w-[180px]">{value}</dd>
               </div>
             ))}
           </dl>
