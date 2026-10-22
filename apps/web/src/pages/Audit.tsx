@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, User, Bot, Server, ChevronRight } from "lucide-react";
 import { Accordion } from "@animate-ui/react/primitives/base-ui/accordion";
 import { cn } from "../lib/cn";
 import { focus, muted } from "../lib/styles";
+import { fetchAuditLogs } from "../lib/api";
 
 export type AuditEvent = {
   id: string;
@@ -80,9 +81,31 @@ const INITIAL_LOGS: AuditEvent[] = [
 ];
 
 export default function Audit() {
-  const [logs] = useState<AuditEvent[]>(INITIAL_LOGS);
+  const [logs, setLogs] = useState<AuditEvent[]>(INITIAL_LOGS);
   const [filterActor, setFilterActor] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadLogs() {
+      try {
+        const fresh = await fetchAuditLogs();
+        if (!cancelled && Array.isArray(fresh) && fresh.length > 0) {
+          setLogs((prev) => {
+            const seen = new Set(prev.map((l) => l.id));
+            const newEntries = fresh.filter((f) => !seen.has(f.id));
+            return [...newEntries, ...prev];
+          });
+        }
+      } catch {
+        // ignore
+      }
+    }
+    loadLogs();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const filtered = logs.filter((log) => {
     if (filterActor !== "all" && log.actor !== filterActor) return false;
