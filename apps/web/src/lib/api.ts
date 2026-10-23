@@ -65,38 +65,9 @@ export async function login(payload: LoginPayload): Promise<{ user: UserProfile 
       credentials: "include",
       body: JSON.stringify(payload),
     });
-<<<<<<< HEAD
-
-    const data = (await res.json().catch(() => ({}))) as ApiError & {
-      user?: UserProfile;
-      email?: string;
-    };
-
-    if (!res.ok) {
-      throw new Error(data.error || data.message || "Invalid credentials");
-    }
-
-    const user: UserProfile = data.user || {
-      id: "usr-" + Date.now(),
-      email: data.email ?? payload.email,
-      name: payload.email.split("@")[0],
-      role: payload.email.includes("viewer")
-        ? "VIEWER"
-        : "OPERATOR",
-    };
-
-    setStoredUser(user);
-    return { user };
-  } catch (err) {
-    // Demo fallback when API server is not running locally
-    const role: UserRole = payload.email.includes("viewer") ? "VIEWER" : "OPERATOR";
-=======
   } catch {
     // Demo fallback only when API server is unreachable
-    let role: UserRole = "OPERATOR";
-    if (payload.email.includes("admin")) role = "ADMIN";
-    if (payload.email.includes("viewer")) role = "VIEWER";
->>>>>>> 61d77d83dec1e081f5f4e8999b919b57669b265d
+    const role: UserRole = payload.email.includes("viewer") ? "VIEWER" : "OPERATOR";
 
     const demoUser: UserProfile = {
       id: "demo-" + role.toLowerCase(),
@@ -121,11 +92,7 @@ export async function login(payload: LoginPayload): Promise<{ user: UserProfile 
     id: "usr-" + Date.now(),
     email: data.email ?? payload.email,
     name: payload.email.split("@")[0],
-    role: payload.email.includes("admin")
-      ? "ADMIN"
-      : payload.email.includes("viewer")
-      ? "VIEWER"
-      : "OPERATOR",
+    role: payload.email.includes("viewer") ? "VIEWER" : "OPERATOR",
   };
 
   setStoredUser(user);

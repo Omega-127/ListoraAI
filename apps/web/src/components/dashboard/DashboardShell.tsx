@@ -101,11 +101,7 @@ function SidebarBody({ onNavigate, collapsed }: { onNavigate?: () => void; colla
     navigate("/login", { replace: true });
   };
 
-<<<<<<< HEAD
   const activeRole: UserRole = user?.role || "OPERATOR";
-=======
-  const activeRole: UserRole = user?.role || "VIEWER";
->>>>>>> 61d77d83dec1e081f5f4e8999b919b57669b265d
 
   return (
     <>
@@ -148,36 +144,13 @@ function SidebarBody({ onNavigate, collapsed }: { onNavigate?: () => void; colla
       </div>
 
       {/* User profile & Logout */}
-<<<<<<< HEAD
-      <div className="border-t border-[var(--border)] p-3 space-y-2">
-        <div className="flex items-center justify-between px-2">
-          <div className="min-w-0">
-            <p className="text-xs font-medium text-neutral-200 truncate">{user?.name || "Active Session"}</p>
-            <p className={`text-[11px] truncate ${muted}`}>{user?.email || "operator@listora.ai"}</p>
-          </div>
-          <RoleBadge role={activeRole} />
-        </div>
-        <button
-          type="button"
-          onClick={handleLogout}
-          className={cn(
-            "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium",
-            muted,
-            "hover:text-[var(--foreground)] hover:bg-white/5",
-            focus,
-          )}
-        >
-          <LogOut className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={1.75} />
-          <span>Log out</span>
-        </button>
-=======
       <div className={cn("border-t border-[var(--border)]", collapsed ? "p-2 flex flex-col items-center gap-2" : "p-3 space-y-2")}>
         {!collapsed ? (
           <>
             <div className="flex items-center justify-between px-2">
               <div className="min-w-0">
                 <p className="text-xs font-medium text-[var(--foreground)] truncate">{user?.name || "Active Session"}</p>
-                <p className={`text-[11px] truncate ${muted}`}>{user?.email || "admin@listora.ai"}</p>
+                <p className={`text-[11px] truncate ${muted}`}>{user?.email || "operator@listora.ai"}</p>
               </div>
               <RoleBadge role={activeRole} />
             </div>
@@ -219,7 +192,6 @@ function SidebarBody({ onNavigate, collapsed }: { onNavigate?: () => void; colla
             </button>
           </>
         )}
->>>>>>> 61d77d83dec1e081f5f4e8999b919b57669b265d
       </div>
     </>
   );
@@ -263,16 +235,10 @@ function DesktopSidebar() {
 }
 
 function ShellChrome() {
-<<<<<<< HEAD
-  const { toggleSidebar, isMobile, openMobile } = Sidebar.useSidebar();
-  const [user] = useState<UserProfile | null>(getStoredUser());
-  const activeRole: UserRole = user?.role || "OPERATOR";
-=======
   const { toggleSidebar, isMobile, openMobile, open } = Sidebar.useSidebar();
   const { user } = useAuth();
-  const activeRole: UserRole = user?.role || "VIEWER";
+  const activeRole: UserRole = user?.role || "OPERATOR";
   const isOpen = isMobile ? openMobile : open;
->>>>>>> 61d77d83dec1e081f5f4e8999b919b57669b265d
 
   return (
     <>

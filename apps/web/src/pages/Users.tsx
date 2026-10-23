@@ -1,12 +1,7 @@
 import { useState, useEffect } from "react";
-<<<<<<< HEAD
 import { Users as UsersIcon, UserCheck, Eye, Check, RefreshCw } from "lucide-react";
-import { listUsers, updateUserRole, getStoredUser, setStoredUser, type UserProfile, type UserRole } from "../lib/api";
-=======
-import { Users as UsersIcon, ShieldCheck, UserCheck, Eye, Check, RefreshCw } from "lucide-react";
 import { listUsers, updateUserRole, type UserProfile, type UserRole } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
->>>>>>> 61d77d83dec1e081f5f4e8999b919b57669b265d
 import { cn } from "../lib/cn";
 import { focus, muted } from "../lib/styles";
 
@@ -137,14 +132,8 @@ export default function Users() {
             <thead>
               <tr className="border-b border-[var(--border)] text-[var(--muted-foreground)]">
                 <th className="py-2.5 pr-4 font-medium">Capability</th>
-<<<<<<< HEAD
-                <th className="py-2.5 px-4 font-medium text-amber-400">Operator</th>
-                <th className="py-2.5 px-4 font-medium text-blue-400">Viewer</th>
-=======
-                <th className="py-2.5 px-4 font-medium text-emerald-600 dark:text-emerald-400">Admin</th>
                 <th className="py-2.5 px-4 font-medium text-amber-600 dark:text-amber-400">Operator</th>
                 <th className="py-2.5 px-4 font-medium text-blue-600 dark:text-blue-400">Viewer</th>
->>>>>>> 61d77d83dec1e081f5f4e8999b919b57669b265d
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border)]">
@@ -156,18 +145,10 @@ export default function Users() {
                 { cap: "Edit Canonical Business Profile & Schedules", op: true, viewer: false },
                 { cap: "Manage Users & Assign Roles", op: true, viewer: false },
               ].map((row, idx) => (
-<<<<<<< HEAD
-                <tr key={idx} className="hover:bg-white/[0.02]">
-                  <td className="py-2.5 pr-4 font-medium text-neutral-300">{row.cap}</td>
-                  <td className="py-2.5 px-4 text-amber-400">{row.op ? "✓ Allowed" : "— Read Only"}</td>
-                  <td className="py-2.5 px-4 text-blue-400">{row.viewer ? "✓ Allowed" : "— Forbidden"}</td>
-=======
                 <tr key={idx} className="hover:bg-black/5 dark:hover:bg-white/[0.02]">
                   <td className="py-2.5 pr-4 font-medium text-[var(--foreground)]">{row.cap}</td>
-                  <td className="py-2.5 px-4 text-emerald-600 dark:text-emerald-400">{row.admin ? "✓ Allowed" : "—"}</td>
                   <td className="py-2.5 px-4 text-amber-600 dark:text-amber-400">{row.op ? "✓ Allowed" : "— Read Only"}</td>
                   <td className="py-2.5 px-4 text-blue-600 dark:text-blue-400">{row.viewer ? "✓ Allowed" : "— Forbidden"}</td>
->>>>>>> 61d77d83dec1e081f5f4e8999b919b57669b265d
                 </tr>
               ))}
             </tbody>

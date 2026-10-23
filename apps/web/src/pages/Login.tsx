@@ -4,8 +4,7 @@ import { AuthShell, fieldClass, labelClass, primaryBtnClass } from "../component
 import { useAuth } from "../context/AuthContext";
 import type { UserRole } from "../lib/api";
 import { focus, muted } from "../lib/styles";
-=======
-import { ShieldCheck, UserCheck, Eye, Lock } from "lucide-react";
+import { UserCheck, Eye, Lock } from "lucide-react";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -101,16 +100,7 @@ export default function Login() {
           <p className={`text-[11px] font-medium uppercase tracking-wider mb-2 ${muted}`}>
             Quick Demo Role Login:
           </p>
-=======
-          <div className="grid grid-cols-3 gap-1.5 text-xs">
-            <button
-              type="button"
-              onClick={() => fillDemo("ADMIN")}
-              className="flex items-center justify-center gap-1.5 rounded border border-[var(--border)] bg-white dark:bg-white/5 py-1.5 px-2 hover:bg-black/5 dark:hover:bg-white/15 transition-colors text-[var(--foreground)] shadow-xs"
-            >
-              <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-              <span>Admin</span>
-            </button>
+          <div className="grid grid-cols-2 gap-1.5 text-xs">
             <button
               type="button"
               onClick={() => fillDemo("OPERATOR")}
