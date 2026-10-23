@@ -19,8 +19,8 @@ const INITIAL_ALERTS: SystemAlert[] = [
   {
     id: "alt-1",
     tone: "blocked",
-    title: "Maps B read-only provider lockout",
-    description: "Write access failed: API keys have write restrictions on mockMapsB. Updates require manual export or upgraded provider credentials.",
+    title: "Mappls (MapmyIndia) read-only partner restriction",
+    description: "Write access restricted: Partner API tier on Mappls (MapmyIndia) is read-only. Updates require verified partner credentials or manual portal verification.",
     targetLink: "/dashboard/report",
     linkLabel: "View report",
     createdAt: "12 mins ago",
@@ -39,8 +39,8 @@ const INITIAL_ALERTS: SystemAlert[] = [
   {
     id: "alt-3",
     tone: "warn",
-    title: "Holiday hours conflict on Maps A",
-    description: "Christmas Day operating status conflicts with your approved profile (Open Dec 25 vs Closed).",
+    title: "Holiday schedule conflict on Google Maps (India)",
+    description: "Republic Day (2026-01-26) operating status conflicts with your approved profile (Open Jan 26 vs Closed).",
     targetLink: "/dashboard/approvals",
     linkLabel: "Inspect conflict",
     createdAt: "2 hours ago",
@@ -50,7 +50,7 @@ const INITIAL_ALERTS: SystemAlert[] = [
     id: "alt-4",
     tone: "info",
     title: "Scheduled consistency check finished",
-    description: "All 3 mock directories evaluated. Consistency score improved from 55% to 67%.",
+    description: "All 3 Indian mapping & directory platforms evaluated (Google Maps India, Mappls, Justdial). Consistency score improved to 84%.",
     targetLink: "/dashboard/score",
     linkLabel: "View score",
     createdAt: "5 hours ago",
@@ -111,8 +111,10 @@ export default function Alerts() {
           type="button"
           onClick={() => setFilterTone("all")}
           className={cn(
-            "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-            filterTone === "all" ? "bg-white/10 text-white" : "text-[var(--muted-foreground)] hover:text-white"
+            "rounded-md px-3 py-1.5 text-xs font-medium transition-colors border border-[var(--border)]",
+            filterTone === "all"
+              ? "bg-[var(--primary)] text-[var(--primary-foreground)] shadow-sm"
+              : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/5"
           )}
         >
           All ({alerts.length})
@@ -121,8 +123,10 @@ export default function Alerts() {
           type="button"
           onClick={() => setFilterTone("blocked")}
           className={cn(
-            "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-            filterTone === "blocked" ? "bg-white/10 text-white" : "text-[var(--muted-foreground)] hover:text-white"
+            "rounded-md px-3 py-1.5 text-xs font-medium transition-colors border border-[var(--border)]",
+            filterTone === "blocked"
+              ? "bg-[var(--primary)] text-[var(--primary-foreground)] shadow-sm"
+              : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/5"
           )}
         >
           Blocked ({alerts.filter((a) => a.tone === "blocked").length})
@@ -131,8 +135,10 @@ export default function Alerts() {
           type="button"
           onClick={() => setFilterTone("warn")}
           className={cn(
-            "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-            filterTone === "warn" ? "bg-white/10 text-white" : "text-[var(--muted-foreground)] hover:text-white"
+            "rounded-md px-3 py-1.5 text-xs font-medium transition-colors border border-[var(--border)]",
+            filterTone === "warn"
+              ? "bg-[var(--primary)] text-[var(--primary-foreground)] shadow-sm"
+              : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/5"
           )}
         >
           Warnings ({alerts.filter((a) => a.tone === "warn").length})
@@ -141,8 +147,10 @@ export default function Alerts() {
           type="button"
           onClick={() => setFilterTone("info")}
           className={cn(
-            "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-            filterTone === "info" ? "bg-white/10 text-white" : "text-[var(--muted-foreground)] hover:text-white"
+            "rounded-md px-3 py-1.5 text-xs font-medium transition-colors border border-[var(--border)]",
+            filterTone === "info"
+              ? "bg-[var(--primary)] text-[var(--primary-foreground)] shadow-sm"
+              : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/5"
           )}
         >
           Info ({alerts.filter((a) => a.tone === "info").length})
@@ -152,7 +160,7 @@ export default function Alerts() {
       {/* Alert Feed */}
       <div className="flex flex-col gap-3">
         {filtered.length === 0 ? (
-          <div className="rounded-xl border border-[var(--border)] bg-[#0d0d0d]/80 p-8 text-center text-sm text-[var(--muted-foreground)]">
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-8 text-center text-sm text-[var(--muted-foreground)] shadow-sm">
             No alerts in this category.
           </div>
         ) : (
@@ -160,8 +168,10 @@ export default function Alerts() {
             <div
               key={item.id}
               className={cn(
-                "rounded-xl border p-4 sm:p-5 transition-colors",
-                !item.read ? "bg-[#111111] border-neutral-700" : "bg-[#0d0d0d]/80 border-[var(--border)]"
+                "rounded-xl border p-4 sm:p-5 transition-colors shadow-sm",
+                !item.read
+                  ? "bg-slate-50 dark:bg-[#111111] border-neutral-300 dark:border-neutral-700"
+                  : "bg-[var(--card)] border-[var(--border)]"
               )}
             >
               <div className="flex items-start gap-3.5">
@@ -195,7 +205,7 @@ export default function Alerts() {
                       <Link
                         to={item.targetLink}
                         className={cn(
-                          "inline-flex items-center gap-1 text-xs font-medium text-white hover:underline",
+                          "inline-flex items-center gap-1 text-xs font-medium text-[var(--foreground)] hover:underline",
                           focus
                         )}
                       >
@@ -207,7 +217,7 @@ export default function Alerts() {
                       <button
                         type="button"
                         onClick={() => markAsRead(item.id)}
-                        className="text-xs text-neutral-400 hover:text-white"
+                        className="text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                       >
                         Mark as read
                       </button>
@@ -215,7 +225,7 @@ export default function Alerts() {
                     <button
                       type="button"
                       onClick={() => deleteAlert(item.id)}
-                      className="text-xs text-neutral-500 hover:text-rose-400 ml-auto"
+                      className="text-xs text-[var(--muted-foreground)] hover:text-rose-500 ml-auto"
                       title="Dismiss alert"
                     >
                       <Trash2 className="h-3.5 w-3.5" />

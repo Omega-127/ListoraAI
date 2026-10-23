@@ -22,21 +22,23 @@ const PROFILE_ID = 'profile-seed-001';
 
 const DEFAULT_PROFILE = {
   id: PROFILE_ID,
-  name: 'Brew & Bloom Café',
-  address: '42 Maple Street, Springfield, IL 62701',
-  phone: '+15550102234',
+  name: 'The Bombay Roastery & Café',
+  address: 'Plot 742, 12th Main Road, HAL 2nd Stage, Indiranagar, Bengaluru, Karnataka 560038',
+  phone: '+918041234567',
   regularHours: {
-    monday: '07:00-18:00',
-    tuesday: '07:00-18:00',
-    wednesday: '07:00-18:00',
-    thursday: '07:00-18:00',
-    friday: '07:00-20:00',
-    saturday: '08:00-20:00',
-    sunday: '09:00-16:00',
+    monday: '07:00-22:00',
+    tuesday: '07:00-22:00',
+    wednesday: '07:00-22:00',
+    thursday: '07:00-22:00',
+    friday: '07:00-23:00',
+    saturday: '08:00-23:00',
+    sunday: '08:00-22:00',
   },
   holidayHours: {
-    '2026-12-25': 'closed',
-    '2026-01-01': 'closed',
+    '2026-01-26': 'closed', // Republic Day
+    '2026-08-15': 'closed', // Independence Day
+    '2026-10-02': 'closed', // Gandhi Jayanti
+    '2026-11-08': 'closed', // Diwali
   },
 };
 

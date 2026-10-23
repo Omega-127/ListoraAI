@@ -1,12 +1,14 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthShell, fieldClass, labelClass, primaryBtnClass } from "../components/AuthShell";
-import { register, type UserRole } from "../lib/api";
+import { useAuth } from "../context/AuthContext";
+import type { UserRole } from "../lib/api";
 import { focus, muted } from "../lib/styles";
 import { UserCheck, Eye } from "lucide-react";
 
 export default function Register() {
   const navigate = useNavigate();
+  const { register } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -98,14 +100,31 @@ export default function Register() {
         {/* Role Selector */}
         <div>
           <label className={labelClass}>Select Role</label>
+<<<<<<< HEAD
           <div className="grid grid-cols-2 gap-2 mt-1">
+=======
+          <div className="grid grid-cols-3 gap-2 mt-1">
+            <button
+              type="button"
+              onClick={() => setRole("ADMIN")}
+              className={`flex flex-col items-center justify-center gap-1 rounded-lg border p-2 text-xs transition-colors ${
+                role === "ADMIN"
+                  ? "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 shadow-sm"
+                  : "border-[var(--border)] bg-slate-50 dark:bg-white/5 text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/10"
+              }`}
+            >
+              <ShieldCheck className="h-4 w-4" />
+              <span className="font-medium">Admin</span>
+              <span className="text-[10px] opacity-70">Full Access</span>
+            </button>
+>>>>>>> 61d77d83dec1e081f5f4e8999b919b57669b265d
             <button
               type="button"
               onClick={() => setRole("OPERATOR")}
               className={`flex flex-col items-center justify-center gap-1 rounded-lg border p-2 text-xs transition-colors ${
                 role === "OPERATOR"
-                  ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
-                  : "border-white/10 bg-white/5 text-neutral-400 hover:bg-white/10"
+                  ? "border-amber-500 bg-amber-500/10 text-amber-700 dark:text-amber-300 shadow-sm"
+                  : "border-[var(--border)] bg-slate-50 dark:bg-white/5 text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/10"
               }`}
             >
               <UserCheck className="h-4 w-4" />
@@ -117,8 +136,8 @@ export default function Register() {
               onClick={() => setRole("VIEWER")}
               className={`flex flex-col items-center justify-center gap-1 rounded-lg border p-2 text-xs transition-colors ${
                 role === "VIEWER"
-                  ? "border-blue-500/50 bg-blue-500/10 text-blue-300"
-                  : "border-white/10 bg-white/5 text-neutral-400 hover:bg-white/10"
+                  ? "border-blue-500 bg-blue-500/10 text-blue-700 dark:text-blue-300 shadow-sm"
+                  : "border-[var(--border)] bg-slate-50 dark:bg-white/5 text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/10"
               }`}
             >
               <Eye className="h-4 w-4" />

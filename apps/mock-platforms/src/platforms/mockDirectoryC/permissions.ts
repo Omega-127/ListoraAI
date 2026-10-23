@@ -12,9 +12,9 @@ export const mockDirectoryCPermissions: PlatformPermissions = {
   canRead: true,
   canWrite: true,
   blockedDates: [
-    '2026-12-25', // Christmas Day
-    '2026-01-01', // New Year's Day
-    // Add today's date here to demo the holiday block live:
-    // new Date().toISOString().slice(0, 10),
+    '2026-01-26', // Republic Day
+    '2026-08-15', // Independence Day
+    '2026-10-02', // Gandhi Jayanti
+    '2026-11-08', // Diwali
   ],
 };

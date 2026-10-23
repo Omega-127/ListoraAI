@@ -1,16 +1,22 @@
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthShell, fieldClass, labelClass, primaryBtnClass } from "../components/AuthShell";
-import { login, type UserRole } from "../lib/api";
+import { useAuth } from "../context/AuthContext";
+import type { UserRole } from "../lib/api";
 import { focus, muted } from "../lib/styles";
-import { UserCheck, Eye } from "lucide-react";
+=======
+import { ShieldCheck, UserCheck, Eye, Lock } from "lucide-react";
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+
+  const redirectMessage = (location.state as { message?: string })?.message;
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -18,7 +24,8 @@ export default function Login() {
     setPending(true);
     try {
       await login({ email: email.trim(), password });
-      navigate("/dashboard", { replace: true });
+      const destination = (location.state as { from?: { pathname?: string } })?.from?.pathname || "/dashboard";
+      navigate(destination, { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Invalid credentials");
     } finally {
@@ -49,6 +56,12 @@ export default function Login() {
         </>
       }
     >
+      {redirectMessage && !error && (
+        <div className="mb-4 rounded-lg bg-indigo-500/10 border border-indigo-500/20 px-3 py-2 text-sm text-indigo-300 flex items-center gap-2">
+          <Lock className="h-4 w-4 shrink-0 text-indigo-400" />
+          <span>{redirectMessage}</span>
+        </div>
+      )}
       <form onSubmit={onSubmit} className="space-y-4" noValidate>
         <div>
           <label htmlFor="login-email" className={labelClass}>
@@ -84,25 +97,34 @@ export default function Login() {
         </div>
 
         {/* Demo Role Presets */}
-        <div className="rounded-lg border border-[var(--border)] bg-black/40 p-3">
+        <div className="rounded-lg border border-[var(--border)] bg-slate-50 dark:bg-black/40 p-3">
           <p className={`text-[11px] font-medium uppercase tracking-wider mb-2 ${muted}`}>
             Quick Demo Role Login:
           </p>
-          <div className="grid grid-cols-2 gap-1.5 text-xs">
+=======
+          <div className="grid grid-cols-3 gap-1.5 text-xs">
+            <button
+              type="button"
+              onClick={() => fillDemo("ADMIN")}
+              className="flex items-center justify-center gap-1.5 rounded border border-[var(--border)] bg-white dark:bg-white/5 py-1.5 px-2 hover:bg-black/5 dark:hover:bg-white/15 transition-colors text-[var(--foreground)] shadow-xs"
+            >
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>Admin</span>
+            </button>
             <button
               type="button"
               onClick={() => fillDemo("OPERATOR")}
-              className="flex items-center justify-center gap-1.5 rounded border border-white/10 bg-white/5 py-1.5 px-2 hover:bg-white/15 transition-colors"
+              className="flex items-center justify-center gap-1.5 rounded border border-[var(--border)] bg-white dark:bg-white/5 py-1.5 px-2 hover:bg-black/5 dark:hover:bg-white/15 transition-colors text-[var(--foreground)] shadow-xs"
             >
-              <UserCheck className="h-3.5 w-3.5 text-amber-400" />
+              <UserCheck className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
               <span>Operator</span>
             </button>
             <button
               type="button"
               onClick={() => fillDemo("VIEWER")}
-              className="flex items-center justify-center gap-1.5 rounded border border-white/10 bg-white/5 py-1.5 px-2 hover:bg-white/15 transition-colors"
+              className="flex items-center justify-center gap-1.5 rounded border border-[var(--border)] bg-white dark:bg-white/5 py-1.5 px-2 hover:bg-black/5 dark:hover:bg-white/15 transition-colors text-[var(--foreground)] shadow-xs"
             >
-              <Eye className="h-3.5 w-3.5 text-blue-400" />
+              <Eye className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
               <span>Viewer</span>
             </button>
           </div>
