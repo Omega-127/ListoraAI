@@ -1,0 +1,72 @@
+{
+  "googleMaps": {
+    "id": "googleMaps",
+    "name": "Google Maps / Google Business Profile",
+    "platformKey": "googleMaps",
+    "status": "DEMO_MODE",
+    "mode": "DEMO",
+    "canWrite": true,
+    "capabilities": {
+      "canRead": true,
+      "canWrite": true,
+      "supportsHolidays": true,
+      "supportsHours": true,
+      "isOfficialApi": true,
+      "policyNotes": "Official Google Business Profile API (v1 / v4) supports automated edits for verified locations. Live mode requires Google Cloud OAuth credentials and location permissions. Simulated demo mode uses local mock server.",
+      "manualPortalUrl": "https://business.google.com"
+    },
+    "policyNotes": "Full read and write capability supported when authenticated with Google Business Profile API.",
+    "config": {
+      "hasSecret": false
+    },
+    "lastTestedAt": "2026-10-23T15:56:12.293Z",
+    "lastSyncedAt": "2026-10-23T15:56:12.294Z"
+  },
+  "mappls": {
+    "id": "mappls",
+    "name": "Mappls (MapmyIndia)",
+    "platformKey": "mappls",
+    "status": "DEMO_MODE",
+    "mode": "DEMO",
+    "canWrite": false,
+    "capabilities": {
+      "canRead": true,
+      "canWrite": false,
+      "supportsHolidays": false,
+      "supportsHours": true,
+      "isOfficialApi": true,
+      "requiresPartnerAgreement": true,
+      "policyNotes": "Mappls REST API public tier is strictly read-only for listing details. Automated mutations require enterprise partner licensing. Changes can also be submitted manually via Mappls Pin / Business Portal.",
+      "manualPortalUrl": "https://mappls.com"
+    },
+    "policyNotes": "Mappls public API is strictly read-only. Proposed updates will be marked as blocked; manual portal action is required.",
+    "config": {
+      "hasSecret": false
+    },
+    "lastTestedAt": "2026-10-23T15:56:12.295Z",
+    "lastSyncedAt": "2026-10-23T15:56:12.295Z"
+  },
+  "justdial": {
+    "id": "justdial",
+    "name": "Justdial (India)",
+    "platformKey": "justdial",
+    "status": "DEMO_MODE",
+    "mode": "DEMO",
+    "canWrite": true,
+    "capabilities": {
+      "canRead": true,
+      "canWrite": true,
+      "supportsHolidays": true,
+      "supportsHours": true,
+      "isOfficialApi": true,
+      "policyNotes": "Justdial automated listing mutations are supported for verified merchants with JD Omni / Merchant API keys. Justdial blocks holiday hours sync on national/public holidays to prevent unintended store closure drifts. Manual verification is required during restricted periods.",
+      "manualPortalUrl": "https://www.justdial.com/Free-Listing"
+    },
+    "policyNotes": "Read-write supported for standard hours and NAP. Holiday hours are policy-blocked during national holidays.",
+    "config": {
+      "hasSecret": false
+    },
+    "lastTestedAt": "2026-10-23T15:56:12.295Z",
+    "lastSyncedAt": "2026-10-23T15:56:12.295Z"
+  }
+}

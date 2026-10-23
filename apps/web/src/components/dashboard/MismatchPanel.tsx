@@ -14,9 +14,10 @@ import { focus, muted } from "../../lib/styles";
 
 const FILTERS: { value: string; label: string }[] = [
   { value: "all", label: "All" },
+  { value: "differences", label: "Value Differences" },
+  { value: "missing", label: "Missing Fields" },
   { value: "outdated", label: "Outdated" },
   { value: "conflicting", label: "Conflicting" },
-  { value: "missing", label: "Missing" },
   { value: "needs_review", label: "Needs review" },
 ];
 
@@ -27,7 +28,10 @@ type MismatchPanelProps = {
 };
 
 function rowsFor(filter: string, mismatches: MismatchRow[]) {
-  return filter === "all" ? mismatches : mismatches.filter((m) => m.kind === filter);
+  if (filter === "all") return mismatches;
+  if (filter === "differences") return mismatches.filter((m) => !m.isMissing && m.kind !== "missing");
+  if (filter === "missing") return mismatches.filter((m) => m.isMissing || m.kind === "missing");
+  return mismatches.filter((m) => m.kind === filter);
 }
 
 export function MismatchPanel({ mismatches, selected, onToggle }: MismatchPanelProps) {
@@ -107,14 +111,26 @@ export function MismatchPanel({ mismatches, selected, onToggle }: MismatchPanelP
                               <span className="truncate">
                                 {row.platform} · {row.field}
                               </span>
-                              <span
-                                className={cn(
-                                  "shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium",
-                                  KIND_TONE[row.kind as MismatchKind],
-                                )}
-                              >
-                                {KIND_LABEL[row.kind as MismatchKind]}
-                              </span>
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <span
+                                  className={cn(
+                                    "rounded px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider",
+                                    row.isMissing || row.kind === "missing"
+                                      ? "bg-red-500/15 text-red-400 border border-red-500/30"
+                                      : "bg-blue-500/15 text-blue-400 border border-blue-500/30",
+                                  )}
+                                >
+                                  {row.isMissing || row.kind === "missing" ? "Missing Field" : "Value Diff"}
+                                </span>
+                                <span
+                                  className={cn(
+                                    "rounded-full px-2 py-0.5 text-[11px] font-medium",
+                                    KIND_TONE[row.kind as MismatchKind],
+                                  )}
+                                >
+                                  {KIND_LABEL[row.kind as MismatchKind]}
+                                </span>
+                              </div>
                             </Accordion.Trigger>
                           </Accordion.Header>
                           <Accordion.Panel className="overflow-hidden text-sm">

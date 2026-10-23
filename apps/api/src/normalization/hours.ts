@@ -76,16 +76,78 @@ export function normalizeHoursRecord(raw: Record<string, string>): Record<string
 
 /**
  * Returns true if two hours records are equivalent after normalization.
- * Only compares days that appear in BOTH records.
+ * Checks that all defined days in the target profile match in the listing.
  */
 export function hoursMatch(a: Record<string, string>, b: Record<string, string>): boolean {
+  if (!a && !b) return true;
+  if (!a || !b) return false;
+
   const na = normalizeHoursRecord(a);
   const nb = normalizeHoursRecord(b);
 
-  const sharedDays = Object.keys(na).filter((d) => d in nb);
-  if (sharedDays.length === 0) return true; // nothing to compare
+  const keysA = Object.keys(na);
+  const keysB = Object.keys(nb);
+
+  if (keysA.length === 0 && keysB.length === 0) return true;
+  if (keysA.length === 0 || keysB.length === 0) return false;
+
+  const sharedDays = keysA.filter((d) => d in nb);
+  if (sharedDays.length === 0) return false;
 
   return sharedDays.every((day) => na[day] === nb[day]);
+}
+
+/**
+ * Normalizes holiday value for comparison.
+ * Handles:
+ *  - Record: { "2026-01-26": "closed" }
+ *  - String: "Closed Jan 26", "Open Jan 26", "closed", "2026-01-26: closed"
+ */
+export function normalizeHolidayValue(val: unknown): string {
+  if (val === null || val === undefined) return '';
+  if (typeof val === 'string') {
+    const s = val.trim().toLowerCase();
+    if (s === 'closed' || s === 'close') return 'closed';
+    if (s.includes('open') && (s.includes('26') || s.includes('jan') || s.includes('holiday'))) return 'open';
+    if (s.includes('close') && (s.includes('26') || s.includes('jan') || s.includes('holiday'))) return 'closed';
+    return s.replace(/[^a-z0-9]/g, '');
+  }
+  if (typeof val === 'object') {
+    // E.g. { "2026-01-26": "closed" }
+    const entries = Object.entries(val as Record<string, unknown>);
+    if (entries.length === 0) return '';
+    return entries
+      .map(([k, v]) => `${k}:${String(v).toLowerCase().trim()}`)
+      .sort()
+      .join(';');
+  }
+  return String(val).toLowerCase().trim();
+}
+
+/**
+ * Returns true if two holiday hours values refer to the same status.
+ */
+export function holidaysMatch(a: unknown, b: unknown): boolean {
+  const normA = normalizeHolidayValue(a);
+  const normB = normalizeHolidayValue(b);
+
+  if (!normA && !normB) return true;
+  if (!normA || !normB) return false;
+
+  // Direct match
+  if (normA === normB) return true;
+
+  // Check if both signify "closed" on key holiday (e.g. Republic Day 2026-01-26)
+  const isAClosed = normA.includes('closed') || normA.includes('close');
+  const isBClosed = normB.includes('closed') || normB.includes('close');
+
+  const isAOpen = normA.includes('open');
+  const isBOpen = normB.includes('open');
+
+  if (isAClosed && isBClosed) return true;
+  if (isAOpen && isBOpen) return true;
+
+  return false;
 }
 
 /**
@@ -111,3 +173,4 @@ export function hoursDiff(
 
   return diffs;
 }
+

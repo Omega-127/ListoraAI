@@ -14,7 +14,7 @@ import { prisma } from '../db/prisma';
 import { getProfile } from './profile.service';
 import { normalizePhone, phonesMatch } from '../normalization/phone';
 import { textsMatch } from '../normalization/text';
-import { hoursMatch } from '../normalization/hours';
+import { hoursMatch, holidaysMatch } from '../normalization/hours';
 import { recordAudit } from './audit.service';
 
 type ListingValues = Record<string, unknown>;
@@ -28,7 +28,7 @@ interface FieldMismatch {
 
 function isEmptyValue(v: unknown): boolean {
   if (v === null || v === undefined) return true;
-  if (typeof v === 'string' && v.trim() === '') return true;
+  if (typeof v === 'string' && (v.trim() === '' || v.trim() === '—')) return true;
   if (typeof v === 'object' && Object.keys(v as object).length === 0) return true;
   return false;
 }
@@ -40,6 +40,7 @@ function classifyField(
   profileUpdatedAt: Date,
   listingFetchedAt: Date,
 ): MismatchKind {
+  if (isEmptyValue(profileValue) && isEmptyValue(listingValue)) return 'OK';
   if (isEmptyValue(listingValue)) return 'MISSING';
 
   // Field-specific comparison
@@ -47,11 +48,13 @@ function classifyField(
 
   if (field === 'phone') {
     matches = phonesMatch(String(profileValue), String(listingValue));
-  } else if (field === 'regularHours' || field === 'holidayHours') {
+  } else if (field === 'regularHours') {
     matches = hoursMatch(
       profileValue as Record<string, string>,
       listingValue as Record<string, string>,
     );
+  } else if (field === 'holidayHours') {
+    matches = holidaysMatch(profileValue, listingValue);
   } else {
     // name, address — text normalization
     matches = textsMatch(String(profileValue), String(listingValue));
@@ -132,10 +135,7 @@ export function detectFieldMismatches(
   const results: FieldMismatch[] = [];
 
   for (const { key, profileValue } of eligibleFields) {
-    // Only include fields that exist in the listing values
-    if (!(key in values)) continue;
-
-    const listingValue = values[key];
+    const listingValue = key in values ? values[key] : undefined;
     const kind = classifyField(key, profileValue, listingValue, profile.updatedAt, listingFetchedAt);
     results.push({ field: key, profileValue, listingValue, kind });
   }
