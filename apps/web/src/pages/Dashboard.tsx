@@ -210,6 +210,41 @@ export default function Dashboard() {
         </div>
       )}
 
+      {/* Top-Rated Publicity Callout Banner */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
+        <div className="flex items-center gap-3">
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-amber-500 text-white font-bold text-sm shadow-sm">
+            ★ 4.9
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-[var(--foreground)] flex items-center gap-2">
+              Top-Rated Verified Publicity Active
+              <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
+                Elite Gold
+              </span>
+            </h3>
+            <p className="text-xs text-[var(--muted-foreground)]">
+              Viewers gave your business a 4.9 / 5.0 rating on Google Maps & Justdial. Your shareable marketing assets and embed badges are live.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <Link
+            to="/dashboard/publicity"
+            className="rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600 transition-colors shadow-sm"
+          >
+            Publicity Hub ➔
+          </Link>
+          <Link
+            to="/rate"
+            target="_blank"
+            className="rounded-lg border border-[var(--border)] bg-[var(--card)] px-3 py-1.5 text-xs font-medium text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+          >
+            Public View
+          </Link>
+        </div>
+      </div>
+
       <AlertsRail alerts={data.alerts} />
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,17rem)_1fr]">

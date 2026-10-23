@@ -21,6 +21,7 @@ import verifyRouter from './routes/verify.routes';
 import scoreRouter from './routes/score.routes';
 import auditRouter from './routes/audit.routes';
 import alertsRouter from './routes/alerts.routes';
+import ratingsRouter from './routes/ratings.routes';
 
 export function createApp() {
   const app = express();
@@ -33,6 +34,7 @@ export function createApp() {
   // --- Public routes ---
   app.use('/health', healthRouter);
   app.use('/auth', authRouter);
+  app.use('/api/v1/ratings', ratingsRouter);
 
   // --- Protected routes (require authentication) ---
   app.use('/api/v1/profile', requireAuth, profileRouter);

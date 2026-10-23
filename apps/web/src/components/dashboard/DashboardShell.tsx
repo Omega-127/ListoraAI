@@ -14,6 +14,7 @@ import {
   LogOut,
   UserCheck,
   Eye,
+  Award,
 } from "lucide-react";
 import * as Sidebar from "@animate-ui/react/primitives/sidebar";
 import { Bell } from "../animate-ui/icons/bell";
@@ -34,6 +35,7 @@ const NAV: {
   { to: "/dashboard/approvals", label: "Approvals", icon: CheckSquare },
   { to: "/dashboard/report", label: "Report", icon: FileText },
   { to: "/dashboard/score", label: "Score", icon: Gauge },
+  { to: "/dashboard/publicity", label: "Publicity & Ratings", icon: Award },
   { to: "/dashboard/audit", label: "Audit", icon: ScrollText },
   { to: "/dashboard/alerts", label: "Alerts", icon: BellRing },
   { to: "/dashboard/users", label: "Users & Roles", icon: UsersIcon },

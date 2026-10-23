@@ -685,6 +685,9 @@ export default function Landing() {
         <nav className="flex items-center gap-6 text-sm text-[var(--muted-foreground)]">
           <a href="#features" className={`hover:text-[var(--foreground)] ${focus}`}>Features</a>
           <a href="#how-it-works" className={`hover:text-[var(--foreground)] ${focus}`}>How it works</a>
+          <Link to="/rate" className={`hover:text-[var(--foreground)] ${focus} flex items-center gap-1 font-medium text-amber-600 dark:text-amber-400`}>
+            ★ Reviews & Rating
+          </Link>
           {isAuthenticated ? (
             <div className="flex items-center gap-3">
               <Link
@@ -718,10 +721,16 @@ export default function Landing() {
       </header>
 
       <section className="px-6 pt-16 md:pt-24 pb-24 flex flex-col items-center text-center">
-        <a href="#how-it-works" className={`inline-flex items-center gap-2 rounded-full border border-[var(--border)] px-3 py-1 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] ${focus}`}>
-          <span className="rounded-full bg-black/5 dark:bg-white/10 px-2 text-xs text-[var(--foreground)]">New</span>
-          Checks holiday hours & temporary closures
-        </a>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <a href="#how-it-works" className={`inline-flex items-center gap-2 rounded-full border border-[var(--border)] px-3 py-1 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] ${focus}`}>
+            <span className="rounded-full bg-black/5 dark:bg-white/10 px-2 text-xs text-[var(--foreground)]">New</span>
+            Checks holiday hours & temporary closures
+          </a>
+          <Link to="/rate" className={`inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-700 dark:text-amber-300 hover:brightness-110 transition-all ${focus}`}>
+            <Sparkles className="h-3 w-3" />
+            4.9/5 ⭐ Top-Rated Publicity Active
+          </Link>
+        </div>
 
         <h1
           aria-label="Your business hours, phone number, address and holiday hours should match everywhere."
