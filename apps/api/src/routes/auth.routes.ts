@@ -29,11 +29,11 @@ const RegisterSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
   name: z.string().optional(),
-  role: z.enum(['OPERATOR', 'VIEWER']).optional(),
+  role: z.enum(['OWNER', 'VIEWER', 'OPERATOR']).optional(),
 });
 
 const UpdateRoleSchema = z.object({
-  role: z.enum(['OPERATOR', 'VIEWER']),
+  role: z.enum(['OWNER', 'VIEWER', 'OPERATOR']),
 });
 
 const COOKIE_NAME = 'session';
