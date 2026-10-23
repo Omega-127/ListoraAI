@@ -7,7 +7,7 @@ import { requireRole } from '../middleware/auth';
 const router = Router();
 
 const ApplySchema = z.object({
-  proposalId: z.string().uuid().optional(),
+  proposalId: z.string().min(1).optional(),
 });
 
 /** POST /api/v1/updates — apply approved proposals */
