@@ -1,13 +1,3 @@
-# Render Blueprint Specification for ListoraAI
-# See ARCHITECTURE.md §7 for full deployment topology.
-databases:
-  - name: listora-postgres
-    databaseName: bizlisting
-    user: bizlisting
-    plan: free
-    region: oregon
-    ipAllowList: []
-
 services:
   # ---------------------------------------------------------------------------
   # 1. Backend Express API
@@ -27,13 +17,11 @@ services:
       - key: PORT
         value: 10000
       - key: DATABASE_URL
-        fromDatabase:
-          name: listora-postgres
-          property: connectionString
+        sync: false
       - key: ANTHROPIC_API_KEY
         sync: false
       - key: SESSION_SECRET
-        sync: false
+        generateValue: true
       - key: OWNER_EMAIL
         value: owner@example.com
       - key: OWNER_PASSWORD_HASH
@@ -82,9 +70,7 @@ services:
   #     - key: NODE_ENV
   #       value: production
   #     - key: DATABASE_URL
-  #       fromDatabase:
-  #         name: listora-postgres
-  #         property: connectionString
+  #       sync: false
   #     - key: ANTHROPIC_API_KEY
   #       sync: false
   #     - key: SESSION_SECRET
