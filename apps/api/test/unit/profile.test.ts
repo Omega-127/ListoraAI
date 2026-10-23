@@ -26,7 +26,6 @@ const BASE_PROFILE = {
   createdAt: new Date('2026-01-01T00:00:00Z'),
   updatedAt: new Date('2026-01-01T00:00:00Z'),
 };
-
 describe('Profile service — getProfile()', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
