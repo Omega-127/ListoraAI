@@ -226,7 +226,7 @@ export type AgentAnalysisResponse = {
   };
   proposalsCreated?: number;
   toolCallCount: number;
-  mode?: "claude-ai" | "heuristic-engine";
+  mode?: string;
   error?: string;
 };
 
