@@ -1,5 +1,8 @@
-# Render Blueprint Specification for ListoraAI
-# See ARCHITECTURE.md §7 for full deployment topology.
+databases:
+  - name: listora-postgres-mho4
+    plan: free
+    region: oregon
+
 services:
   # ---------------------------------------------------------------------------
   # 1. Backend Express API
