@@ -1,12 +1,14 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthShell, fieldClass, labelClass, primaryBtnClass } from "../components/AuthShell";
-import { register, type UserRole } from "../lib/api";
+import { useAuth } from "../context/AuthContext";
+import type { UserRole } from "../lib/api";
 import { focus, muted } from "../lib/styles";
 import { ShieldCheck, UserCheck, Eye } from "lucide-react";
 
 export default function Register() {
   const navigate = useNavigate();
+  const { register } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

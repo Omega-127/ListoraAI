@@ -57,38 +57,16 @@ export function clearStoredUser(): void {
 }
 
 export async function login(payload: LoginPayload): Promise<{ user: UserProfile }> {
+  let res: Response;
   try {
-    const res = await fetch(`${baseUrl}/auth/login`, {
+    res = await fetch(`${baseUrl}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify(payload),
     });
-
-    const data = (await res.json().catch(() => ({}))) as ApiError & {
-      user?: UserProfile;
-      email?: string;
-    };
-
-    if (!res.ok) {
-      throw new Error(data.error || data.message || "Invalid credentials");
-    }
-
-    const user: UserProfile = data.user || {
-      id: "usr-" + Date.now(),
-      email: data.email ?? payload.email,
-      name: payload.email.split("@")[0],
-      role: payload.email.includes("admin")
-        ? "ADMIN"
-        : payload.email.includes("viewer")
-        ? "VIEWER"
-        : "OPERATOR",
-    };
-
-    setStoredUser(user);
-    return { user };
-  } catch (err) {
-    // Demo fallback when API server is not running locally
+  } catch {
+    // Demo fallback only when API server is unreachable
     let role: UserRole = "OPERATOR";
     if (payload.email.includes("admin")) role = "ADMIN";
     if (payload.email.includes("viewer")) role = "VIEWER";
@@ -102,35 +80,41 @@ export async function login(payload: LoginPayload): Promise<{ user: UserProfile 
     setStoredUser(demoUser);
     return { user: demoUser };
   }
+
+  const data = (await res.json().catch(() => ({}))) as ApiError & {
+    user?: UserProfile;
+    email?: string;
+  };
+
+  if (!res.ok) {
+    throw new Error(data.error || data.message || "Invalid credentials");
+  }
+
+  const user: UserProfile = data.user || {
+    id: "usr-" + Date.now(),
+    email: data.email ?? payload.email,
+    name: payload.email.split("@")[0],
+    role: payload.email.includes("admin")
+      ? "ADMIN"
+      : payload.email.includes("viewer")
+      ? "VIEWER"
+      : "OPERATOR",
+  };
+
+  setStoredUser(user);
+  return { user };
 }
 
 export async function register(payload: RegisterPayload): Promise<{ user: UserProfile }> {
+  let res: Response;
   try {
-    const res = await fetch(`${baseUrl}/auth/register`, {
+    res = await fetch(`${baseUrl}/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify(payload),
     });
-
-    const data = (await res.json().catch(() => ({}))) as ApiError & {
-      user?: UserProfile;
-    };
-
-    if (!res.ok) {
-      throw new Error(data.error || data.message || "Registration failed");
-    }
-
-    const user: UserProfile = data.user || {
-      id: "usr-" + Date.now(),
-      email: payload.email,
-      name: payload.name || payload.email.split("@")[0],
-      role: payload.role || "OPERATOR",
-    };
-
-    setStoredUser(user);
-    return { user };
-  } catch (err) {
+  } catch {
     const fallbackUser: UserProfile = {
       id: "demo-" + Date.now(),
       email: payload.email,
@@ -140,6 +124,24 @@ export async function register(payload: RegisterPayload): Promise<{ user: UserPr
     setStoredUser(fallbackUser);
     return { user: fallbackUser };
   }
+
+  const data = (await res.json().catch(() => ({}))) as ApiError & {
+    user?: UserProfile;
+  };
+
+  if (!res.ok) {
+    throw new Error(data.error || data.message || "Registration failed");
+  }
+
+  const user: UserProfile = data.user || {
+    id: "usr-" + Date.now(),
+    email: payload.email,
+    name: payload.name || payload.email.split("@")[0],
+    role: payload.role || "OPERATOR",
+  };
+
+  setStoredUser(user);
+  return { user };
 }
 
 export async function logout(): Promise<void> {
@@ -159,6 +161,10 @@ export async function getMe(): Promise<UserProfile | null> {
     const res = await fetch(`${baseUrl}/auth/me`, {
       credentials: "include",
     });
+    if (res.status === 401) {
+      clearStoredUser();
+      return null;
+    }
     if (!res.ok) return getStoredUser();
     const data = await res.json();
     if (data.user) {
@@ -220,7 +226,7 @@ export type AgentAnalysisResponse = {
   };
   proposalsCreated?: number;
   toolCallCount: number;
-  mode?: "claude-ai" | "heuristic-engine";
+  mode?: string;
   error?: string;
 };
 
