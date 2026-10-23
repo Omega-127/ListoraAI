@@ -43,7 +43,7 @@ export const INITIAL_DEMO_PROPOSALS: Record<
     reason: 'Standardize formatting to E.164 canonical telephone protocol (+918041234567).',
   },
   'prop-2': {
-    platform: 'mappls',
+    platform: 'appleMaps',
     externalId: 'listing_002',
     field: 'regularHours',
     oldValue: 'Mon–Fri 8–20',
@@ -57,7 +57,7 @@ export const INITIAL_DEMO_PROPOSALS: Record<
       sunday: '08:00-22:00',
     },
     status: 'PENDING_APPROVAL',
-    reason: 'Weekend and evening operating schedules on Mappls contradict approved canonical hours.',
+    reason: 'Weekend and evening operating schedules on Apple Maps contradict approved canonical hours.',
   },
   'prop-3': {
     platform: 'justdial',

@@ -39,29 +39,36 @@ const PLATFORM_PATHS: Record<string, string> = {
   'googleMaps': 'google-maps-india',
   'google-maps-india': 'google-maps-india',
   'google-maps': 'google-maps-india',
-  'mappls': 'mappls-india',
-  'mappls-india': 'mappls-india',
-  'mapmyindia': 'mappls-india',
+  'appleMaps': 'apple-maps-india',
+  'apple-maps-india': 'apple-maps-india',
+  'apple-maps': 'apple-maps-india',
+  'applemaps': 'apple-maps-india',
+  'mappls': 'apple-maps-india',
+  'mappls-india': 'apple-maps-india',
+  'mapmyindia': 'apple-maps-india',
   'justdial': 'justdial-india',
   'justdial-india': 'justdial-india',
 
   // Legacy aliases
   'mock-maps-a': 'google-maps-india',
-  'mock-maps-b': 'mappls-india',
+  'mock-maps-b': 'apple-maps-india',
   'mock-directory-c': 'justdial-india',
   'mockMapsA': 'google-maps-india',
-  'mockMapsB': 'mappls-india',
+  'mockMapsB': 'apple-maps-india',
   'mockDirectoryC': 'justdial-india',
   'maps-a': 'google-maps-india',
-  'maps-b': 'mappls-india',
+  'maps-b': 'apple-maps-india',
   'directory-c': 'justdial-india',
 };
 
-export const ALL_PLATFORMS = ['googleMaps', 'mappls', 'justdial'];
+export const ALL_PLATFORMS = ['googleMaps', 'appleMaps', 'justdial'];
 
 /** Platform → listing id map used for seeded data */
 export const PLATFORM_LISTING_IDS: Record<string, string> = {
   'googleMaps': 'listing_001',
+  'appleMaps': 'listing_002',
+  'apple-maps-india': 'listing_002',
+  'apple-maps': 'listing_002',
   'mappls': 'listing_002',
   'justdial': 'listing_003',
   'mock-maps-a': 'listing_001',

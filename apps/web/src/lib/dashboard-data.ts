@@ -112,7 +112,7 @@ export function buildDashboardSnapshot(
     {
       id: "mm-3",
       listingId: "lst-b",
-      platform: "Mappls (MapmyIndia)",
+      platform: "Apple Maps (India)",
       field: "Phone",
       profileValue: profilePhone,
       listingValue: mm3Approved ? profilePhone : "080 4123 4567",
@@ -121,12 +121,12 @@ export function buildDashboardSnapshot(
       proposalId: "prop-1",
       explanation: mm3Approved
         ? "✓ Approved change: Standardized to international E.164 (+91) format."
-        : `Listed number lacks international E.164 prefix (+91). Mappls is read-only for public API tier, so changes require a partner block record.`,
+        : `Listed number lacks international E.164 prefix (+91). Apple Maps (India) requires Apple Business Connect credentials, so direct third-party API writes are restricted.`,
     },
     {
       id: "mm-4",
       listingId: "lst-b",
-      platform: "Mappls (MapmyIndia)",
+      platform: "Apple Maps (India)",
       field: "Name",
       profileValue: profileName,
       listingValue: mm4Approved ? profileName : "Bombay Roastery",
@@ -198,7 +198,7 @@ export function buildDashboardSnapshot(
   alerts.push({
     id: "a2",
     tone: "blocked",
-    text: "Mappls (MapmyIndia) is read-only — approved updates require partner export.",
+    text: "Apple Maps (India) is read-only for standard API keys — updates require Apple Business Connect export.",
   });
 
   return {
@@ -225,8 +225,8 @@ export function buildDashboardSnapshot(
       },
       {
         id: "lst-b",
-        platform: "mappls",
-        label: "Mappls (MapmyIndia)",
+        platform: "appleMaps",
+        label: "Apple Maps (India)",
         writable: false,
         values: {
           name: mm4Approved ? profileName : "Bombay Roastery",

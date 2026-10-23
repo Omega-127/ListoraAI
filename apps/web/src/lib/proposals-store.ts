@@ -120,7 +120,7 @@ export async function applyAllApprovedAction(): Promise<{ success: boolean; summ
   return {
     success: true,
     summary:
-      "Updates dispatched to connected platforms. Google Maps (India): SUCCESS (verified), Mappls (MapmyIndia): BLOCKED (read-only partner restrictions), Justdial (India): SUCCESS.",
+      "Updates dispatched to connected platforms. Google Maps (India): SUCCESS (verified), Apple Maps (India): BLOCKED (Apple Business Connect verification required), Justdial (India): SUCCESS.",
   };
 }
 

@@ -35,7 +35,7 @@ const INITIAL_LOGS: AuditEvent[] = [
     eventType: "AGENT_TOOL_CALL",
     actor: "agent",
     timestamp: "2026-10-20 18:30:04",
-    summary: "Agent executed compareFields tool on Mappls (MapmyIndia) listing snapshot",
+    summary: "Agent executed compareFields tool on Apple Maps (India) listing snapshot",
     payload: {
       tool: "compareFields",
       listingId: "lst-b",
@@ -74,7 +74,7 @@ const INITIAL_LOGS: AuditEvent[] = [
     timestamp: "2026-10-20 12:00:00",
     summary: "Background cron rechecked 3 connected Indian map & directory platforms for discrepancies",
     payload: {
-      platformsChecked: ["Google Maps (India)", "Mappls (MapmyIndia)", "Justdial (India)"],
+      platformsChecked: ["Google Maps (India)", "Apple Maps (India)", "Justdial (India)"],
       syncDurationMs: 412,
     },
   },

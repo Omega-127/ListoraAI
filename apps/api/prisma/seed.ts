@@ -106,7 +106,7 @@ async function main() {
       fetchedAt: new Date(),
     },
   });
-  console.log('✅ Listings seeded: Google Maps (India), Mappls (MapmyIndia), Justdial (India)');
+  console.log('✅ Listings seeded: Google Maps (India), Apple Maps (India), Justdial (India)');
 
   // 3. Upsert initial mismatches and proposals
   const seedProposals = [
@@ -138,7 +138,7 @@ async function main() {
       },
       status: 'PENDING_APPROVAL' as const,
       kind: 'CONFLICTING' as const,
-      reason: 'Weekend and evening operating schedules on Mappls contradict approved canonical hours.',
+      reason: 'Weekend and evening operating schedules on Apple Maps contradict approved canonical hours.',
     },
     {
       id: 'prop-3',

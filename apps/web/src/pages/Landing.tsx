@@ -9,7 +9,7 @@ import { Sparkles, ShieldCheck, CheckCircle2, ArrowRight, Database, RefreshCw, B
 type Outcome = "verified" | "blocked";
 const rows: { platform: string; field: string; before: string; after: string; outcome: Outcome }[] = [
   { platform: "Google Maps (India)", field: "Hours", before: "Mon–Fri 8–20", after: "Mon–Sat 07:00-22:00", outcome: "verified" },
-  { platform: "Mappls (MapmyIndia)", field: "Phone", before: "080 4123 4567", after: "080 4123 4567", outcome: "blocked" },
+  { platform: "Apple Maps (India)", field: "Phone", before: "080 4123 4567", after: "080 4123 4567", outcome: "blocked" },
   { platform: "Justdial (India)", field: "Holiday", before: "Open Jan 26", after: "Closed Jan 26", outcome: "verified" },
 ];
 
@@ -94,7 +94,7 @@ function FormatBody() {
         </button>
       </div>
       <ul className="mt-3 text-xs">
-        {[["Google Maps", "+91 80 4123 4567", on], ["Mappls", "080 4123 4567", false]].map(([n, v, ok]) => (
+        {[["Google Maps", "+91 80 4123 4567", on], ["Apple Maps", "080 4123 4567", false]].map(([n, v, ok]) => (
           <li key={String(n)} className="flex items-center justify-between gap-2 border-t border-[var(--border)] py-2">
             <span>{n}</span><span className="tabular-nums">{v}</span>
             <Pill tone={ok ? "text-emerald-700 bg-emerald-500/15 dark:text-[#10b981] dark:bg-[#10b981]/10" : "text-amber-800 bg-amber-500/15 dark:text-[#a3a3a3] dark:bg-white/10"}>{ok ? "Match" : "Mismatch"}</Pill>
@@ -105,7 +105,7 @@ function FormatBody() {
   );
 }
 
-const sims = [["Google Maps", "Mon–Fri 8–20", "Mon–Sat 07:00-22:00"], ["Mappls", "080 4123 4567", "+91 80 4123 4567"], ["Justdial", "Open Jan 26", "Closed Jan 26"]];
+const sims = [["Google Maps", "Mon–Fri 8–20", "Mon–Sat 07:00-22:00"], ["Apple Maps", "080 4123 4567", "+91 80 4123 4567"], ["Justdial", "Open Jan 26", "Closed Jan 26"]];
 function PreviewBody() {
   const [tab, setTab] = useState(0);
   return (
@@ -125,7 +125,7 @@ function PreviewBody() {
   );
 }
 
-const log = [["Google Maps hours", "Approved 9:12. Re-check confirmed Mon–Sat 07:00-22:00."], ["Mappls phone", "Approved 9:12. Platform is read-only, so it was blocked."], ["Justdial holiday", "Approved 9:13. Re-check is still pending."]];
+const log = [["Google Maps hours", "Approved 9:12. Re-check confirmed Mon–Sat 07:00-22:00."], ["Apple Maps phone", "Approved 9:12. Platform requires Apple Business Connect delegation, so direct write was blocked."], ["Justdial holiday", "Approved 9:13. Re-check is still pending."]];
 function HistoryBody() {
   const [open, setOpen] = useState(0);
   return (
@@ -151,7 +151,7 @@ function ApprovalBody() {
   return (
     <>
       <ul className="text-xs">
-        {["Google Maps hours", "Justdial holiday", "Mappls phone"].map((l, k) => (
+        {["Google Maps hours", "Justdial holiday", "Apple Maps phone"].map((l, k) => (
           <li key={l} className="flex items-center gap-2 py-1.5">
             <button role="checkbox" aria-checked={c[k]} aria-label={l} onClick={() => setC((v) => v.map((x, j) => (j === k ? !x : x)))}
               className={`grid h-4 w-4 place-items-center rounded border transition-colors duration-200 motion-reduce:transition-none ${c[k] ? "border-transparent bg-[var(--primary)] text-[var(--primary-foreground)]" : "border-black/25 dark:border-white/25"} ${focus}`}>
@@ -201,7 +201,7 @@ function HolidayBody() {
   );
 }
 
-const toasts = ["2 mismatches need review", "Mappls blocked the update", "Re-check finished"];
+const toasts = ["2 mismatches need review", "Apple Maps blocked direct write", "Re-check finished"];
 function AlertsBody() {
   const [i, setI] = useState(0);
   useEffect(() => {
@@ -777,7 +777,7 @@ export default function Landing() {
             })}
           </ul>
           <p className="px-5 py-3 border-t border-[var(--border)] text-sm text-[var(--muted-foreground)]" aria-live="polite">
-            {matched} of 9 checked fields match. {applied && "Mappls (MapmyIndia) requires verified enterprise tier credentials for direct API writes, so its phone number is left as it is."}
+            {matched} of 9 checked fields match. {applied && "Apple Maps (India) requires verified Apple Business Connect credentials for direct API writes, so its phone number is left as it is."}
           </p>
         </div>
       </section>

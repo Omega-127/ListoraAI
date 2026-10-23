@@ -20,6 +20,9 @@ app.use('/google-maps-india', mapsA);
 app.use('/google-maps', mapsA);
 app.use('/googleMaps', mapsA);
 
+app.use('/apple-maps-india', mapsB);
+app.use('/apple-maps', mapsB);
+app.use('/appleMaps', mapsB);
 app.use('/mappls-india', mapsB);
 app.use('/mappls', mapsB);
 app.use('/mapmyindia', mapsB);
@@ -48,7 +51,7 @@ app.get('/health', (_req, res) => {
 app.listen(PORT, () => {
   console.info(`[platforms-india] Listening on http://localhost:${PORT}`);
   console.info(`  /google-maps-india  → Google Maps (India) (read-write)`);
-  console.info(`  /mappls-india       → Mappls / MapmyIndia  (read-only)`);
+  console.info(`  /apple-maps-india   → Apple Maps (India)  (read-only / Apple Business Connect)`);
   console.info(`  /justdial-india     → Justdial (India)     (holiday-sync)`);
 });
 

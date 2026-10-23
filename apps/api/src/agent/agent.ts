@@ -271,7 +271,7 @@ export async function runAgent(options: AgentTaskOptions = {}): Promise<AgentRes
         kind: 'CONFLICTING',
         profileValue: 'Mon-Fri 07:00-22:00',
         listingValue: 'Mon-Fri 08:00-20:00',
-        listing: { platform: 'Mappls (MapmyIndia)' },
+        listing: { platform: 'Apple Maps (India)' },
       },
       {
         id: 'demo-mismatch-3',

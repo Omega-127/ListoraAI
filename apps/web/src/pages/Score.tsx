@@ -81,7 +81,7 @@ function computeScores(statuses: Record<string, ProposalStatus>) {
   ];
 
   const mapsScore = Math.round(((2 + (mm1Approved ? 1 : 0) + (mm2Approved ? 1 : 0)) / 4) * 100);
-  const mapplsScore = Math.round(((1 + (mm3Approved ? 1 : 0) + (mm4Approved ? 1 : 0)) / 3) * 100);
+  const appleMapsScore = Math.round(((1 + (mm3Approved ? 1 : 0) + (mm4Approved ? 1 : 0)) / 3) * 100);
   const justdialScore = Math.round(((3 + (mm5Approved ? 1 : 0)) / 4) * 100);
 
   const platforms: PlatformScore[] = [
@@ -94,11 +94,11 @@ function computeScores(statuses: Record<string, ProposalStatus>) {
       lastVerified: "Just now",
     },
     {
-      platform: "mappls",
-      name: "Mappls (MapmyIndia)",
-      score: mapplsScore,
+      platform: "appleMaps",
+      name: "Apple Maps (India)",
+      score: appleMapsScore,
       writable: false,
-      status: mapplsScore === 100 ? "healthy" : "needs_attention",
+      status: appleMapsScore === 100 ? "healthy" : "needs_attention",
       lastVerified: "Just now",
     },
     {
