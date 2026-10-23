@@ -1,8 +1,3 @@
-databases:
-  - name: listora-postgres-mho4
-    plan: free
-    region: oregon
-
 services:
   # ---------------------------------------------------------------------------
   # 1. Backend Express API
@@ -22,9 +17,7 @@ services:
       - key: PORT
         value: 10000
       - key: DATABASE_URL
-        fromDatabase:
-          name: listora-postgres-mho4
-          property: connectionString
+        sync: false
       - key: ANTHROPIC_API_KEY
         sync: false
       - key: SESSION_SECRET
