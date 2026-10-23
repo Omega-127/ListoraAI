@@ -1,40 +1,40 @@
 {
   "listing_002": {
     "id": "listing_002",
-    "name": "Brew & Bloom Café",
-    "address": "42 Maple St, Springfield, IL 62701",
-    "phone": "(555) 010-2234",
-    "website": "https://brewandbloom.example.com",
+    "name": "The Bombay Roastery & Café",
+    "address": "742, 12th Main, HAL 2nd Stage, Indiranagar, Bangalore 560038",
+    "phone": "080 4123 4567",
+    "website": "https://bombayroastery.in",
     "regularHours": {
-      "monday": "07:00-18:00",
-      "tuesday": "07:00-18:00",
-      "wednesday": "07:00-18:00",
-      "thursday": "07:00-18:00",
-      "friday": "07:00-20:00",
+      "monday": "07:00-22:00",
+      "tuesday": "07:00-22:00",
+      "wednesday": "07:00-22:00",
+      "thursday": "07:00-22:00",
+      "friday": "07:00-23:00",
       "saturday": "08:00-20:00",
-      "sunday": "09:00-16:00"
+      "sunday": "08:00-22:00"
     },
     "holidayHours": {},
-    "description": "Artisan coffee and pastries in Springfield.",
-    "categories": ["Café", "Coffee"]
+    "description": "Specialty coffee, artisanal chai and sourdough bakes in Indiranagar, Bengaluru.",
+    "categories": ["Café", "Coffee Shop", "Bakery"]
   },
   "listing-001": {
     "id": "listing-001",
-    "name": "Brew & Bloom Café",
-    "address": "42 Maple St, Springfield, IL 62701",
-    "phone": "(555) 010-2234",
-    "website": "https://brewandbloom.example.com",
+    "name": "The Bombay Roastery & Café",
+    "address": "742, 12th Main, HAL 2nd Stage, Indiranagar, Bangalore 560038",
+    "phone": "080 4123 4567",
+    "website": "https://bombayroastery.in",
     "regularHours": {
-      "monday": "07:00-18:00",
-      "tuesday": "07:00-18:00",
-      "wednesday": "07:00-18:00",
-      "thursday": "07:00-18:00",
-      "friday": "07:00-20:00",
+      "monday": "07:00-22:00",
+      "tuesday": "07:00-22:00",
+      "wednesday": "07:00-22:00",
+      "thursday": "07:00-22:00",
+      "friday": "07:00-23:00",
       "saturday": "08:00-20:00",
-      "sunday": "09:00-16:00"
+      "sunday": "08:00-22:00"
     },
     "holidayHours": {},
-    "description": "Artisan coffee and pastries in Springfield.",
-    "categories": ["Café", "Coffee"]
+    "description": "Specialty coffee, artisanal chai and sourdough bakes in Indiranagar, Bengaluru.",
+    "categories": ["Café", "Coffee Shop", "Bakery"]
   }
 }

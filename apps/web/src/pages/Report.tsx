@@ -15,22 +15,37 @@ export type ReportRow = {
   apiLatencyMs: number;
 };
 
+export function formatPlatformName(platform: string): string {
+  const map: Record<string, string> = {
+    mockMapsA: "Google Maps (India)",
+    googleMaps: "Google Maps (India)",
+    "google-maps-india": "Google Maps (India)",
+    mockMapsB: "Mappls (MapmyIndia)",
+    mappls: "Mappls (MapmyIndia)",
+    "mappls-india": "Mappls (MapmyIndia)",
+    mockDirectoryC: "Justdial (India)",
+    justdial: "Justdial (India)",
+    "justdial-india": "Justdial (India)",
+  };
+  return map[platform] || platform;
+}
+
 const INITIAL_REPORT_DATA: ReportRow[] = [
   {
     id: "rep-1",
-    platform: "mockMapsA",
+    platform: "Google Maps (India)",
     field: "phone",
-    beforeValue: "(555) 010-2234",
-    afterValue: "+15550102234",
+    beforeValue: "080 4123 4567",
+    afterValue: "+918041234567",
     appliedAt: "Today, 14:32",
     verificationStatus: "VERIFIED",
     apiLatencyMs: 142,
   },
   {
     id: "rep-2",
-    platform: "mockMapsA",
+    platform: "Google Maps (India)",
     field: "holidayHours",
-    beforeValue: "Open Dec 25",
+    beforeValue: "Open Jan 26",
     afterValue: "closed",
     appliedAt: "Today, 14:32",
     verificationStatus: "VERIFIED",
@@ -38,30 +53,30 @@ const INITIAL_REPORT_DATA: ReportRow[] = [
   },
   {
     id: "rep-3",
-    platform: "mockMapsB",
+    platform: "Mappls (MapmyIndia)",
     field: "hours",
-    beforeValue: "Mon–Sat 7–5",
-    afterValue: "Mon–Fri 07:00-18:00, Sat 08:00-20:00, Sun 09:00-16:00",
+    beforeValue: "Mon–Fri 8–20",
+    afterValue: "Mon–Fri 07:00-22:00, Sat 08:00-23:00, Sun 08:00-22:00",
     appliedAt: "Today, 11:15",
     verificationStatus: "PENDING",
     apiLatencyMs: 230,
   },
   {
     id: "rep-4",
-    platform: "mockDirectoryC",
+    platform: "Justdial (India)",
     field: "name",
-    beforeValue: "Bella Cucina (Downtown)",
-    afterValue: "Bella Cucina Ristorante",
+    beforeValue: "The Bombay Roastery (Indiranagar)",
+    afterValue: "The Bombay Roastery & Café",
     appliedAt: "Yesterday, 16:45",
     verificationStatus: "VERIFIED",
     apiLatencyMs: 310,
   },
   {
     id: "rep-5",
-    platform: "mockMapsB",
+    platform: "Google Maps (India)",
     field: "address",
-    beforeValue: "42 Maple",
-    afterValue: "42 Maple Street, Springfield, IL 62701",
+    beforeValue: "Plot 742, 12th Main Rd, HAL 2nd Stage, Bangalore",
+    afterValue: "Plot 742, 12th Main Road, HAL 2nd Stage, Indiranagar, Bengaluru, Karnataka 560038",
     appliedAt: "2 days ago",
     verificationStatus: "VERIFIED",
     apiLatencyMs: 195,
@@ -87,7 +102,7 @@ export default function Report() {
     await new Promise((r) => setTimeout(r, 300));
     setProgressVal(100);
 
-    let phone = "+15550102234";
+    let phone = "+918041234567";
     try {
       const stored = localStorage.getItem("listora_canonical_business_profile");
       if (stored) {
@@ -100,9 +115,9 @@ export default function Report() {
 
     const newEntry: ReportRow = {
       id: `rep-${Date.now()}`,
-      platform: "mockMapsA",
+      platform: "Google Maps (India)",
       field: "phone",
-      beforeValue: "(555) 010-2234",
+      beforeValue: "080 4123 4567",
       afterValue: phone,
       appliedAt: "Just now",
       verificationStatus: "VERIFIED",
@@ -137,15 +152,15 @@ export default function Report() {
       </div>
 
       {isApplying && (
-        <div className="rounded-xl border border-[var(--border)] bg-[#0d0d0d]/80 p-4">
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 shadow-sm">
           <div className="flex items-center justify-between text-xs mb-2">
-            <span className="font-medium text-neutral-300">Syncing updates with platform endpoints…</span>
-            <span className="font-mono text-neutral-400">{progressVal}%</span>
+            <span className="font-medium text-[var(--foreground)]">Syncing updates with platform endpoints…</span>
+            <span className="font-mono text-[var(--muted-foreground)]">{progressVal}%</span>
           </div>
-          <Progress.Root value={progressVal} className="h-2 w-full overflow-hidden rounded-full bg-neutral-800">
+          <Progress.Root value={progressVal} className="h-2 w-full overflow-hidden rounded-full bg-black/10 dark:bg-neutral-800">
             <Progress.Track className="h-full w-full">
               <Progress.Indicator
-                className="h-full bg-neutral-200 transition-all duration-300 ease-out"
+                className="h-full bg-[var(--primary)] transition-all duration-300 ease-out"
                 style={{ width: `${progressVal}%` }}
               />
             </Progress.Track>
@@ -155,21 +170,21 @@ export default function Report() {
 
       {/* Stats Cards */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-xl border border-[var(--border)] bg-[#0d0d0d]/80 p-5">
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-sm">
           <p className={`text-xs font-medium uppercase tracking-wider ${muted}`}>Total Dispatched</p>
-          <p className="mt-2 text-2xl font-semibold tracking-tight tabular-nums">{totalApplied}</p>
+          <p className="mt-2 text-2xl font-semibold tracking-tight tabular-nums text-[var(--foreground)]">{totalApplied}</p>
           <p className={`mt-1 text-xs ${muted}`}>Successful write executions</p>
         </div>
-        <div className="rounded-xl border border-[var(--border)] bg-[#0d0d0d]/80 p-5">
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-sm">
           <p className={`text-xs font-medium uppercase tracking-wider ${muted}`}>Read-Back Verified</p>
-          <p className="mt-2 text-2xl font-semibold tracking-tight tabular-nums text-emerald-400">
+          <p className="mt-2 text-2xl font-semibold tracking-tight tabular-nums text-emerald-600 dark:text-emerald-400">
             {verifiedCount}
           </p>
           <p className={`mt-1 text-xs ${muted}`}>Confirmed live on destination platform</p>
         </div>
-        <div className="rounded-xl border border-[var(--border)] bg-[#0d0d0d]/80 p-5">
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-sm">
           <p className={`text-xs font-medium uppercase tracking-wider ${muted}`}>Pending Recheck</p>
-          <p className="mt-2 text-2xl font-semibold tracking-tight tabular-nums text-amber-400">
+          <p className="mt-2 text-2xl font-semibold tracking-tight tabular-nums text-amber-600 dark:text-amber-400">
             {pendingVerificationCount}
           </p>
           <p className={`mt-1 text-xs ${muted}`}>Awaiting directory cache invalidation</p>
@@ -177,7 +192,7 @@ export default function Report() {
       </div>
 
       {/* Comparison Table */}
-      <div className="rounded-xl border border-[var(--border)] bg-[#0d0d0d]/80 overflow-hidden">
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-sm overflow-hidden">
         <div className="border-b border-[var(--border)] px-5 py-4">
           <h2 className="text-base font-semibold tracking-tight">Recent Synchronization Logs</h2>
           <p className={`text-xs ${muted}`}>Before and after state inspection across connected providers.</p>
@@ -185,7 +200,7 @@ export default function Report() {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-[var(--border)] bg-black/40 text-[var(--muted-foreground)]">
+              <tr className="border-b border-[var(--border)] bg-slate-50 dark:bg-black/40 text-[var(--muted-foreground)]">
                 <th className="py-3 px-4 font-medium uppercase tracking-wider">Platform / Field</th>
                 <th className="py-3 px-4 font-medium uppercase tracking-wider">Before Value</th>
                 <th className="py-3 px-4 font-medium uppercase tracking-wider">Applied Value</th>
@@ -196,20 +211,20 @@ export default function Report() {
             </thead>
             <tbody className="divide-y divide-[var(--border)]">
               {reports.map((row) => (
-                <tr key={row.id} className="hover:bg-white/[0.02] transition-colors">
+                <tr key={row.id} className="hover:bg-black/5 dark:hover:bg-white/[0.02] transition-colors">
                   <td className="py-3.5 px-4 font-medium text-[var(--foreground)]">
                     <div className="flex items-center gap-1.5">
-                      <span className="font-semibold uppercase tracking-wider text-neutral-300">
-                        {row.platform}
+                      <span className="font-semibold uppercase tracking-wider text-[var(--foreground)]">
+                        {formatPlatformName(row.platform)}
                       </span>
-                      <span className="text-neutral-500">•</span>
-                      <span className="capitalize text-neutral-400">{row.field}</span>
+                      <span className="text-[var(--border)]">•</span>
+                      <span className="capitalize text-[var(--muted-foreground)]">{row.field}</span>
                     </div>
                   </td>
-                  <td className="py-3.5 px-4 font-mono text-rose-300/80 max-w-[180px] truncate">
+                  <td className="py-3.5 px-4 font-mono text-rose-600 dark:text-rose-300/80 max-w-[180px] truncate">
                     {row.beforeValue}
                   </td>
-                  <td className="py-3.5 px-4 font-mono text-emerald-300 max-w-[200px] truncate">
+                  <td className="py-3.5 px-4 font-mono text-emerald-700 dark:text-emerald-300 max-w-[200px] truncate">
                     {row.afterValue}
                   </td>
                   <td className="py-3.5 px-4">

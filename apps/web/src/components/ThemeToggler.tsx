@@ -17,9 +17,9 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 
 const NEXT: Record<ThemeSelection, ThemeSelection> = {
-  light: "system",
-  system: "dark",
-  dark: "light",
+  light: "dark",
+  dark: "system",
+  system: "light",
 };
 
 const ICONS = { light: Sun03Icon, dark: Moon02Icon, system: ComputerIcon };

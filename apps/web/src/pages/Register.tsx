@@ -106,8 +106,8 @@ export default function Register() {
               onClick={() => setRole("ADMIN")}
               className={`flex flex-col items-center justify-center gap-1 rounded-lg border p-2 text-xs transition-colors ${
                 role === "ADMIN"
-                  ? "border-[var(--primary)] bg-[var(--primary)]/10 text-emerald-300"
-                  : "border-white/10 bg-white/5 text-neutral-400 hover:bg-white/10"
+                  ? "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 shadow-sm"
+                  : "border-[var(--border)] bg-slate-50 dark:bg-white/5 text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/10"
               }`}
             >
               <ShieldCheck className="h-4 w-4" />
@@ -119,8 +119,8 @@ export default function Register() {
               onClick={() => setRole("OPERATOR")}
               className={`flex flex-col items-center justify-center gap-1 rounded-lg border p-2 text-xs transition-colors ${
                 role === "OPERATOR"
-                  ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
-                  : "border-white/10 bg-white/5 text-neutral-400 hover:bg-white/10"
+                  ? "border-amber-500 bg-amber-500/10 text-amber-700 dark:text-amber-300 shadow-sm"
+                  : "border-[var(--border)] bg-slate-50 dark:bg-white/5 text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/10"
               }`}
             >
               <UserCheck className="h-4 w-4" />
@@ -132,8 +132,8 @@ export default function Register() {
               onClick={() => setRole("VIEWER")}
               className={`flex flex-col items-center justify-center gap-1 rounded-lg border p-2 text-xs transition-colors ${
                 role === "VIEWER"
-                  ? "border-blue-500/50 bg-blue-500/10 text-blue-300"
-                  : "border-white/10 bg-white/5 text-neutral-400 hover:bg-white/10"
+                  ? "border-blue-500 bg-blue-500/10 text-blue-700 dark:text-blue-300 shadow-sm"
+                  : "border-[var(--border)] bg-slate-50 dark:bg-white/5 text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/10"
               }`}
             >
               <Eye className="h-4 w-4" />
