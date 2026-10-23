@@ -1,6 +1,6 @@
 const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:4000";
 
-export type UserRole = "ADMIN" | "OPERATOR" | "VIEWER";
+export type UserRole = "OPERATOR" | "VIEWER";
 
 export type UserProfile = {
   id: string;
@@ -67,9 +67,7 @@ export async function login(payload: LoginPayload): Promise<{ user: UserProfile 
     });
   } catch {
     // Demo fallback only when API server is unreachable
-    let role: UserRole = "OPERATOR";
-    if (payload.email.includes("admin")) role = "ADMIN";
-    if (payload.email.includes("viewer")) role = "VIEWER";
+    const role: UserRole = payload.email.includes("viewer") ? "VIEWER" : "OPERATOR";
 
     const demoUser: UserProfile = {
       id: "demo-" + role.toLowerCase(),
@@ -94,11 +92,7 @@ export async function login(payload: LoginPayload): Promise<{ user: UserProfile 
     id: "usr-" + Date.now(),
     email: data.email ?? payload.email,
     name: payload.email.split("@")[0],
-    role: payload.email.includes("admin")
-      ? "ADMIN"
-      : payload.email.includes("viewer")
-      ? "VIEWER"
-      : "OPERATOR",
+    role: payload.email.includes("viewer") ? "VIEWER" : "OPERATOR",
   };
 
   setStoredUser(user);
@@ -187,7 +181,6 @@ export async function listUsers(): Promise<UserProfile[]> {
   } catch {
     // Fallback demo user list
     return [
-      { id: "usr-1", email: "admin@listora.ai", name: "System Admin", role: "ADMIN", createdAt: "2026-10-01" },
       { id: "usr-2", email: "operator@listora.ai", name: "Operations Lead", role: "OPERATOR", createdAt: "2026-10-05" },
       { id: "usr-3", email: "viewer@listora.ai", name: "Auditor / Stakeholder", role: "VIEWER", createdAt: "2026-10-10" },
     ];
@@ -474,7 +467,7 @@ export async function updateBusinessProfile(profile: BusinessProfileData): Promi
       id: "aud-" + Date.now(),
       eventType: "PROFILE_UPDATED",
       actor: "owner",
-      actorEmail: getStoredUser()?.email || "admin@listora.ai",
+      actorEmail: getStoredUser()?.email || "operator@listora.ai",
       timestamp: new Date().toISOString().replace("T", " ").slice(0, 19),
       summary: `Updated canonical business profile (${profile.name})`,
       payload: {

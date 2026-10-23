@@ -29,11 +29,11 @@ const RegisterSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
   name: z.string().optional(),
-  role: z.enum(['ADMIN', 'OPERATOR', 'VIEWER']).optional(),
+  role: z.enum(['OPERATOR', 'VIEWER']).optional(),
 });
 
 const UpdateRoleSchema = z.object({
-  role: z.enum(['ADMIN', 'OPERATOR', 'VIEWER']),
+  role: z.enum(['OPERATOR', 'VIEWER']),
 });
 
 const COOKIE_NAME = 'session';
@@ -84,7 +84,7 @@ router.post('/login', validate({ body: LoginSchema }), async (req, res, next) =>
       maxAge: 8 * 60 * 60 * 1000,
     });
 
-    await recordAudit('USER_LOGIN', user.role === 'ADMIN' ? 'owner' : 'system', {
+    await recordAudit('USER_LOGIN', user.role === 'OPERATOR' ? 'owner' : 'system', {
       email: user.email,
       role: user.role,
     });
@@ -168,9 +168,9 @@ router.get('/me', requireAuth, (req, res) => {
 });
 
 /**
- * GET /auth/users — Admin only: list all registered and demo users
+ * GET /auth/users — Operator only: list all registered and demo users
  */
-router.get('/users', requireAuth, requireRole('ADMIN'), async (_req, res, next) => {
+router.get('/users', requireAuth, requireRole('OPERATOR'), async (_req, res, next) => {
   try {
     const users = await listUsers();
     res.json(users);
@@ -182,12 +182,12 @@ router.get('/users', requireAuth, requireRole('ADMIN'), async (_req, res, next) 
 });
 
 /**
- * PATCH /auth/users/:id/role — Admin only: change a user's role
+ * PATCH /auth/users/:id/role — Operator only: change a user's role
  */
 router.patch(
   '/users/:id/role',
   requireAuth,
-  requireRole('ADMIN'),
+  requireRole('OPERATOR'),
   validate({ body: UpdateRoleSchema }),
   async (req, res, next) => {
     try {

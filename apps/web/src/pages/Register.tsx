@@ -4,7 +4,7 @@ import { AuthShell, fieldClass, labelClass, primaryBtnClass } from "../component
 import { useAuth } from "../context/AuthContext";
 import type { UserRole } from "../lib/api";
 import { focus, muted } from "../lib/styles";
-import { ShieldCheck, UserCheck, Eye } from "lucide-react";
+import { UserCheck, Eye } from "lucide-react";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -100,20 +100,7 @@ export default function Register() {
         {/* Role Selector */}
         <div>
           <label className={labelClass}>Select Role</label>
-          <div className="grid grid-cols-3 gap-2 mt-1">
-            <button
-              type="button"
-              onClick={() => setRole("ADMIN")}
-              className={`flex flex-col items-center justify-center gap-1 rounded-lg border p-2 text-xs transition-colors ${
-                role === "ADMIN"
-                  ? "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 shadow-sm"
-                  : "border-[var(--border)] bg-slate-50 dark:bg-white/5 text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/10"
-              }`}
-            >
-              <ShieldCheck className="h-4 w-4" />
-              <span className="font-medium">Admin</span>
-              <span className="text-[10px] opacity-70">Full Access</span>
-            </button>
+          <div className="grid grid-cols-2 gap-2 mt-1">
             <button
               type="button"
               onClick={() => setRole("OPERATOR")}
@@ -188,8 +175,7 @@ export default function Register() {
         </button>
 
         <p className={`text-xs leading-relaxed text-center ${muted}`}>
-          Role permissions: <span className="text-emerald-400 font-medium">Admin</span> (manage profile & users),{" "}
-          <span className="text-amber-400 font-medium">Operator</span> (approvals & sync),{" "}
+          Role permissions: <span className="text-amber-400 font-medium">Operator</span> (manage profile, approvals & sync),{" "}
           <span className="text-blue-400 font-medium">Viewer</span> (read-only audit & reports).
         </p>
       </form>

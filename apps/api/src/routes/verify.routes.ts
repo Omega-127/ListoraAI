@@ -10,7 +10,7 @@ const VerifySchema = z.object({
   proposalId: z.string().min(1).optional(),
 });
 
-router.post('/', requireRole('ADMIN', 'OPERATOR'), validate({ body: VerifySchema }), async (req, res, next) => {
+router.post('/', requireRole('OPERATOR'), validate({ body: VerifySchema }), async (req, res, next) => {
   try {
     const { proposalId } = req.body as z.infer<typeof VerifySchema>;
 
