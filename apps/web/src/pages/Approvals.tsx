@@ -27,29 +27,45 @@ export type ProposalItem = {
   createdAt: string;
 };
 
+export function formatPlatformName(platform: string): string {
+  const map: Record<string, string> = {
+    mockMapsA: "Google Maps (India)",
+    googleMaps: "Google Maps (India)",
+    "google-maps-india": "Google Maps (India)",
+    mockMapsB: "Mappls (MapmyIndia)",
+    mappls: "Mappls (MapmyIndia)",
+    "mappls-india": "Mappls (MapmyIndia)",
+    mockDirectoryC: "Justdial (India)",
+    justdial: "Justdial (India)",
+    "justdial-india": "Justdial (India)",
+  };
+  return map[platform] || platform;
+}
+
 function createProposalsForProfile(profile: any): ProposalItem[] {
-  const profileName = profile?.name || "Brew & Bloom Café";
-  const profilePhone = profile?.phone || "+15550102234";
-  const formattedHours = profile?.regularHours?.monday ? `Mon-Fri ${profile.regularHours.monday}` : "Mon–Fri 07:00-18:00, Sat 08:00-20:00, Sun 09:00-16:00";
+  const profileName = profile?.name || "The Bombay Roastery & Café";
+  const profilePhone = profile?.phone || "+918041234567";
+  const profileAddress = profile?.address || "Plot 742, 12th Main Road, HAL 2nd Stage, Indiranagar, Bengaluru, Karnataka 560038";
+  const formattedHours = profile?.regularHours?.monday ? `Mon-Fri ${profile.regularHours.monday}` : "Mon–Fri 07:00-22:00, Sat 08:00-23:00, Sun 08:00-22:00";
 
   return [
     {
       id: "prop-1",
-      platform: "mockMapsA",
+      platform: "Google Maps (India)",
       field: "phone",
-      oldValue: "(555) 010-2234",
+      oldValue: "080 4123 4567",
       newValue: profilePhone,
       status: "PENDING_APPROVAL",
       confidence: 99,
-      reason: `Standardize telephone to canonical international E.164 protocol (${profilePhone}).`,
+      reason: `Standardize telephone to canonical international E.164 protocol (${profilePhone}) with India country code (+91).`,
       riskLevel: "low",
       createdAt: "10 mins ago",
     },
     {
       id: "prop-2",
-      platform: "mockMapsB",
+      platform: "Mappls (MapmyIndia)",
       field: "hours",
-      oldValue: "Mon–Sat 7–5",
+      oldValue: "Mon–Fri 8–20",
       newValue: formattedHours,
       status: "PENDING_APPROVAL",
       confidence: 96,
@@ -59,37 +75,37 @@ function createProposalsForProfile(profile: any): ProposalItem[] {
     },
     {
       id: "prop-3",
-      platform: "mockDirectoryC",
+      platform: "Justdial (India)",
       field: "name",
-      oldValue: `${profileName} (Downtown)`,
+      oldValue: `${profileName} (Indiranagar)`,
       newValue: profileName,
       status: "PENDING_APPROVAL",
       confidence: 92,
-      reason: `Standardizes listing to match registered trade name (${profileName}).`,
+      reason: `Standardizes listing to match registered trade name (${profileName}) without local modifier.`,
       riskLevel: "high",
       createdAt: "1 hour ago",
     },
     {
       id: "prop-4",
-      platform: "mockMapsA",
+      platform: "Google Maps (India)",
       field: "holidayHours",
-      oldValue: "Open Dec 25",
+      oldValue: "Open Jan 26",
       newValue: "closed",
       status: "APPROVED",
       confidence: 98,
-      reason: "Store is marked closed on Christmas Day in canonical profile.",
+      reason: "Store is marked closed on Republic Day (2026-01-26) in canonical business profile.",
       riskLevel: "low",
       createdAt: "3 hours ago",
     },
     {
       id: "prop-5",
-      platform: "mockDirectoryC",
+      platform: "Justdial (India)",
       field: "address",
-      oldValue: "42 Maple St Suite B",
-      newValue: profile?.address || "42 Maple Street, Springfield, IL 62701",
+      oldValue: "Plot 742, 12th Main Rd, HAL 2nd Stage, Bangalore 560038",
+      newValue: profileAddress,
       status: "REJECTED",
       confidence: 84,
-      reason: "Suite unit discrepancy flagged as unsafe without human verification.",
+      reason: "Address abbreviation discrepancy flagged for manual verification before directory dispatch.",
       riskLevel: "high",
       createdAt: "Yesterday",
     },
@@ -172,7 +188,7 @@ export default function Approvals() {
         if (data && Array.isArray(data) && data.length > 0 && !cancelled) {
           const mapped: ProposalItem[] = data.map((item: any) => ({
             id: item.id,
-            platform: item.platform || "mockMapsA",
+            platform: formatPlatformName(item.platform || "googleMaps"),
             field: item.field,
             oldValue: typeof item.oldValue === "object" ? JSON.stringify(item.oldValue) : String(item.oldValue ?? "N/A"),
             newValue: typeof item.newValue === "object" ? JSON.stringify(item.newValue) : String(item.newValue ?? ""),
@@ -358,7 +374,7 @@ export default function Approvals() {
                 <div className="flex-1 space-y-3">
                   <div className="flex flex-wrap items-center gap-2 text-xs">
                     <span className="font-semibold uppercase tracking-wider text-[var(--foreground)]">
-                      {item.platform}
+                      {formatPlatformName(item.platform)}
                     </span>
                     <span className="text-[var(--border)]">•</span>
                     <span className="capitalize font-medium text-[var(--muted-foreground)]">

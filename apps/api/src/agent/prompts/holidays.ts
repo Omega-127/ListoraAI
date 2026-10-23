@@ -14,8 +14,8 @@ Your focus is to analyze temporary closures, special event hours, and official h
 
 Key rules:
 1. Verify specific date formats (YYYY-MM-DD) against the canonical holiday schedule.
-2. If the canonical profile declares a closure (e.g. Christmas, New Year's Day) but a directory reports open hours, flag it immediately to prevent disappointed customers arriving to locked doors.
-3. Keep in mind that certain directories (e.g. mockDirectoryC) apply scheduled lockouts or permission blocks during declared holidays.
+2. If the canonical profile declares a closure (e.g. Republic Day, Independence Day, Gandhi Jayanti, Diwali) but a directory reports open hours, flag it immediately to prevent disappointed customers arriving to locked doors.
+3. Keep in mind that certain directories (e.g. Justdial / India local directories) apply scheduled lockouts or permission blocks during declared national holidays.
 
 PROMPT VERSION: ${HOLIDAYS_PROMPT_VERSION}
 `;

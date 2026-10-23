@@ -8,9 +8,9 @@ import { Sparkles, ShieldCheck, CheckCircle2, ArrowRight, Database, RefreshCw, B
 
 type Outcome = "verified" | "blocked";
 const rows: { platform: string; field: string; before: string; after: string; outcome: Outcome }[] = [
-  { platform: "Maps A", field: "Hours", before: "Mon–Fri 8–4", after: "Mon–Sat 7–5", outcome: "verified" },
-  { platform: "Maps B", field: "Phone", before: "555 0124", after: "555 0124", outcome: "blocked" },
-  { platform: "Directory C", field: "Holiday", before: "Open Dec 25", after: "Closed Dec 25", outcome: "verified" },
+  { platform: "Google Maps (India)", field: "Hours", before: "Mon–Fri 8–20", after: "Mon–Sat 07:00-22:00", outcome: "verified" },
+  { platform: "Mappls (MapmyIndia)", field: "Phone", before: "080 4123 4567", after: "080 4123 4567", outcome: "blocked" },
+  { platform: "Justdial (India)", field: "Holiday", before: "Open Jan 26", after: "Closed Jan 26", outcome: "verified" },
 ];
 
 const chip: Record<string, string> = {
@@ -94,7 +94,7 @@ function FormatBody() {
         </button>
       </div>
       <ul className="mt-3 text-xs">
-        {[["Maps A", "(415) 555-0142", on], ["Maps B", "(415) 555-0124", false]].map(([n, v, ok]) => (
+        {[["Google Maps", "+91 80 4123 4567", on], ["Mappls", "080 4123 4567", false]].map(([n, v, ok]) => (
           <li key={String(n)} className="flex items-center justify-between gap-2 border-t border-[var(--border)] py-2">
             <span>{n}</span><span className="tabular-nums">{v}</span>
             <Pill tone={ok ? "text-emerald-700 bg-emerald-500/15 dark:text-[#10b981] dark:bg-[#10b981]/10" : "text-amber-800 bg-amber-500/15 dark:text-[#a3a3a3] dark:bg-white/10"}>{ok ? "Match" : "Mismatch"}</Pill>
@@ -105,7 +105,7 @@ function FormatBody() {
   );
 }
 
-const sims = [["Maps A", "Mon–Fri 8–4", "Mon–Sat 7–5"], ["Maps B", "555 0124", "555 0142"], ["Directory C", "Open Dec 25", "Closed Dec 25"]];
+const sims = [["Google Maps", "Mon–Fri 8–20", "Mon–Sat 07:00-22:00"], ["Mappls", "080 4123 4567", "+91 80 4123 4567"], ["Justdial", "Open Jan 26", "Closed Jan 26"]];
 function PreviewBody() {
   const [tab, setTab] = useState(0);
   return (
@@ -125,7 +125,7 @@ function PreviewBody() {
   );
 }
 
-const log = [["Maps A hours", "Approved 9:12. Re-check confirmed Mon–Sat 7–5."], ["Maps B phone", "Approved 9:12. Platform is read-only, so it was blocked."], ["Directory C holiday", "Approved 9:13. Re-check is still pending."]];
+const log = [["Google Maps hours", "Approved 9:12. Re-check confirmed Mon–Sat 07:00-22:00."], ["Mappls phone", "Approved 9:12. Platform is read-only, so it was blocked."], ["Justdial holiday", "Approved 9:13. Re-check is still pending."]];
 function HistoryBody() {
   const [open, setOpen] = useState(0);
   return (
@@ -151,7 +151,7 @@ function ApprovalBody() {
   return (
     <>
       <ul className="text-xs">
-        {["Maps A hours", "Directory C holiday", "Maps B phone"].map((l, k) => (
+        {["Google Maps hours", "Justdial holiday", "Mappls phone"].map((l, k) => (
           <li key={l} className="flex items-center gap-2 py-1.5">
             <button role="checkbox" aria-checked={c[k]} aria-label={l} onClick={() => setC((v) => v.map((x, j) => (j === k ? !x : x)))}
               className={`grid h-4 w-4 place-items-center rounded border transition-colors duration-200 motion-reduce:transition-none ${c[k] ? "border-transparent bg-[var(--primary)] text-[var(--primary-foreground)]" : "border-black/25 dark:border-white/25"} ${focus}`}>
@@ -196,12 +196,12 @@ function HolidayBody() {
           </button>
         ))}
       </div>
-      <p className={`mt-1 text-xs ${muted}`}>{v === 2 ? "Directory C says Open 9–5. It matches." : "Directory C says Open 9–5. Conflict."}</p>
+      <p className={`mt-1 text-xs ${muted}`}>{v === 2 ? "Justdial says Open 9–5. It matches." : "Justdial says Open 9–5. Conflict."}</p>
     </>
   );
 }
 
-const toasts = ["2 mismatches need review", "Maps B blocked the update", "Re-check finished"];
+const toasts = ["2 mismatches need review", "Mappls blocked the update", "Re-check finished"];
 function AlertsBody() {
   const [i, setI] = useState(0);
   useEffect(() => {
@@ -753,7 +753,7 @@ export default function Landing() {
 
         <div className="mt-16 w-full max-w-2xl rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-sm text-left">
           <div className="flex items-center justify-between gap-4 px-5 py-4 border-b border-[var(--border)]">
-            <p className="text-sm text-[var(--muted-foreground)]">Approved: Mon–Sat 7–5, 555 0142, closed Dec 25</p>
+            <p className="text-sm text-[var(--muted-foreground)]">Approved: Mon–Sat 07:00-22:00, +91 80 4123 4567, closed Jan 26</p>
             <button
               onClick={() => setApplied((v) => !v)}
               className={`shrink-0 rounded-lg border border-[var(--border)] px-3 py-1.5 text-sm font-medium hover:bg-black/5 dark:hover:bg-white/5 ${focus}`}
@@ -765,8 +765,8 @@ export default function Landing() {
             {rows.map((r) => {
               const status = applied ? r.outcome : "mismatch";
               return (
-                <li key={r.platform} className="grid grid-cols-[1fr_auto] md:grid-cols-[9rem_5rem_1fr_auto] items-center gap-x-4 gap-y-1 px-5 py-4 border-b border-[var(--border)] last:border-b-0">
-                  <span className="font-medium">{r.platform}</span>
+                <li key={r.platform} className="grid grid-cols-[1fr_auto] md:grid-cols-[11rem_5rem_1fr_auto] items-center gap-x-4 gap-y-1 px-5 py-4 border-b border-[var(--border)] last:border-b-0">
+                  <span className="font-medium text-xs sm:text-sm">{r.platform}</span>
                   <span className="text-sm text-[var(--muted-foreground)] md:order-none order-3">{r.field}</span>
                   <span className="tabular-nums md:order-none order-4 col-span-2 md:col-span-1">{applied ? r.after : r.before}</span>
                   <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors duration-300 motion-reduce:transition-none ${chip[status]}`}>
@@ -777,7 +777,7 @@ export default function Landing() {
             })}
           </ul>
           <p className="px-5 py-3 border-t border-[var(--border)] text-sm text-[var(--muted-foreground)]" aria-live="polite">
-            {matched} of 9 checked fields match. {applied && "Maps B doesn’t allow edits, so its phone number is left as it is."}
+            {matched} of 9 checked fields match. {applied && "Mappls (MapmyIndia) requires verified enterprise tier credentials for direct API writes, so its phone number is left as it is."}
           </p>
         </div>
       </section>

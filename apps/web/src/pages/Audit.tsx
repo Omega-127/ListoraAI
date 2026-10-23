@@ -22,12 +22,12 @@ const INITIAL_LOGS: AuditEvent[] = [
     actor: "owner",
     actorEmail: "sarvesh@listora.ai",
     timestamp: "2026-10-20 18:45:12",
-    summary: "Approved update proposal for phone number on mockMapsA",
+    summary: "Approved update proposal for phone number on Google Maps (India)",
     payload: {
       proposalId: "prop-1",
-      platform: "mockMapsA",
+      platform: "Google Maps (India)",
       field: "phone",
-      value: "+15550102234",
+      value: "+918041234567",
     },
   },
   {
@@ -35,12 +35,12 @@ const INITIAL_LOGS: AuditEvent[] = [
     eventType: "AGENT_TOOL_CALL",
     actor: "agent",
     timestamp: "2026-10-20 18:30:04",
-    summary: "Agent executed compareFields tool on mockMapsB listing snapshot",
+    summary: "Agent executed compareFields tool on Mappls (MapmyIndia) listing snapshot",
     payload: {
       tool: "compareFields",
       listingId: "lst-b",
       mismatchesFound: 2,
-      model: "claude-3-5-sonnet",
+      model: "grok-beta",
     },
   },
   {
@@ -48,9 +48,9 @@ const INITIAL_LOGS: AuditEvent[] = [
     eventType: "UPDATE_APPLIED",
     actor: "agent",
     timestamp: "2026-10-20 18:00:29",
-    summary: "Dispatched API update for holiday hours on mockMapsA",
+    summary: "Dispatched API update for holiday hours on Google Maps (India)",
     payload: {
-      endpoint: "PUT /api/v1/mock/maps-a/profile",
+      endpoint: "PATCH /api/v1/mock/google-maps-india/listing_001",
       statusCode: 200,
       latencyMs: 142,
     },
@@ -61,10 +61,10 @@ const INITIAL_LOGS: AuditEvent[] = [
     actor: "owner",
     actorEmail: "sarvesh@listora.ai",
     timestamp: "2026-10-20 16:12:00",
-    summary: "Updated canonical operating schedule for Saturday hours",
+    summary: "Updated canonical operating schedule for weekend hours",
     payload: {
-      previous: "08:00-18:00",
-      next: "08:00-20:00",
+      previous: "08:00-22:00",
+      next: "08:00-23:00",
     },
   },
   {
@@ -72,9 +72,9 @@ const INITIAL_LOGS: AuditEvent[] = [
     eventType: "SCHEDULED_RECHECK",
     actor: "system",
     timestamp: "2026-10-20 12:00:00",
-    summary: "Background cron rechecked 3 connected platforms for discrepancies",
+    summary: "Background cron rechecked 3 connected Indian map & directory platforms for discrepancies",
     payload: {
-      platformsChecked: ["mockMapsA", "mockMapsB", "mockDirectoryC"],
+      platformsChecked: ["Google Maps (India)", "Mappls (MapmyIndia)", "Justdial (India)"],
       syncDurationMs: 412,
     },
   },

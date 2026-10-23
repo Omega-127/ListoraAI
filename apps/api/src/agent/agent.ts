@@ -119,19 +119,19 @@ async function runHeuristicAgent(
     profile = await getProfile();
   } catch {
     profile = {
-      name: 'Brew & Bloom Café',
-      address: '42 Maple Street, Springfield, IL 62701',
-      phone: '+15550102234',
+      name: 'The Bombay Roastery & Café',
+      address: 'Plot 742, 12th Main Road, HAL 2nd Stage, Indiranagar, Bengaluru, Karnataka 560038',
+      phone: '+918041234567',
       regularHours: {
-        monday: '07:00-18:00',
-        tuesday: '07:00-18:00',
-        wednesday: '07:00-18:00',
-        thursday: '07:00-18:00',
-        friday: '07:00-20:00',
-        saturday: '08:00-20:00',
-        sunday: '09:00-16:00',
+        monday: '07:00-22:00',
+        tuesday: '07:00-22:00',
+        wednesday: '07:00-22:00',
+        thursday: '07:00-22:00',
+        friday: '07:00-23:00',
+        saturday: '08:00-23:00',
+        sunday: '08:00-22:00',
       },
-      holidayHours: { '2026-12-25': 'closed', '2026-01-01': 'closed' },
+      holidayHours: { '2026-01-26': 'closed', '2026-08-15': 'closed' },
     };
   }
 
@@ -260,27 +260,27 @@ export async function runAgent(options: AgentTaskOptions = {}): Promise<AgentRes
         listingId: 'demo-lst-1',
         field: 'phone',
         kind: 'OUTDATED',
-        profileValue: '+15550102234',
-        listingValue: '(555) 010-2234',
-        listing: { platform: 'mockMapsA' },
+        profileValue: '+918041234567',
+        listingValue: '(080) 4123-4567',
+        listing: { platform: 'Google Maps (India)' },
       },
       {
         id: 'demo-mismatch-2',
         listingId: 'demo-lst-2',
         field: 'hours',
         kind: 'CONFLICTING',
-        profileValue: 'Mon-Fri 07:00-18:00',
-        listingValue: 'Mon-Fri 08:00-16:00',
-        listing: { platform: 'mockMapsB' },
+        profileValue: 'Mon-Fri 07:00-22:00',
+        listingValue: 'Mon-Fri 08:00-20:00',
+        listing: { platform: 'Mappls (MapmyIndia)' },
       },
       {
         id: 'demo-mismatch-3',
         listingId: 'demo-lst-3',
         field: 'holidayHours',
         kind: 'NEEDS_REVIEW',
-        profileValue: { '2026-12-25': 'closed' },
-        listingValue: { '2026-12-25': 'open 9-5' },
-        listing: { platform: 'mockDirectoryC' },
+        profileValue: { '2026-01-26': 'closed' },
+        listingValue: { '2026-01-26': 'open 9-5' },
+        listing: { platform: 'Justdial (India)' },
       },
     ];
   }
