@@ -370,6 +370,7 @@ app.ts
  ├─ app.use("/api/v1/score",     requireAuth, scoreRouter)
  ├─ app.use("/api/v1/audit",     requireAuth, auditRouter)
  ├─ app.use("/api/v1/alerts",    requireAuth, alertsRouter)
+ ├─ app.use("/api/v1/ratings",   ratingsRouter)
  └─ app.use(errorHandler)
 ```
 
@@ -378,6 +379,7 @@ app.ts
 | Route file | Endpoints | Notes |
 |---|---|---|
 | `auth.routes.ts` | `POST /auth/login`, `POST /auth/logout`, `GET /auth/me` | Sets the session cookie (see 4.7) |
+| `ratings.routes.ts` | `GET /ratings`, `POST /ratings`, `GET /ratings/publicity` | Public reviews, live score delta impact, and owner publicity kit |
 | `profile.routes.ts` | `GET /profile`, `PUT /profile` | Every write is audited |
 | `listings.routes.ts` | `GET /listings`, `POST /listings/refresh` | Refresh fetches from mock platforms |
 | `mismatches.routes.ts` | `GET /mismatches`, `GET /mismatches/:id` | Includes AI explanation when available |
