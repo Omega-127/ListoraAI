@@ -35,21 +35,35 @@ export interface UpdateResult {
 
 // Platform slug → path segment on the mock server
 const PLATFORM_PATHS: Record<string, string> = {
-  'mock-maps-a': 'mock-maps-a',
-  'mock-maps-b': 'mock-maps-b',
-  'mock-directory-c': 'mock-directory-c',
-  'mockMapsA': 'mock-maps-a',
-  'mockMapsB': 'mock-maps-b',
-  'mockDirectoryC': 'mock-directory-c',
-  'maps-a': 'mock-maps-a',
-  'maps-b': 'mock-maps-b',
-  'directory-c': 'mock-directory-c',
+  // Indian platforms
+  'googleMaps': 'google-maps-india',
+  'google-maps-india': 'google-maps-india',
+  'google-maps': 'google-maps-india',
+  'mappls': 'mappls-india',
+  'mappls-india': 'mappls-india',
+  'mapmyindia': 'mappls-india',
+  'justdial': 'justdial-india',
+  'justdial-india': 'justdial-india',
+
+  // Legacy aliases
+  'mock-maps-a': 'google-maps-india',
+  'mock-maps-b': 'mappls-india',
+  'mock-directory-c': 'justdial-india',
+  'mockMapsA': 'google-maps-india',
+  'mockMapsB': 'mappls-india',
+  'mockDirectoryC': 'justdial-india',
+  'maps-a': 'google-maps-india',
+  'maps-b': 'mappls-india',
+  'directory-c': 'justdial-india',
 };
 
-export const ALL_PLATFORMS = ['mockMapsA', 'mockMapsB', 'mockDirectoryC'];
+export const ALL_PLATFORMS = ['googleMaps', 'mappls', 'justdial'];
 
 /** Platform → listing id map used for seeded data */
 export const PLATFORM_LISTING_IDS: Record<string, string> = {
+  'googleMaps': 'listing_001',
+  'mappls': 'listing_002',
+  'justdial': 'listing_003',
   'mock-maps-a': 'listing_001',
   'mock-maps-b': 'listing_002',
   'mock-directory-c': 'listing_003',

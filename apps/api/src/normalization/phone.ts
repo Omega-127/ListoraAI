@@ -7,9 +7,9 @@ import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 /**
  * Normalizes a phone string to E.164.
- * Uses 'US' as the default country code when the number has no country prefix.
+ * Uses 'IN' as default country code, falling back to 'US' or 'GB'.
  */
-export function normalizePhone(raw: string, defaultCountry: 'US' | 'GB' = 'US'): string | null {
+export function normalizePhone(raw: string, defaultCountry: 'IN' | 'US' | 'GB' = 'IN'): string | null {
   if (!raw || typeof raw !== 'string') return null;
   const parsed = parsePhoneNumberFromString(raw.trim(), defaultCountry);
   if (!parsed || !parsed.isPossible()) return null;

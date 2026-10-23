@@ -67,25 +67,25 @@ const FIELD_SCORES: FieldScore[] = [
 
 const PLATFORM_SCORES: PlatformScore[] = [
   {
-    platform: "mockMapsA",
-    name: "Maps A (Mock Provider)",
-    score: 75,
+    platform: "googleMaps",
+    name: "Google Maps (India)",
+    score: 85,
     writable: true,
     status: "needs_attention",
     lastVerified: "14 mins ago",
   },
   {
-    platform: "mockMapsB",
-    name: "Maps B (Mock Provider)",
-    score: 50,
+    platform: "mappls",
+    name: "Mappls (MapmyIndia)",
+    score: 67,
     writable: false,
     status: "needs_attention",
     lastVerified: "28 mins ago",
   },
   {
-    platform: "mockDirectoryC",
-    name: "Directory C (Mock Aggregator)",
-    score: 67,
+    platform: "justdial",
+    name: "Justdial (India)",
+    score: 100,
     writable: true,
     status: "healthy",
     lastVerified: "1 hour ago",
@@ -119,16 +119,16 @@ export default function Score() {
       </div>
 
       {/* Hero Score Card */}
-      <div className="grid gap-6 rounded-2xl border border-[var(--border)] bg-[#0d0d0d]/90 p-6 md:grid-cols-3 md:items-center">
+      <div className="grid gap-6 rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 md:grid-cols-3 md:items-center shadow-sm">
         <div className="flex flex-col items-start md:border-r md:border-[var(--border)] md:pr-6">
           <span className={`text-xs font-semibold uppercase tracking-wider ${muted}`}>
             Overall Consistency Score
           </span>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-5xl font-bold tracking-tight text-white tabular-nums">
+            <span className="text-5xl font-bold tracking-tight text-[var(--foreground)] tabular-nums">
               {overallScore}%
             </span>
-            <span className="text-sm font-medium text-neutral-400">
+            <span className={`text-sm font-medium ${muted}`}>
               ({totalMatching}/{totalEligible} matching)
             </span>
           </div>
@@ -139,36 +139,36 @@ export default function Score() {
 
         <div className="md:col-span-2 space-y-4">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-medium text-neutral-300">Composite Health Index</span>
-            <span className="font-mono text-neutral-400">{overallScore}%</span>
+            <span className="font-medium text-[var(--foreground)]">Composite Health Index</span>
+            <span className={`font-mono ${muted}`}>{overallScore}%</span>
           </div>
-          <Progress.Root value={overallScore} className="h-3 w-full overflow-hidden rounded-full bg-neutral-800">
+          <Progress.Root value={overallScore} className="h-3 w-full overflow-hidden rounded-full bg-black/10 dark:bg-neutral-800">
             <Progress.Track className="h-full w-full">
               <Progress.Indicator
-                className="h-full bg-gradient-to-r from-neutral-300 to-white transition-all duration-500 ease-out"
+                className="h-full bg-[var(--primary)] transition-all duration-500 ease-out"
                 style={{ width: `${overallScore}%` }}
               />
             </Progress.Track>
           </Progress.Root>
           <div className="grid grid-cols-3 gap-2 pt-2 text-center text-xs">
-            <div className="rounded-lg bg-black/40 p-2 border border-[var(--border)]">
+            <div className="rounded-lg bg-slate-50 dark:bg-black/40 p-2 border border-[var(--border)]">
               <p className={`text-[10px] uppercase font-medium ${muted}`}>Matching</p>
-              <p className="mt-0.5 font-mono text-emerald-400 font-semibold">{totalMatching}</p>
+              <p className="mt-0.5 font-mono text-emerald-600 dark:text-emerald-400 font-semibold">{totalMatching}</p>
             </div>
-            <div className="rounded-lg bg-black/40 p-2 border border-[var(--border)]">
+            <div className="rounded-lg bg-slate-50 dark:bg-black/40 p-2 border border-[var(--border)]">
               <p className={`text-[10px] uppercase font-medium ${muted}`}>Mismatches</p>
-              <p className="mt-0.5 font-mono text-rose-400 font-semibold">{totalEligible - totalMatching}</p>
+              <p className="mt-0.5 font-mono text-rose-600 dark:text-rose-400 font-semibold">{totalEligible - totalMatching}</p>
             </div>
-            <div className="rounded-lg bg-black/40 p-2 border border-[var(--border)]">
+            <div className="rounded-lg bg-slate-50 dark:bg-black/40 p-2 border border-[var(--border)]">
               <p className={`text-[10px] uppercase font-medium ${muted}`}>Eligible</p>
-              <p className="mt-0.5 font-mono text-neutral-300 font-semibold">{totalEligible}</p>
+              <p className="mt-0.5 font-mono text-[var(--foreground)] font-semibold">{totalEligible}</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Field-by-Field Breakdown */}
-      <div className="rounded-xl border border-[var(--border)] bg-[#0d0d0d]/80 p-5 md:p-6">
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 md:p-6 shadow-sm">
         <h2 className="text-base font-semibold tracking-tight">Field Breakdown</h2>
         <p className={`text-xs mt-0.5 ${muted}`}>
           Normalized comparison score calculated per attribute.
@@ -183,24 +183,24 @@ export default function Score() {
                   <span className={`ml-2 text-xs ${muted}`}>({item.description})</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-mono text-neutral-400">
+                  <span className="text-xs font-mono text-[var(--muted-foreground)]">
                     {item.matching}/{item.eligible} verified
                   </span>
-                  <span className="w-10 text-right font-mono text-xs font-semibold tabular-nums text-white">
+                  <span className="w-10 text-right font-mono text-xs font-semibold tabular-nums text-[var(--foreground)]">
                     {item.score}%
                   </span>
                 </div>
               </div>
-              <Progress.Root value={item.score} className="h-1.5 w-full overflow-hidden rounded-full bg-neutral-800">
+              <Progress.Root value={item.score} className="h-1.5 w-full overflow-hidden rounded-full bg-black/10 dark:bg-neutral-800">
                 <Progress.Track className="h-full w-full">
                   <Progress.Indicator
                     className={cn(
                       "h-full transition-all duration-300 ease-out",
                       item.score === 100
-                        ? "bg-emerald-400"
+                        ? "bg-emerald-500"
                         : item.score >= 60
-                        ? "bg-neutral-300"
-                        : "bg-rose-400"
+                        ? "bg-[var(--primary)]"
+                        : "bg-rose-500"
                     )}
                     style={{ width: `${item.score}%` }}
                   />
@@ -212,7 +212,7 @@ export default function Score() {
       </div>
 
       {/* Platform Breakdown */}
-      <div className="rounded-xl border border-[var(--border)] bg-[#0d0d0d]/80 p-5 md:p-6">
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 md:p-6 shadow-sm">
         <h2 className="text-base font-semibold tracking-tight">Platform Alignment</h2>
         <p className={`text-xs mt-0.5 ${muted}`}>
           Directory compliance rate and API write capability.
@@ -222,33 +222,33 @@ export default function Score() {
           {platformScores.map((platform) => (
             <div
               key={platform.platform}
-              className="rounded-lg border border-[var(--border)] bg-black/40 p-4 space-y-3"
+              className="rounded-lg border border-[var(--border)] bg-slate-50 dark:bg-black/40 p-4 space-y-3"
             >
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-neutral-300">
+                <span className="text-xs font-semibold uppercase tracking-wider text-[var(--foreground)]">
                   {platform.platform}
                 </span>
                 <span
                   className={cn(
                     "rounded px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide",
                     platform.writable
-                      ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                      : "bg-neutral-800 text-neutral-400 border border-neutral-700"
+                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                      : "bg-black/5 dark:bg-neutral-800 text-[var(--muted-foreground)] border border-[var(--border)]"
                   )}
                 >
                   {platform.writable ? "Writable" : "Read-only"}
                 </span>
               </div>
               <div>
-                <p className="text-xs text-neutral-400">{platform.name}</p>
+                <p className="text-xs text-[var(--muted-foreground)]">{platform.name}</p>
                 <div className="mt-2 flex items-baseline gap-2">
-                  <span className="text-2xl font-bold tracking-tight text-white tabular-nums">
+                  <span className="text-2xl font-bold tracking-tight text-[var(--foreground)] tabular-nums">
                     {platform.score}%
                   </span>
                   <span className={`text-xs ${muted}`}>consistency</span>
                 </div>
               </div>
-              <div className="border-t border-[var(--border)] pt-2 text-[11px] text-neutral-500">
+              <div className="border-t border-[var(--border)] pt-2 text-[11px] text-[var(--muted-foreground)]">
                 Last checked: {platform.lastVerified}
               </div>
             </div>

@@ -35,7 +35,7 @@ export function MismatchPanel({ mismatches, selected, onToggle }: MismatchPanelP
   const shown = useMemo(() => rowsFor(filter, mismatches), [filter, mismatches]);
 
   return (
-    <div className="rounded-xl border border-[var(--border)] bg-[#0d0d0d]/80 p-4 md:p-5">
+    <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 md:p-5 shadow-sm">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold tracking-tight">Mismatches</h2>
@@ -49,14 +49,14 @@ export function MismatchPanel({ mismatches, selected, onToggle }: MismatchPanelP
       </div>
 
       <Tabs.Root value={filter} onValueChange={setFilter} className="mt-5">
-        <Tabs.List className="relative flex flex-wrap gap-1 rounded-lg bg-white/5 p-1">
+        <Tabs.List className="relative flex flex-wrap gap-1 rounded-lg bg-black/5 dark:bg-white/5 p-1">
           {FILTERS.map((f) => (
             <Tabs.Tab
               key={f.value}
               value={f.value}
               className={cn(
                 "relative z-10 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-                "data-[active]:bg-white/10 data-[active]:text-[var(--foreground)]",
+                "data-[active]:bg-white dark:data-[active]:bg-white/10 data-[active]:text-[var(--foreground)] data-[active]:shadow-sm",
                 muted,
                 focus,
               )}
@@ -84,7 +84,7 @@ export function MismatchPanel({ mismatches, selected, onToggle }: MismatchPanelP
                             checked={selected.has(row.id)}
                             onCheckedChange={() => onToggle(row.id)}
                             className={cn(
-                              "relative flex h-4 w-4 items-center justify-center rounded border border-white/25 bg-transparent transition-colors data-[checked]:border-transparent data-[checked]:bg-[var(--primary)] data-[checked]:text-[var(--primary-foreground)]",
+                              "relative flex h-4 w-4 items-center justify-center rounded border border-[var(--border)] dark:border-white/25 bg-transparent transition-colors data-[checked]:border-transparent data-[checked]:bg-[var(--primary)] data-[checked]:text-[var(--primary-foreground)]",
                               "before:absolute before:-inset-px before:rounded before:bg-[var(--primary)] before:opacity-0 before:transition-[opacity,transform] before:duration-300 data-[checked]:before:scale-100 data-[checked]:before:opacity-100 before:scale-[0.7]",
                               focus,
                             )}

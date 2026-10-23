@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Users as UsersIcon, ShieldCheck, UserCheck, Eye, Check, RefreshCw } from "lucide-react";
-import { listUsers, updateUserRole, getStoredUser, setStoredUser, type UserProfile, type UserRole } from "../lib/api";
+import { listUsers, updateUserRole, type UserProfile, type UserRole } from "../lib/api";
+import { useAuth } from "../context/AuthContext";
 import { cn } from "../lib/cn";
 import { focus, muted } from "../lib/styles";
 
@@ -26,7 +27,7 @@ const ROLE_CONFIG: Record<UserRole, { label: string; tone: string; icon: typeof 
 };
 
 export default function Users() {
-  const [currentUser, setCurrentUser] = useState<UserProfile | null>(getStoredUser());
+  const { user: currentUser, updateUser } = useAuth();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -51,8 +52,7 @@ export default function Users() {
       );
       if (currentUser?.id === userId) {
         const updated = { ...currentUser, role: newRole };
-        setCurrentUser(updated);
-        setStoredUser(updated);
+        updateUser(updated);
       }
       setSuccessMsg(`Role successfully updated to ${newRole}`);
       setTimeout(() => setSuccessMsg(null), 3000);
@@ -63,8 +63,7 @@ export default function Users() {
       );
       if (currentUser?.id === userId) {
         const updated = { ...currentUser, role: newRole };
-        setCurrentUser(updated);
-        setStoredUser(updated);
+        updateUser(updated);
       }
       setSuccessMsg(`Role switched to ${newRole} (Demo mode)`);
       setTimeout(() => setSuccessMsg(null), 3000);
@@ -78,12 +77,10 @@ export default function Users() {
       name: currentUser?.name || "Active User",
       role: newRole,
     };
-    setCurrentUser(updated);
-    setStoredUser(updated);
+    updateUser(updated);
     setSuccessMsg(`Simulating active session as: ${newRole}`);
     setTimeout(() => {
       setSuccessMsg(null);
-      window.location.reload();
     }, 800);
   };
 
@@ -105,7 +102,7 @@ export default function Users() {
         </div>
 
         {/* Demo Role Switcher */}
-        <div className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[#0d0d0d]/90 p-2 text-xs">
+        <div className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card)] p-2 text-xs shadow-sm">
           <span className={`font-medium ${muted}`}>Switch Role:</span>
           {(["ADMIN", "OPERATOR", "VIEWER"] as UserRole[]).map((r) => (
             <button
@@ -115,8 +112,8 @@ export default function Users() {
               className={cn(
                 "rounded px-2.5 py-1 text-xs font-medium transition-colors",
                 activeRole === r
-                  ? "bg-white/20 text-white font-semibold shadow-sm"
-                  : "text-neutral-400 hover:text-neutral-200 hover:bg-white/5",
+                  ? "bg-[var(--primary)] text-[var(--primary-foreground)] font-semibold shadow-sm"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/5",
                 focus
               )}
             >
@@ -127,23 +124,23 @@ export default function Users() {
       </div>
 
       {successMsg && (
-        <div className="flex items-center gap-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-4 py-2.5 text-xs text-emerald-300">
+        <div className="flex items-center gap-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-4 py-2.5 text-xs text-emerald-700 dark:text-emerald-300">
           <Check className="h-4 w-4" />
           <span>{successMsg}</span>
         </div>
       )}
 
       {/* Role Permission Matrix Card */}
-      <div className="rounded-xl border border-[var(--border)] bg-[#0d0d0d]/80 p-5 space-y-4">
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 space-y-4 shadow-sm">
         <h2 className="text-base font-semibold">Permission Matrix by Role</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-[var(--border)] text-neutral-400">
+              <tr className="border-b border-[var(--border)] text-[var(--muted-foreground)]">
                 <th className="py-2.5 pr-4 font-medium">Capability</th>
-                <th className="py-2.5 px-4 font-medium text-emerald-400">Admin</th>
-                <th className="py-2.5 px-4 font-medium text-amber-400">Operator</th>
-                <th className="py-2.5 px-4 font-medium text-blue-400">Viewer</th>
+                <th className="py-2.5 px-4 font-medium text-emerald-600 dark:text-emerald-400">Admin</th>
+                <th className="py-2.5 px-4 font-medium text-amber-600 dark:text-amber-400">Operator</th>
+                <th className="py-2.5 px-4 font-medium text-blue-600 dark:text-blue-400">Viewer</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border)]">
@@ -155,11 +152,11 @@ export default function Users() {
                 { cap: "Edit Canonical Business Profile & Schedules", admin: true, op: false, viewer: false },
                 { cap: "Manage Users & Assign Roles", admin: true, op: false, viewer: false },
               ].map((row, idx) => (
-                <tr key={idx} className="hover:bg-white/[0.02]">
-                  <td className="py-2.5 pr-4 font-medium text-neutral-300">{row.cap}</td>
-                  <td className="py-2.5 px-4 text-emerald-400">{row.admin ? "✓ Allowed" : "—"}</td>
-                  <td className="py-2.5 px-4 text-amber-400">{row.op ? "✓ Allowed" : "— Read Only"}</td>
-                  <td className="py-2.5 px-4 text-blue-400">{row.viewer ? "✓ Allowed" : "— Forbidden"}</td>
+                <tr key={idx} className="hover:bg-black/5 dark:hover:bg-white/[0.02]">
+                  <td className="py-2.5 pr-4 font-medium text-[var(--foreground)]">{row.cap}</td>
+                  <td className="py-2.5 px-4 text-emerald-600 dark:text-emerald-400">{row.admin ? "✓ Allowed" : "—"}</td>
+                  <td className="py-2.5 px-4 text-amber-600 dark:text-amber-400">{row.op ? "✓ Allowed" : "— Read Only"}</td>
+                  <td className="py-2.5 px-4 text-blue-600 dark:text-blue-400">{row.viewer ? "✓ Allowed" : "— Forbidden"}</td>
                 </tr>
               ))}
             </tbody>
@@ -168,7 +165,7 @@ export default function Users() {
       </div>
 
       {/* Users List */}
-      <div className="rounded-xl border border-[var(--border)] bg-[#0d0d0d]/80 p-5 space-y-4">
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 space-y-4 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-base font-semibold">Active Workspace Users</h2>

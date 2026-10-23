@@ -10,10 +10,10 @@ type ScoreHeroProps = {
 
 export function ScoreHero({ score, matching, eligible }: ScoreHeroProps) {
   return (
-    <div className="rounded-xl border border-[var(--border)] bg-[#0d0d0d]/80 p-5 md:p-6">
+    <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 md:p-6 shadow-sm">
       <p className={`text-xs font-medium uppercase tracking-wider ${muted}`}>Consistency score</p>
       <div className="mt-3 flex items-end gap-1">
-        <span className="text-5xl font-semibold tracking-tight tabular-nums md:text-6xl">
+        <span className="text-5xl font-semibold tracking-tight tabular-nums md:text-6xl text-[var(--foreground)]">
           <SlidingNumber number={score} fromNumber={0} inView />
         </span>
         <span className={`mb-1.5 text-xl ${muted}`}>%</span>
@@ -26,7 +26,7 @@ export function ScoreHero({ score, matching, eligible }: ScoreHeroProps) {
           <Progress.Label className={muted}>Field coverage</Progress.Label>
           <Progress.Value className="tabular-nums text-[var(--foreground)]" />
         </div>
-        <Progress.Track className="h-1.5 overflow-hidden rounded-full bg-white/10">
+        <Progress.Track className="h-1.5 overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
           <Progress.Indicator className="h-full rounded-full bg-[var(--primary)]" />
         </Progress.Track>
       </Progress.Root>

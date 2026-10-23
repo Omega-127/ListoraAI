@@ -57,38 +57,16 @@ export function clearStoredUser(): void {
 }
 
 export async function login(payload: LoginPayload): Promise<{ user: UserProfile }> {
+  let res: Response;
   try {
-    const res = await fetch(`${baseUrl}/auth/login`, {
+    res = await fetch(`${baseUrl}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify(payload),
     });
-
-    const data = (await res.json().catch(() => ({}))) as ApiError & {
-      user?: UserProfile;
-      email?: string;
-    };
-
-    if (!res.ok) {
-      throw new Error(data.error || data.message || "Invalid credentials");
-    }
-
-    const user: UserProfile = data.user || {
-      id: "usr-" + Date.now(),
-      email: data.email ?? payload.email,
-      name: payload.email.split("@")[0],
-      role: payload.email.includes("admin")
-        ? "ADMIN"
-        : payload.email.includes("viewer")
-        ? "VIEWER"
-        : "OPERATOR",
-    };
-
-    setStoredUser(user);
-    return { user };
-  } catch (err) {
-    // Demo fallback when API server is not running locally
+  } catch {
+    // Demo fallback only when API server is unreachable
     let role: UserRole = "OPERATOR";
     if (payload.email.includes("admin")) role = "ADMIN";
     if (payload.email.includes("viewer")) role = "VIEWER";
@@ -102,35 +80,41 @@ export async function login(payload: LoginPayload): Promise<{ user: UserProfile 
     setStoredUser(demoUser);
     return { user: demoUser };
   }
+
+  const data = (await res.json().catch(() => ({}))) as ApiError & {
+    user?: UserProfile;
+    email?: string;
+  };
+
+  if (!res.ok) {
+    throw new Error(data.error || data.message || "Invalid credentials");
+  }
+
+  const user: UserProfile = data.user || {
+    id: "usr-" + Date.now(),
+    email: data.email ?? payload.email,
+    name: payload.email.split("@")[0],
+    role: payload.email.includes("admin")
+      ? "ADMIN"
+      : payload.email.includes("viewer")
+      ? "VIEWER"
+      : "OPERATOR",
+  };
+
+  setStoredUser(user);
+  return { user };
 }
 
 export async function register(payload: RegisterPayload): Promise<{ user: UserProfile }> {
+  let res: Response;
   try {
-    const res = await fetch(`${baseUrl}/auth/register`, {
+    res = await fetch(`${baseUrl}/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify(payload),
     });
-
-    const data = (await res.json().catch(() => ({}))) as ApiError & {
-      user?: UserProfile;
-    };
-
-    if (!res.ok) {
-      throw new Error(data.error || data.message || "Registration failed");
-    }
-
-    const user: UserProfile = data.user || {
-      id: "usr-" + Date.now(),
-      email: payload.email,
-      name: payload.name || payload.email.split("@")[0],
-      role: payload.role || "OPERATOR",
-    };
-
-    setStoredUser(user);
-    return { user };
-  } catch (err) {
+  } catch {
     const fallbackUser: UserProfile = {
       id: "demo-" + Date.now(),
       email: payload.email,
@@ -140,6 +124,24 @@ export async function register(payload: RegisterPayload): Promise<{ user: UserPr
     setStoredUser(fallbackUser);
     return { user: fallbackUser };
   }
+
+  const data = (await res.json().catch(() => ({}))) as ApiError & {
+    user?: UserProfile;
+  };
+
+  if (!res.ok) {
+    throw new Error(data.error || data.message || "Registration failed");
+  }
+
+  const user: UserProfile = data.user || {
+    id: "usr-" + Date.now(),
+    email: payload.email,
+    name: payload.name || payload.email.split("@")[0],
+    role: payload.role || "OPERATOR",
+  };
+
+  setStoredUser(user);
+  return { user };
 }
 
 export async function logout(): Promise<void> {
@@ -159,6 +161,10 @@ export async function getMe(): Promise<UserProfile | null> {
     const res = await fetch(`${baseUrl}/auth/me`, {
       credentials: "include",
     });
+    if (res.status === 401) {
+      clearStoredUser();
+      return null;
+    }
     if (!res.ok) return getStoredUser();
     const data = await res.json();
     if (data.user) {
@@ -220,7 +226,7 @@ export type AgentAnalysisResponse = {
   };
   proposalsCreated?: number;
   toolCallCount: number;
-  mode?: "claude-ai" | "heuristic-engine";
+  mode?: string;
   error?: string;
 };
 
@@ -390,22 +396,23 @@ export type BusinessProfileData = {
 };
 
 export const DEFAULT_BUSINESS_PROFILE: BusinessProfileData = {
-  name: "Brew & Bloom Café",
-  address: "42 Maple Street, Springfield, IL 62701",
-  phone: "+15550102234",
+  name: "The Bombay Roastery & Café",
+  address: "Plot 742, 12th Main Road, HAL 2nd Stage, Indiranagar, Bengaluru, Karnataka 560038",
+  phone: "+918041234567",
   regularHours: {
-    monday: "07:00-18:00",
-    tuesday: "07:00-18:00",
-    wednesday: "07:00-18:00",
-    thursday: "07:00-18:00",
-    friday: "07:00-20:00",
-    saturday: "08:00-20:00",
-    sunday: "09:00-16:00",
+    monday: "07:00-22:00",
+    tuesday: "07:00-22:00",
+    wednesday: "07:00-22:00",
+    thursday: "07:00-22:00",
+    friday: "07:00-23:00",
+    saturday: "08:00-23:00",
+    sunday: "08:00-22:00",
   },
   holidayHours: {
-    "2026-12-25": "closed",
-    "2026-01-01": "closed",
-    "2026-07-04": "08:00-14:00",
+    "2026-01-26": "closed", // Republic Day
+    "2026-08-15": "closed", // Independence Day
+    "2026-10-02": "closed", // Gandhi Jayanti
+    "2026-11-08": "closed", // Diwali
   },
 };
 

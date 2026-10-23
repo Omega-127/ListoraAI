@@ -6,11 +6,13 @@ import { SYSTEM_PROMPT_VERSION } from '../../src/agent/prompts/system';
 import { INVESTIGATOR_PROMPT_VERSION } from '../../src/agent/prompts/investigator';
 import { HOLIDAYS_PROMPT_VERSION } from '../../src/agent/prompts/holidays';
 import { prisma } from '../../src/db/prisma';
+import * as aiClient from '../../src/clients/ai.client';
 
 describe('AI Agent Orchestration & Guardrails', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     vi.spyOn(prisma.auditLog, 'create').mockImplementation(async () => ({} as any));
+    vi.spyOn(aiClient, 'isAIConfigured').mockReturnValue(false);
   });
 
   describe('Agent Tools', () => {

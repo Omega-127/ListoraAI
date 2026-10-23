@@ -1,4 +1,4 @@
-import { useState, useEffect, type CSSProperties } from "react";
+import { type CSSProperties } from "react";
 import { NavLink, Outlet, Link, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -20,7 +20,9 @@ import * as Sidebar from "@animate-ui/react/primitives/sidebar";
 import { Bell } from "../animate-ui/icons/bell";
 import { cn } from "../../lib/cn";
 import { focus, muted } from "../../lib/styles";
-import { getStoredUser, logout, type UserRole, type UserProfile } from "../../lib/api";
+import { useAuth } from "../../context/AuthContext";
+import ThemeTogglerDemo from "../ThemeToggler";
+import type { UserRole } from "../../lib/api";
 
 const NAV: {
   to: string;
@@ -63,9 +65,9 @@ function RoleBadge({ role }: { role: UserRole }) {
   );
 }
 
-function NavItems({ onNavigate }: { onNavigate?: () => void }) {
+function NavItems({ onNavigate, collapsed }: { onNavigate?: () => void; collapsed?: boolean }) {
   return (
-    <nav className="flex flex-col gap-0.5 px-2" aria-label="Dashboard">
+    <nav className="flex flex-col gap-1 px-2" aria-label="Dashboard">
       {NAV.map(({ to, label, icon: Icon, end }) => (
         <NavLink
           key={to}
@@ -73,116 +75,179 @@ function NavItems({ onNavigate }: { onNavigate?: () => void }) {
           end={end}
           onClick={onNavigate}
           data-sidebar="menu-button"
+          title={collapsed ? label : undefined}
           className={({ isActive }) =>
             cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-              isActive ? "text-[var(--foreground)]" : muted,
-              !isActive && "hover:text-[var(--foreground)]",
+              "group relative flex items-center rounded-lg text-sm font-medium transition-all duration-200",
+              collapsed ? "justify-center h-10 w-10 mx-auto px-0" : "gap-3 px-3 py-2",
+              isActive
+                ? "text-[var(--foreground)] bg-black/5 dark:bg-white/10 shadow-sm"
+                : muted,
+              !isActive && "hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/5",
               focus,
             )
           }
         >
-          <Icon className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={1.75} />
-          <span className="truncate">{label}</span>
+          <Icon className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover:scale-110" aria-hidden="true" strokeWidth={1.75} />
+          {!collapsed && <span className="truncate">{label}</span>}
+          {collapsed && (
+            <div className="pointer-events-none absolute left-full ml-3 hidden rounded-md bg-neutral-900 border border-neutral-700/80 px-2.5 py-1 text-xs font-medium text-white shadow-xl z-50 whitespace-nowrap group-hover:block animate-in fade-in zoom-in-95 duration-150">
+              {label}
+            </div>
+          )}
         </NavLink>
       ))}
     </nav>
   );
 }
 
-function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
+function SidebarBody({ onNavigate, collapsed }: { onNavigate?: () => void; collapsed?: boolean }) {
   const navigate = useNavigate();
-  const [user, setUser] = useState<UserProfile | null>(getStoredUser());
-
-  useEffect(() => {
-    setUser(getStoredUser());
-  }, []);
+  const { user, logout } = useAuth();
 
   const handleLogout = async () => {
     await logout();
-    navigate("/login");
+    navigate("/login", { replace: true });
   };
 
-  const activeRole: UserRole = user?.role || "ADMIN";
+  const activeRole: UserRole = user?.role || "VIEWER";
 
   return (
     <>
-      <div className="flex h-14 items-center justify-between border-b border-[var(--border)] px-4">
-        <Link to="/" className={cn("text-base font-semibold tracking-tight", focus)}>
-          ListoraAI
-        </Link>
-        <RoleBadge role={activeRole} />
+      <div
+        className={cn(
+          "flex h-14 items-center border-b border-[var(--border)] transition-all duration-200",
+          collapsed ? "justify-center px-2" : "justify-between px-4",
+        )}
+      >
+        {collapsed ? (
+          <Link
+            to="/"
+            title="ListoraAI Home"
+            className={cn(
+              "flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-[var(--border)] text-[var(--foreground)] font-bold text-sm tracking-wider shadow-sm hover:scale-105 transition-transform",
+              focus,
+            )}
+          >
+            L
+          </Link>
+        ) : (
+          <>
+            <Link to="/" className={cn("text-base font-semibold tracking-tight hover:opacity-80 transition-opacity", focus)}>
+              ListoraAI
+            </Link>
+            <RoleBadge role={activeRole} />
+          </>
+        )}
       </div>
+
       <div className="flex-1 overflow-y-auto py-3">
-        <p className={cn("mb-2 px-5 text-[11px] font-medium uppercase tracking-wider", muted)}>
-          Workspace
-        </p>
-        <NavItems onNavigate={onNavigate} />
+        {!collapsed ? (
+          <p className={cn("mb-2 px-5 text-[11px] font-medium uppercase tracking-wider", muted)}>
+            Workspace
+          </p>
+        ) : (
+          <div className="mb-3 h-px w-6 mx-auto bg-black/10 dark:bg-white/10" />
+        )}
+        <NavItems onNavigate={onNavigate} collapsed={collapsed} />
       </div>
 
       {/* User profile & Logout */}
-      <div className="border-t border-[var(--border)] p-3 space-y-2">
-        <div className="flex items-center justify-between px-2">
-          <div className="min-w-0">
-            <p className="text-xs font-medium text-neutral-200 truncate">{user?.name || "Active Session"}</p>
-            <p className={`text-[11px] truncate ${muted}`}>{user?.email || "admin@listora.ai"}</p>
-          </div>
-          <RoleBadge role={activeRole} />
-        </div>
-        <button
-          type="button"
-          onClick={handleLogout}
-          className={cn(
-            "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium",
-            muted,
-            "hover:text-[var(--foreground)] hover:bg-white/5",
-            focus,
-          )}
-        >
-          <LogOut className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={1.75} />
-          <span>Log out</span>
-        </button>
+      <div className={cn("border-t border-[var(--border)]", collapsed ? "p-2 flex flex-col items-center gap-2" : "p-3 space-y-2")}>
+        {!collapsed ? (
+          <>
+            <div className="flex items-center justify-between px-2">
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-[var(--foreground)] truncate">{user?.name || "Active Session"}</p>
+                <p className={`text-[11px] truncate ${muted}`}>{user?.email || "admin@listora.ai"}</p>
+              </div>
+              <RoleBadge role={activeRole} />
+            </div>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className={cn(
+                "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium",
+                muted,
+                "hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors",
+                focus,
+              )}
+            >
+              <LogOut className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={1.75} />
+              <span>Log out</span>
+            </button>
+          </>
+        ) : (
+          <>
+            <div
+              title={`${user?.name || "User"} (${activeRole})`}
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 border border-[var(--border)] text-xs font-semibold text-[var(--foreground)] cursor-default"
+            >
+              {(user?.name || user?.email || "U").charAt(0).toUpperCase()}
+            </div>
+            <button
+              type="button"
+              onClick={handleLogout}
+              title="Log out"
+              className={cn(
+                "group relative flex h-9 w-9 items-center justify-center rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors",
+                focus,
+              )}
+            >
+              <LogOut className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={1.75} />
+              <div className="pointer-events-none absolute left-full ml-3 hidden rounded-md bg-neutral-900 border border-neutral-700/80 px-2.5 py-1 text-xs font-medium text-white shadow-xl z-50 whitespace-nowrap group-hover:block animate-in fade-in zoom-in-95 duration-150">
+                Log out
+              </div>
+            </button>
+          </>
+        )}
       </div>
     </>
   );
 }
 
 function DesktopSidebar() {
-  const { isMobile, openMobile, setOpenMobile } = Sidebar.useSidebar();
+  const { isMobile, openMobile, setOpenMobile, open } = Sidebar.useSidebar();
 
   if (isMobile) {
     if (!openMobile) return null;
     return (
-      <div className="fixed inset-0 z-50 md:hidden">
+      <div className="fixed inset-0 z-50 md:hidden animate-in fade-in duration-200">
         <button
           type="button"
           aria-label="Close menu"
-          className="absolute inset-0 bg-black/60"
+          className="absolute inset-0 bg-black/70 backdrop-blur-sm"
           onClick={() => setOpenMobile(false)}
         />
-        <Sidebar.Highlight className="relative flex h-full w-[18rem] flex-col border-r border-[var(--border)] bg-[#0d0d0d]">
-          <SidebarBody onNavigate={() => setOpenMobile(false)} />
-        </Sidebar.Highlight>
+        <div className="relative flex h-full w-[16rem] flex-col border-r border-[var(--border)] bg-[var(--sidebar)] shadow-2xl">
+          <SidebarBody onNavigate={() => setOpenMobile(false)} collapsed={false} />
+        </div>
       </div>
     );
   }
 
+  const widthClass = open ? "w-[15.5rem]" : "w-[4.25rem]";
+
   return (
     <>
-      <Sidebar.Gap className="relative hidden w-[var(--sidebar-width)] bg-transparent md:block" />
-      <Sidebar.Container className="fixed inset-y-0 left-0 z-30 hidden h-svh w-[var(--sidebar-width)] border-r border-[var(--border)] bg-[#0d0d0d] md:flex md:flex-col">
-        <Sidebar.Highlight className="flex h-full w-full flex-col">
-          <SidebarBody />
-        </Sidebar.Highlight>
-      </Sidebar.Container>
+      <div className={cn("hidden shrink-0 transition-all duration-300 ease-in-out md:block", widthClass)} />
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-30 hidden h-svh border-r border-[var(--border)] bg-[var(--sidebar)] transition-all duration-300 ease-in-out md:flex md:flex-col overflow-hidden",
+          widthClass,
+        )}
+      >
+        <SidebarBody collapsed={!open} />
+      </aside>
     </>
   );
 }
 
 function ShellChrome() {
-  const { toggleSidebar, isMobile, openMobile } = Sidebar.useSidebar();
-  const [user] = useState<UserProfile | null>(getStoredUser());
-  const activeRole: UserRole = user?.role || "ADMIN";
+  const { toggleSidebar, isMobile, openMobile, open } = Sidebar.useSidebar();
+  const { user } = useAuth();
+  const activeRole: UserRole = user?.role || "VIEWER";
+  const isOpen = isMobile ? openMobile : open;
 
   return (
     <>
@@ -192,16 +257,18 @@ function ShellChrome() {
           <button
             type="button"
             onClick={toggleSidebar}
-            aria-label={isMobile ? (openMobile ? "Close sidebar" : "Open sidebar") : "Toggle sidebar"}
+            aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
+            title={isOpen ? "Collapse sidebar (Ctrl+B)" : "Expand sidebar (Ctrl+B)"}
             className={cn(
-              "grid h-9 w-9 place-items-center rounded-lg border border-[var(--border)] hover:bg-white/5",
+              "grid h-9 w-9 place-items-center rounded-lg border border-[var(--border)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer text-[var(--foreground)]",
               focus,
             )}
           >
-            <Sidebar.TriggerIcon
-              open={<PanelLeftClose className="h-4 w-4" strokeWidth={1.75} />}
-              closed={<PanelLeftOpen className="h-4 w-4" strokeWidth={1.75} />}
-            />
+            {isOpen ? (
+              <PanelLeftClose className="h-4 w-4" strokeWidth={1.75} />
+            ) : (
+              <PanelLeftOpen className="h-4 w-4" strokeWidth={1.75} />
+            )}
           </button>
 
           <div className="ml-auto flex items-center gap-3">
@@ -212,7 +279,7 @@ function ShellChrome() {
             <NavLink
               to="/dashboard/alerts"
               className={cn(
-                "relative grid h-9 w-9 place-items-center rounded-lg border border-[var(--border)] hover:bg-white/5",
+                "relative grid h-9 w-9 place-items-center rounded-lg border border-[var(--border)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-[var(--foreground)]",
                 focus,
               )}
               aria-label="Alerts"
@@ -220,6 +287,8 @@ function ShellChrome() {
               <Bell size={16} animateOnHover />
               <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-[var(--primary)]" />
             </NavLink>
+
+            <ThemeTogglerDemo />
           </div>
         </header>
         <main className="flex-1 px-4 py-6 md:px-8 md:py-8">
@@ -235,7 +304,7 @@ export default function DashboardShell() {
     <div className="min-h-svh bg-[var(--background)] text-[var(--foreground)]">
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_70%_45%_at_0%_0%,rgba(255,255,255,0.05),transparent_55%)]"
+        className="pointer-events-none fixed inset-0 dark:bg-[radial-gradient(ellipse_70%_45%_at_0%_0%,rgba(255,255,255,0.05),transparent_55%)] bg-[radial-gradient(ellipse_70%_45%_at_0%_0%,rgba(15,23,42,0.03),transparent_55%)]"
       />
       <Sidebar.Provider
         defaultOpen
@@ -243,7 +312,7 @@ export default function DashboardShell() {
         style={
           {
             "--sidebar-width": "15.5rem",
-            "--sidebar-width-icon": "3.25rem",
+            "--sidebar-width-icon": "4.25rem",
           } as CSSProperties
         }
       >

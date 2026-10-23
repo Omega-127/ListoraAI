@@ -10,6 +10,12 @@ import { z } from 'zod';
 const EnvSchema = z.object({
   DATABASE_URL: z.string().min(1),
   ANTHROPIC_API_KEY: z.string().default('placeholder-not-configured'),
+  GROQ_API_KEY: z.string().optional(),
+  GROK_API_KEY: z.string().optional(),
+  XAI_API_KEY: z.string().optional(),
+  OPENAI_API_KEY: z.string().optional(),
+  AI_PROVIDER: z.string().optional(),
+  AI_MODEL: z.string().optional(),
   SESSION_SECRET: z.string().min(32).default('default-session-secret-min-32-chars-long-listora-ai'),
   OWNER_EMAIL: z.string().email().default('owner@example.com'),
   OWNER_PASSWORD_HASH: z.string().min(1).default('$2a$10$wT3wW8R1x55mQ2K1v1F6OuK7YtK0b4zY6R1x55mQ2K1v1F6OuK7Yt'),

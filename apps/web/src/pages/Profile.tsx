@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { Building2, MapPin, Phone, Clock, Calendar, Check, Save, RotateCcw, Lock, ShieldAlert } from "lucide-react";
 import { cn } from "../lib/cn";
 import { focus, muted } from "../lib/styles";
+import { useAuth } from "../context/AuthContext";
 import {
-  getStoredUser,
   getBusinessProfile,
   updateBusinessProfile,
   DEFAULT_BUSINESS_PROFILE,
@@ -92,8 +92,8 @@ export default function Profile() {
     }
   };
 
-  const user = getStoredUser();
-  // Allow ADMIN or default session to edit/save canonical profile smoothly
+  const { user } = useAuth();
+  // Allow ADMIN or OPERATOR to edit/save canonical profile
   const isAdmin = !user || user.role === "ADMIN" || user.role === "OPERATOR";
 
   const handleReset = async () => {
@@ -158,7 +158,7 @@ export default function Profile() {
 
       <form onSubmit={handleSave} className="flex flex-col gap-6">
         {/* Core NAP Details */}
-        <div className="rounded-xl border border-[var(--border)] bg-[#0d0d0d]/80 p-5 md:p-6">
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 md:p-6 shadow-sm">
           <h2 className="text-base font-semibold tracking-tight">Name, Address & Phone (NAP)</h2>
           <p className={`mt-1 text-sm ${muted}`}>
             Verified identifiers matched directly against Google, Apple, Yelp, and directories.
@@ -177,7 +177,7 @@ export default function Profile() {
                   value={profile.name}
                   onChange={(e) => setProfile({ ...profile, name: e.target.value })}
                   className={cn(
-                    "w-full rounded-lg border border-[var(--border)] bg-black/40 pl-9 pr-3 py-2 text-sm text-[var(--foreground)] outline-none focus:border-neutral-400",
+                    "w-full rounded-lg border border-[var(--border)] bg-slate-50 dark:bg-black/40 pl-9 pr-3 py-2 text-sm text-[var(--foreground)] outline-none focus:border-neutral-400",
                     focus
                   )}
                   placeholder="Official registered name"
@@ -198,7 +198,7 @@ export default function Profile() {
                   value={profile.phone}
                   onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
                   className={cn(
-                    "w-full rounded-lg border border-[var(--border)] bg-black/40 pl-9 pr-3 py-2 text-sm text-[var(--foreground)] outline-none focus:border-neutral-400",
+                    "w-full rounded-lg border border-[var(--border)] bg-slate-50 dark:bg-black/40 pl-9 pr-3 py-2 text-sm text-[var(--foreground)] outline-none focus:border-neutral-400",
                     focus
                   )}
                   placeholder="+15550102234"
@@ -219,7 +219,7 @@ export default function Profile() {
                   value={profile.address}
                   onChange={(e) => setProfile({ ...profile, address: e.target.value })}
                   className={cn(
-                    "w-full rounded-lg border border-[var(--border)] bg-black/40 pl-9 pr-3 py-2 text-sm text-[var(--foreground)] outline-none focus:border-neutral-400",
+                    "w-full rounded-lg border border-[var(--border)] bg-slate-50 dark:bg-black/40 pl-9 pr-3 py-2 text-sm text-[var(--foreground)] outline-none focus:border-neutral-400",
                     focus
                   )}
                   placeholder="Street, City, State ZIP"
@@ -231,7 +231,7 @@ export default function Profile() {
         </div>
 
         {/* Regular Operating Hours Accordion */}
-        <div className="rounded-xl border border-[var(--border)] bg-[#0d0d0d]/80 p-5 md:p-6">
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 md:p-6 shadow-sm">
           <div className="flex items-center gap-2 mb-2">
             <Clock className="h-4 w-4 text-[var(--muted-foreground)]" />
             <h2 className="text-base font-semibold tracking-tight">Operating Schedule</h2>
@@ -240,7 +240,7 @@ export default function Profile() {
             Standard weekly schedule. Formatted in 24h intervals (e.g., 07:00-18:00) or 'closed'.
           </p>
 
-          <div className="mt-5 divide-y divide-[var(--border)] rounded-lg border border-[var(--border)] bg-black/30">
+          <div className="mt-5 divide-y divide-[var(--border)] rounded-lg border border-[var(--border)] bg-slate-50 dark:bg-black/30">
             {DAYS_OF_WEEK.map(({ key, label }) => (
               <div key={key} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 gap-2">
                 <span className="text-sm font-medium w-32 capitalize">{label}</span>
@@ -250,7 +250,7 @@ export default function Profile() {
                     value={profile.regularHours[key] || "closed"}
                     onChange={(e) => handleHourChange(key, e.target.value)}
                     className={cn(
-                      "w-full rounded-md border border-[var(--border)] bg-black/50 px-3 py-1.5 text-xs text-[var(--foreground)] font-mono outline-none focus:border-neutral-400",
+                      "w-full rounded-md border border-[var(--border)] bg-white dark:bg-black/50 px-3 py-1.5 text-xs text-[var(--foreground)] font-mono outline-none focus:border-neutral-400",
                       focus
                     )}
                     placeholder="08:00-17:00 or closed"
@@ -259,7 +259,7 @@ export default function Profile() {
                     type="button"
                     onClick={() => handleHourChange(key, "closed")}
                     className={cn(
-                      "text-xs px-2.5 py-1 rounded border border-[var(--border)] text-[var(--muted-foreground)] hover:text-white hover:bg-white/5",
+                      "text-xs px-2.5 py-1 rounded border border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/5",
                       focus
                     )}
                   >
@@ -272,7 +272,7 @@ export default function Profile() {
         </div>
 
         {/* Holiday Exceptions */}
-        <div className="rounded-xl border border-[var(--border)] bg-[#0d0d0d]/80 p-5 md:p-6">
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 md:p-6 shadow-sm">
           <div className="flex items-center gap-2 mb-2">
             <Calendar className="h-4 w-4 text-[var(--muted-foreground)]" />
             <h2 className="text-base font-semibold tracking-tight">Holiday & Special Closures</h2>
@@ -288,11 +288,11 @@ export default function Profile() {
               Object.entries(profile.holidayHours).map(([date, hours]) => (
                 <div
                   key={date}
-                  className="flex items-center justify-between rounded-lg border border-[var(--border)] bg-black/30 px-3.5 py-2"
+                  className="flex items-center justify-between rounded-lg border border-[var(--border)] bg-slate-50 dark:bg-black/30 px-3.5 py-2"
                 >
                   <div className="flex items-center gap-3">
                     <span className="font-mono text-xs text-[var(--foreground)]">{date}</span>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-neutral-800 text-[var(--muted-foreground)] font-mono">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-black/5 dark:bg-neutral-800 text-[var(--muted-foreground)] font-mono">
                       {hours}
                     </span>
                   </div>

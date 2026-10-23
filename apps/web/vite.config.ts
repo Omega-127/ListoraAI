@@ -11,6 +11,7 @@ export default defineConfig({
     // Monorepo root still has React 18; Animate UI needs React 19's `use()`.
     dedupe: ["react", "react-dom"],
     alias: {
+      "@": path.resolve(root, "src"),
       react: path.resolve(root, "node_modules/react"),
       "react-dom": path.resolve(root, "node_modules/react-dom"),
     },
