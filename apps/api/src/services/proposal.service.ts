@@ -7,6 +7,7 @@
  */
 import { z } from 'zod';
 import { prisma } from '../db/prisma';
+import type { Prisma } from '@prisma/client';
 import { recordAudit } from './audit.service';
 import { AppError } from '../middleware/errorHandler';
 
@@ -19,6 +20,135 @@ export const CreateProposalSchema = z.object({
 });
 
 export type CreateProposalInput = z.infer<typeof CreateProposalSchema>;
+
+export const INITIAL_DEMO_PROPOSALS: Record<
+  string,
+  {
+    platform: string;
+    externalId: string;
+    field: string;
+    oldValue: unknown;
+    newValue: unknown;
+    status: 'PENDING_APPROVAL' | 'APPROVED' | 'REJECTED';
+    reason: string;
+  }
+> = {
+  'prop-1': {
+    platform: 'mockMapsA',
+    externalId: 'listing_001',
+    field: 'phone',
+    oldValue: '(555) 010-2234',
+    newValue: '+15550102234',
+    status: 'PENDING_APPROVAL',
+    reason: 'Standardize formatting to E.164 canonical telephone protocol.',
+  },
+  'prop-2': {
+    platform: 'mockMapsB',
+    externalId: 'listing_002',
+    field: 'regularHours',
+    oldValue: 'Mon–Sat 7–5',
+    newValue: {
+      monday: '07:00-18:00',
+      tuesday: '07:00-18:00',
+      wednesday: '07:00-18:00',
+      thursday: '07:00-18:00',
+      friday: '07:00-20:00',
+      saturday: '08:00-20:00',
+      sunday: '09:00-16:00',
+    },
+    status: 'PENDING_APPROVAL',
+    reason: 'Saturday and Sunday operating schedules contradict approved hours.',
+  },
+  'prop-3': {
+    platform: 'mockDirectoryC',
+    externalId: 'listing_003',
+    field: 'name',
+    oldValue: 'Bella Cucina (Downtown)',
+    newValue: 'Brew & Bloom Café',
+    status: 'PENDING_APPROVAL',
+    reason: 'Removes unauthorized location qualifier to align with legal branding.',
+  },
+  'prop-4': {
+    platform: 'mockMapsA',
+    externalId: 'listing_001',
+    field: 'holidayHours',
+    oldValue: 'Open Dec 25',
+    newValue: { '2026-12-25': 'closed' },
+    status: 'APPROVED',
+    reason: 'Store is marked closed on Christmas Day in canonical profile.',
+  },
+  'prop-5': {
+    platform: 'mockDirectoryC',
+    externalId: 'listing_003',
+    field: 'address',
+    oldValue: '42 Maple St Suite B',
+    newValue: '42 Maple Street, Springfield, IL 62701',
+    status: 'REJECTED',
+    reason: 'Suite unit discrepancy flagged as unsafe without human verification.',
+  },
+};
+
+/**
+ * Ensures demo/initial proposals and their required listing/mismatch relations
+ * are present in the database.
+ */
+export async function ensureDemoProposalsExist(): Promise<void> {
+  for (const [id, demo] of Object.entries(INITIAL_DEMO_PROPOSALS)) {
+    try {
+      const existing = await prisma.proposal.findUnique({ where: { id } });
+      if (existing) continue;
+
+      const listing = await prisma.listing.upsert({
+        where: {
+          platform_externalId: {
+            platform: demo.platform,
+            externalId: demo.externalId,
+          },
+        },
+        update: {},
+        create: {
+          platform: demo.platform,
+          externalId: demo.externalId,
+          values: { [demo.field]: demo.oldValue } as Prisma.InputJsonValue,
+          fetchedAt: new Date(),
+        },
+      });
+
+      const mismatch = await prisma.mismatch.upsert({
+        where: { id: `mismatch-${id}` },
+        update: {},
+        create: {
+          id: `mismatch-${id}`,
+          listingId: listing.id,
+          field: demo.field,
+          profileValue: demo.newValue as Prisma.InputJsonValue,
+          listingValue: demo.oldValue as Prisma.InputJsonValue,
+          kind: demo.status === 'REJECTED' ? 'NEEDS_REVIEW' : 'CONFLICTING',
+          explanation: demo.reason,
+        },
+      });
+
+      await prisma.proposal.upsert({
+        where: { id },
+        update: {},
+        create: {
+          id,
+          mismatchId: mismatch.id,
+          platform: demo.platform,
+          field: demo.field,
+          oldValue: demo.oldValue as Prisma.InputJsonValue,
+          newValue: demo.newValue as Prisma.InputJsonValue,
+          status: demo.status,
+          approvedAt: demo.status === 'APPROVED' ? new Date() : null,
+          approvedBy: demo.status === 'APPROVED' ? 'owner' : null,
+          rejectedAt: demo.status === 'REJECTED' ? new Date() : null,
+        },
+      });
+    } catch {
+      // Ignore parallel insertion conflicts
+    }
+  }
+}
 
 export async function createProposal(input: CreateProposalInput, actor: string) {
   // Verify mismatch exists
@@ -47,6 +177,15 @@ export async function createProposal(input: CreateProposalInput, actor: string) 
 }
 
 export async function getProposals(options?: { status?: string }) {
+  try {
+    const count = await prisma.proposal.count();
+    if (count === 0) {
+      await ensureDemoProposalsExist();
+    }
+  } catch {
+    // If DB is offline, continue to query
+  }
+
   return prisma.proposal.findMany({
     where: options?.status ? { status: options.status as 'PENDING_APPROVAL' | 'APPROVED' | 'REJECTED' } : undefined,
     include: {
@@ -59,7 +198,7 @@ export async function getProposals(options?: { status?: string }) {
 }
 
 export async function getProposalById(id: string) {
-  return prisma.proposal.findUnique({
+  let proposal = await prisma.proposal.findUnique({
     where: { id },
     include: {
       mismatch: { include: { listing: true } },
@@ -67,13 +206,40 @@ export async function getProposalById(id: string) {
       verifications: true,
     },
   });
+
+  if (!proposal && INITIAL_DEMO_PROPOSALS[id]) {
+    await ensureDemoProposalsExist();
+    proposal = await prisma.proposal.findUnique({
+      where: { id },
+      include: {
+        mismatch: { include: { listing: true } },
+        updateResults: true,
+        verifications: true,
+      },
+    });
+  }
+
+  return proposal;
 }
 
 export async function approveProposal(id: string, approvedBy: string) {
-  const proposal = await prisma.proposal.findUnique({ where: { id } });
+  let proposal = await prisma.proposal.findUnique({ where: { id } });
+
+  // If the proposal is not in the database yet, auto-materialize it from initial demo proposals
+  if (!proposal && INITIAL_DEMO_PROPOSALS[id]) {
+    await ensureDemoProposalsExist();
+    proposal = await prisma.proposal.findUnique({ where: { id } });
+  }
+
   if (!proposal) throw new AppError(404, `Proposal ${id} not found`);
-  if (proposal.status !== 'PENDING_APPROVAL') {
-    throw new AppError(409, `Proposal is already ${proposal.status.toLowerCase()}`);
+
+  // Idempotent approval
+  if (proposal.status === 'APPROVED') {
+    return proposal;
+  }
+
+  if (proposal.status === 'REJECTED') {
+    throw new AppError(409, `Proposal is already rejected`);
   }
 
   const updated = await prisma.proposal.update({
@@ -86,10 +252,22 @@ export async function approveProposal(id: string, approvedBy: string) {
 }
 
 export async function rejectProposal(id: string, rejectedBy: string) {
-  const proposal = await prisma.proposal.findUnique({ where: { id } });
+  let proposal = await prisma.proposal.findUnique({ where: { id } });
+
+  if (!proposal && INITIAL_DEMO_PROPOSALS[id]) {
+    await ensureDemoProposalsExist();
+    proposal = await prisma.proposal.findUnique({ where: { id } });
+  }
+
   if (!proposal) throw new AppError(404, `Proposal ${id} not found`);
-  if (proposal.status !== 'PENDING_APPROVAL') {
-    throw new AppError(409, `Proposal is already ${proposal.status.toLowerCase()}`);
+
+  // Idempotent rejection
+  if (proposal.status === 'REJECTED') {
+    return proposal;
+  }
+
+  if (proposal.status === 'APPROVED') {
+    throw new AppError(409, `Proposal is already approved`);
   }
 
   const updated = await prisma.proposal.update({

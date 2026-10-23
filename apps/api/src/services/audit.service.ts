@@ -6,12 +6,19 @@ import { prisma } from '../db/prisma';
 import type { Prisma } from '@prisma/client';
 
 
+import { logger } from '../utils/logger';
+
 export type AuditActor = 'owner' | 'agent' | 'system';
 
 export async function recordAudit(eventType: string, actor: AuditActor, payload: Record<string, unknown>) {
-  return prisma.auditLog.create({
-    data: { eventType, actor, payload: payload as Prisma.InputJsonValue },
-  });
+  try {
+    return await prisma.auditLog.create({
+      data: { eventType, actor, payload: payload as Prisma.InputJsonValue },
+    });
+  } catch (err) {
+    logger.warn('Failed to record audit log', { eventType, error: (err as Error).message });
+    return null;
+  }
 }
 
 export async function getAuditLog(options?: {

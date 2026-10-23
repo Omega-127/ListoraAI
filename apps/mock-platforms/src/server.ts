@@ -15,15 +15,18 @@ const mapsA = createMockMapsAApp();
 const mapsB = createMockMapsBApp();
 const directoryC = createMockDirectoryCApp();
 
-// Mount under both standard prefixes so any caller configuration succeeds
+// Mount under standard prefixes so any caller configuration succeeds
 app.use('/mock-maps-a', mapsA);
 app.use('/maps-a', mapsA);
+app.use('/mockMapsA', mapsA);
 
 app.use('/mock-maps-b', mapsB);
 app.use('/maps-b', mapsB);
+app.use('/mockMapsB', mapsB);
 
 app.use('/mock-directory-c', directoryC);
 app.use('/directory-c', directoryC);
+app.use('/mockDirectoryC', directoryC);
 
 // Health check for Render
 app.get('/health', (_req, res) => {
