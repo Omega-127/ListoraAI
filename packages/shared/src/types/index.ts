@@ -104,3 +104,37 @@ export interface UserSummary {
   createdAt: string;
 }
 
+// ---- Platform Connections & Sync ----
+export type { PlatformConnectionStatus, PlatformMode, PlatformSyncStatus } from '../constants/statuses';
+
+export interface PlatformCapabilities {
+  canRead: boolean;
+  canWrite: boolean;
+  supportsHolidays: boolean;
+  supportsHours: boolean;
+  isOfficialApi: boolean;
+  requiresPartnerAgreement?: boolean;
+  manualPortalUrl?: string;
+  policyNotes: string;
+}
+
+export interface PlatformConnection {
+  id: string; // 'googleMaps' | 'mappls' | 'justdial'
+  name: string;
+  platformKey: string;
+  status: import('../constants/statuses').PlatformConnectionStatus;
+  mode: import('../constants/statuses').PlatformMode;
+  canWrite: boolean;
+  capabilities: PlatformCapabilities;
+  policyNotes: string;
+  config?: {
+    clientId?: string;
+    locationId?: string;
+    accountId?: string;
+    merchantId?: string;
+    hasSecret?: boolean;
+  };
+  lastTestedAt?: string;
+  lastSyncedAt?: string;
+}
+

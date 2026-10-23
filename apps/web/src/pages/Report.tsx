@@ -11,8 +11,10 @@ export type ReportRow = {
   beforeValue: string;
   afterValue: string;
   appliedAt: string;
-  verificationStatus: "VERIFIED" | "PENDING" | "FAILED";
+  verificationStatus: "VERIFIED" | "PENDING" | "FAILED" | "BLOCKED" | "DEMO_ONLY";
   apiLatencyMs: number;
+  mode: "LIVE" | "DEMO";
+  manualActionRequired?: string;
 };
 
 export function formatPlatformName(platform: string): string {
@@ -40,6 +42,7 @@ const INITIAL_REPORT_DATA: ReportRow[] = [
     appliedAt: "Today, 14:32",
     verificationStatus: "VERIFIED",
     apiLatencyMs: 142,
+    mode: "DEMO",
   },
   {
     id: "rep-2",
@@ -50,6 +53,7 @@ const INITIAL_REPORT_DATA: ReportRow[] = [
     appliedAt: "Today, 14:32",
     verificationStatus: "VERIFIED",
     apiLatencyMs: 189,
+    mode: "DEMO",
   },
   {
     id: "rep-3",
@@ -58,18 +62,22 @@ const INITIAL_REPORT_DATA: ReportRow[] = [
     beforeValue: "Mon–Fri 8–20",
     afterValue: "Mon–Fri 07:00-22:00, Sat 08:00-23:00, Sun 08:00-22:00",
     appliedAt: "Today, 11:15",
-    verificationStatus: "PENDING",
-    apiLatencyMs: 230,
+    verificationStatus: "BLOCKED",
+    apiLatencyMs: 85,
+    mode: "LIVE",
+    manualActionRequired: "Mappls public REST API is read-only. Manual portal update required.",
   },
   {
     id: "rep-4",
     platform: "Justdial (India)",
-    field: "name",
-    beforeValue: "The Bombay Roastery (Indiranagar)",
-    afterValue: "The Bombay Roastery & Café",
+    field: "holidayHours",
+    beforeValue: "Open Jan 26",
+    afterValue: "closed",
     appliedAt: "Yesterday, 16:45",
-    verificationStatus: "VERIFIED",
-    apiLatencyMs: 310,
+    verificationStatus: "BLOCKED",
+    apiLatencyMs: 95,
+    mode: "LIVE",
+    manualActionRequired: "Policy lock on Republic Day. Updates require verified merchant portal login.",
   },
   {
     id: "rep-5",
@@ -80,6 +88,7 @@ const INITIAL_REPORT_DATA: ReportRow[] = [
     appliedAt: "2 days ago",
     verificationStatus: "VERIFIED",
     apiLatencyMs: 195,
+    mode: "DEMO",
   },
 ];
 
@@ -90,7 +99,7 @@ export default function Report() {
 
   const totalApplied = reports.length;
   const verifiedCount = reports.filter((r) => r.verificationStatus === "VERIFIED").length;
-  const pendingVerificationCount = reports.filter((r) => r.verificationStatus === "PENDING").length;
+  const blockedCount = reports.filter((r) => r.verificationStatus === "BLOCKED").length;
 
   const handleApplyPendingUpdates = async () => {
     setIsApplying(true);
@@ -113,17 +122,32 @@ export default function Report() {
       // ignore
     }
 
-    const newEntry: ReportRow = {
-      id: `rep-${Date.now()}`,
-      platform: "Google Maps (India)",
-      field: "phone",
-      beforeValue: "080 4123 4567",
-      afterValue: phone,
-      appliedAt: "Just now",
-      verificationStatus: "VERIFIED",
-      apiLatencyMs: 145,
-    };
-    setReports((prev) => [newEntry, ...prev]);
+    const newEntries: ReportRow[] = [
+      {
+        id: `rep-${Date.now()}-1`,
+        platform: "Google Maps (India)",
+        field: "phone",
+        beforeValue: "080 4123 4567",
+        afterValue: phone,
+        appliedAt: "Just now",
+        verificationStatus: "VERIFIED",
+        apiLatencyMs: 145,
+        mode: "DEMO",
+      },
+      {
+        id: `rep-${Date.now()}-2`,
+        platform: "Mappls (MapmyIndia)",
+        field: "hours",
+        beforeValue: "Mon–Fri 8–20",
+        afterValue: "Mon–Sat 07:00-22:00",
+        appliedAt: "Just now",
+        verificationStatus: "BLOCKED",
+        apiLatencyMs: 90,
+        mode: "LIVE",
+        manualActionRequired: "Public API read-only. Manual portal submission required.",
+      },
+    ];
+    setReports((prev) => [...newEntries, ...prev]);
     setIsApplying(false);
     setProgressVal(0);
   };
@@ -173,21 +197,21 @@ export default function Report() {
         <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-sm">
           <p className={`text-xs font-medium uppercase tracking-wider ${muted}`}>Total Dispatched</p>
           <p className="mt-2 text-2xl font-semibold tracking-tight tabular-nums text-[var(--foreground)]">{totalApplied}</p>
-          <p className={`mt-1 text-xs ${muted}`}>Successful write executions</p>
+          <p className={`mt-1 text-xs ${muted}`}>Recorded synchronization requests</p>
         </div>
         <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-sm">
           <p className={`text-xs font-medium uppercase tracking-wider ${muted}`}>Read-Back Verified</p>
           <p className="mt-2 text-2xl font-semibold tracking-tight tabular-nums text-emerald-600 dark:text-emerald-400">
             {verifiedCount}
           </p>
-          <p className={`mt-1 text-xs ${muted}`}>Confirmed live on destination platform</p>
+          <p className={`mt-1 text-xs ${muted}`}>Confirmed on target destination</p>
         </div>
         <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-sm">
-          <p className={`text-xs font-medium uppercase tracking-wider ${muted}`}>Pending Recheck</p>
+          <p className={`text-xs font-medium uppercase tracking-wider ${muted}`}>Manual Action Required</p>
           <p className="mt-2 text-2xl font-semibold tracking-tight tabular-nums text-amber-600 dark:text-amber-400">
-            {pendingVerificationCount}
+            {blockedCount}
           </p>
-          <p className={`mt-1 text-xs ${muted}`}>Awaiting directory cache invalidation</p>
+          <p className={`mt-1 text-xs ${muted}`}>Read-only / policy locked portals</p>
         </div>
       </div>
 
@@ -201,11 +225,12 @@ export default function Report() {
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-[var(--border)] bg-slate-50 dark:bg-black/40 text-[var(--muted-foreground)]">
-                <th className="py-3 px-4 font-medium uppercase tracking-wider">Platform / Field</th>
+                <th className="py-3 px-4 font-medium uppercase tracking-wider">Platform & Mode</th>
+                <th className="py-3 px-4 font-medium uppercase tracking-wider">Field</th>
                 <th className="py-3 px-4 font-medium uppercase tracking-wider">Before Value</th>
                 <th className="py-3 px-4 font-medium uppercase tracking-wider">Applied Value</th>
                 <th className="py-3 px-4 font-medium uppercase tracking-wider">Verification</th>
-                <th className="py-3 px-4 font-medium uppercase tracking-wider">Latency</th>
+                <th className="py-3 px-4 font-medium uppercase tracking-wider">Status / Action</th>
                 <th className="py-3 px-4 font-medium uppercase tracking-wider">Dispatched</th>
               </tr>
             </thead>
@@ -213,18 +238,29 @@ export default function Report() {
               {reports.map((row) => (
                 <tr key={row.id} className="hover:bg-black/5 dark:hover:bg-white/[0.02] transition-colors">
                   <td className="py-3.5 px-4 font-medium text-[var(--foreground)]">
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex flex-col gap-1">
                       <span className="font-semibold uppercase tracking-wider text-[var(--foreground)]">
                         {formatPlatformName(row.platform)}
                       </span>
-                      <span className="text-[var(--border)]">•</span>
-                      <span className="capitalize text-[var(--muted-foreground)]">{row.field}</span>
+                      <span
+                        className={cn(
+                          "w-fit rounded px-1.5 py-0.2 text-[9px] font-medium uppercase tracking-wider",
+                          row.mode === "LIVE"
+                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                            : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                        )}
+                      >
+                        {row.mode === "LIVE" ? "Live API" : "Demo Mode"}
+                      </span>
                     </div>
                   </td>
-                  <td className="py-3.5 px-4 font-mono text-rose-600 dark:text-rose-300/80 max-w-[180px] truncate">
+                  <td className="py-3.5 px-4 capitalize text-[var(--muted-foreground)] font-medium">
+                    {row.field}
+                  </td>
+                  <td className="py-3.5 px-4 font-mono text-rose-600 dark:text-rose-300/80 max-w-[150px] truncate" title={row.beforeValue}>
                     {row.beforeValue}
                   </td>
-                  <td className="py-3.5 px-4 font-mono text-emerald-700 dark:text-emerald-300 max-w-[200px] truncate">
+                  <td className="py-3.5 px-4 font-mono text-emerald-700 dark:text-emerald-300 max-w-[170px] truncate" title={row.afterValue}>
                     {row.afterValue}
                   </td>
                   <td className="py-3.5 px-4">
@@ -232,18 +268,32 @@ export default function Report() {
                       <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400">
                         <CheckCircle2 className="h-3.5 w-3.5" /> Verified
                       </span>
-                    ) : row.verificationStatus === "PENDING" ? (
+                    ) : row.verificationStatus === "BLOCKED" ? (
                       <span className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-400">
+                        <AlertTriangle className="h-3.5 w-3.5" /> Blocked
+                      </span>
+                    ) : row.verificationStatus === "PENDING" ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-blue-400">
                         <Clock className="h-3.5 w-3.5" /> Rechecking
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1 text-[11px] font-medium text-rose-400">
-                        <AlertTriangle className="h-3.5 w-3.5" /> Mismatch
+                        <AlertTriangle className="h-3.5 w-3.5" /> Failed
                       </span>
                     )}
                   </td>
-                  <td className="py-3.5 px-4 font-mono text-neutral-400">{row.apiLatencyMs}ms</td>
-                  <td className="py-3.5 px-4 text-neutral-400">{row.appliedAt}</td>
+                  <td className="py-3.5 px-4 text-xs max-w-[220px]">
+                    {row.manualActionRequired ? (
+                      <span className="text-amber-500/90 text-[11px] font-normal leading-tight block">
+                        {row.manualActionRequired}
+                      </span>
+                    ) : (
+                      <span className="text-neutral-400 text-[11px]">
+                        Automated update applied ({row.apiLatencyMs}ms)
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-3.5 px-4 text-neutral-400 whitespace-nowrap">{row.appliedAt}</td>
                 </tr>
               ))}
             </tbody>

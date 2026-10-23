@@ -5,6 +5,7 @@ import { AlertsRail } from "../components/dashboard/AlertsRail";
 import { ListingsGrid } from "../components/dashboard/ListingsGrid";
 import { MismatchPanel } from "../components/dashboard/MismatchPanel";
 import { ScoreHero } from "../components/dashboard/ScoreHero";
+import { PlatformConnectionsCard } from "../components/dashboard/PlatformConnectionsCard";
 import { RefreshCw } from "../components/animate-ui/icons/refresh-cw";
 import { DEMO_DASHBOARD, buildDashboardSnapshot } from "../lib/dashboard-data";
 import { cn } from "../lib/cn";
@@ -14,13 +15,16 @@ import {
   refreshListings as apiRefreshListings,
   getStoredUser,
   getBusinessProfile,
+  fetchPlatformConnections,
   type AgentAnalysisResponse,
+  type PlatformConnection,
 } from "../lib/api";
 import { Sparkles, ArrowRight, Bot, Lock } from "lucide-react";
 
 
 export default function Dashboard() {
   const [data, setData] = useState(DEMO_DASHBOARD);
+  const [platforms, setPlatforms] = useState<PlatformConnection[]>([]);
   const [selected, setSelected] = useState<Set<string>>(() => new Set(["mm-1", "mm-2", "mm-3"]));
   const [refreshing, setRefreshing] = useState(false);
   const [agentRunning, setAgentRunning] = useState(false);
@@ -28,6 +32,32 @@ export default function Dashboard() {
 
   useEffect(() => {
     let cancelled = false;
+
+    async function loadPlatforms() {
+      try {
+        const list = await fetchPlatformConnections();
+        if (!cancelled && list.length > 0) {
+          setPlatforms(list);
+          // Apply connection modes to listings
+          setData((prev) => ({
+            ...prev,
+            listings: prev.listings.map((l) => {
+              const matched = list.find((p) => p.id === l.platform || p.platformKey === l.platform);
+              if (matched) {
+                return {
+                  ...l,
+                  connectionMode: matched.mode,
+                };
+              }
+              return l;
+            }),
+          }));
+        }
+      } catch {
+        // ignore
+      }
+    }
+
     async function syncProfile() {
       try {
         const profile = await getBusinessProfile();
@@ -38,6 +68,8 @@ export default function Dashboard() {
         // ignore
       }
     }
+
+    loadPlatforms();
     syncProfile();
 
     const handleProfileChange = (e: Event) => {
@@ -285,6 +317,27 @@ export default function Dashboard() {
           </Progress.Root>
         </div>
       </div>
+
+      <PlatformConnectionsCard
+        platforms={platforms}
+        onPlatformsChange={(updated) => {
+          setPlatforms(updated);
+          setData((prev) => ({
+            ...prev,
+            listings: prev.listings.map((l) => {
+              const matched = updated.find((p) => p.id === l.platform || p.platformKey === l.platform);
+              if (matched) {
+                return {
+                  ...l,
+                  connectionMode: matched.mode,
+                };
+              }
+              return l;
+            }),
+          }));
+        }}
+        onRefreshListings={handleRefreshListings}
+      />
 
       <section>
         <div className="mb-3 flex items-end justify-between gap-3">
