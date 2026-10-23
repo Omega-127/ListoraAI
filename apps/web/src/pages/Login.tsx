@@ -4,6 +4,7 @@ import { AuthShell, fieldClass, labelClass, primaryBtnClass } from "../component
 import { useAuth } from "../context/AuthContext";
 import type { UserRole } from "../lib/api";
 import { focus, muted } from "../lib/styles";
+=======
 import { ShieldCheck, UserCheck, Eye, Lock } from "lucide-react";
 
 export default function Login() {
@@ -103,6 +104,7 @@ export default function Login() {
           <p className={`text-[11px] font-medium uppercase tracking-wider mb-2 ${muted}`}>
             Quick Demo Role Login:
           </p>
+=======
           <div className="grid grid-cols-3 gap-1.5 text-xs">
             <button
               type="button"
