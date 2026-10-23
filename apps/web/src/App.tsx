@@ -13,24 +13,28 @@ import Register from "./pages/Register";
 import Users from "./pages/Users";
 
 
+import { AuthProvider } from "./context/AuthContext";
+
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Landing />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/dashboard" element={<DashboardShell />}>
-        <Route index element={<Dashboard />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="approvals" element={<Approvals />} />
-        <Route path="report" element={<Report />} />
-        <Route path="score" element={<Score />} />
-        <Route path="audit" element={<Audit />} />
-        <Route path="alerts" element={<Alerts />} />
-        <Route path="users" element={<Users />} />
-      </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/dashboard" element={<DashboardShell />}>
+          <Route index element={<Dashboard />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="approvals" element={<Approvals />} />
+          <Route path="report" element={<Report />} />
+          <Route path="score" element={<Score />} />
+          <Route path="audit" element={<Audit />} />
+          <Route path="alerts" element={<Alerts />} />
+          <Route path="users" element={<Users />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AuthProvider>
   );
 }
 
