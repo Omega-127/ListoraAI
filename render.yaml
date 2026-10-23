@@ -1,13 +1,3 @@
-# Render Blueprint Specification for ListoraAI
-# See ARCHITECTURE.md §7 for full deployment topology.
-databases:
-  - name: listora-postgres
-    databaseName: bizlisting
-    user: bizlisting
-    plan: free
-    region: oregon
-    ipAllowList: []
-
 services:
   # ---------------------------------------------------------------------------
   # 1. Backend Express API
@@ -27,9 +17,7 @@ services:
       - key: PORT
         value: 10000
       - key: DATABASE_URL
-        fromDatabase:
-          name: listora-postgres
-          property: connectionString
+        sync: false
       - key: ANTHROPIC_API_KEY
         sync: false
       - key: SESSION_SECRET
@@ -39,12 +27,12 @@ services:
       - key: OWNER_PASSWORD_HASH
         value: '$2a$10$wT3wW8R1x55mQ2K1v1F6OuK7YtK0b4zY6R1x55mQ2K1v1F6OuK7Yt'
       - key: CORS_ORIGINS
-        value: https://listora-ai.vercel.app
+        value: https://listora-tau.vercel.app,https://listora-ai.vercel.app
       - key: MOCK_PLATFORM_URLS
         fromService:
           type: web
           name: listora-mock-platforms
-          property: host
+          property: hostport
 
   # ---------------------------------------------------------------------------
   # 2. Mock Listing Platforms
@@ -82,9 +70,7 @@ services:
   #     - key: NODE_ENV
   #       value: production
   #     - key: DATABASE_URL
-  #       fromDatabase:
-  #         name: listora-postgres
-  #         property: connectionString
+  #       sync: false
   #     - key: ANTHROPIC_API_KEY
   #       sync: false
   #     - key: SESSION_SECRET
