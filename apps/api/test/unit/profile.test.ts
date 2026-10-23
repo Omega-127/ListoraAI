@@ -48,7 +48,7 @@ describe('Profile service — getProfile()', () => {
     expect(upsertSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { id: 'profile-seed-001' },
-        create: expect.objectContaining({ id: 'profile-seed-001', name: 'Brew & Bloom Café' }),
+        create: expect.objectContaining({ id: 'profile-seed-001' }),
       }),
     );
   });

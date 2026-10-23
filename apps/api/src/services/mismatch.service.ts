@@ -82,7 +82,7 @@ export async function detectAllMismatches() {
 
   for (const listing of listings) {
     const values = listing.values as ListingValues;
-    const fieldMismatches = detectFieldMismatches(profile, values, listing.fetchedAt);
+    const fieldMismatches = detectFieldMismatches(profile, values, listing.fetchedAt, { checkAllFields: true });
 
     // Clear previous mismatches for this listing
     await prisma.mismatch.deleteMany({ where: { listingId: listing.id } });
@@ -117,24 +117,31 @@ export async function detectAllMismatches() {
 
 /**
  * Compares profile fields against listing values for a single listing.
- * Returns an array of FieldMismatch results for all eligible fields.
+ * Returns an array of FieldMismatch results.
  */
 export function detectFieldMismatches(
   profile: { name: string; address: string; phone: string; regularHours: unknown; holidayHours: unknown; updatedAt: Date },
   values: ListingValues,
   listingFetchedAt: Date,
+  options?: { checkAllFields?: boolean },
 ): FieldMismatch[] {
-  const eligibleFields: Array<{ key: string; profileValue: unknown }> = [
-    { key: 'name', profileValue: profile.name },
-    { key: 'address', profileValue: profile.address },
-    { key: 'phone', profileValue: profile.phone },
-    { key: 'regularHours', profileValue: profile.regularHours },
-    { key: 'holidayHours', profileValue: profile.holidayHours },
-  ];
+  const profileFieldMap: Record<string, unknown> = {
+    name: profile.name,
+    address: profile.address,
+    phone: profile.phone,
+    regularHours: profile.regularHours,
+    holidayHours: profile.holidayHours,
+  };
+
+  const fieldsToCheck = options?.checkAllFields
+    ? ['name', 'address', 'phone', 'regularHours', 'holidayHours']
+    : Object.keys(values);
 
   const results: FieldMismatch[] = [];
 
-  for (const { key, profileValue } of eligibleFields) {
+  for (const key of fieldsToCheck) {
+    if (!(key in profileFieldMap)) continue;
+    const profileValue = profileFieldMap[key];
     const listingValue = key in values ? values[key] : undefined;
     const kind = classifyField(key, profileValue, listingValue, profile.updatedAt, listingFetchedAt);
     results.push({ field: key, profileValue, listingValue, kind });
