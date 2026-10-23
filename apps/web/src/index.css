@@ -9,6 +9,27 @@
   --border: rgba(255, 255, 255, 0.1);
   --primary: #d4d4d4;
   --primary-foreground: #171717;
+  color-scheme: dark;
+}
+
+.light, [data-theme="light"] {
+  --background: #fbfbfb;
+  --foreground: #09090b;
+  --muted-foreground: #71717a;
+  --border: rgba(0, 0, 0, 0.1);
+  --primary: #18181b;
+  --primary-foreground: #fafafa;
+  color-scheme: light;
+}
+
+.dark, [data-theme="dark"] {
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --muted-foreground: #a3a3a3;
+  --border: rgba(255, 255, 255, 0.1);
+  --primary: #d4d4d4;
+  --primary-foreground: #171717;
+  color-scheme: dark;
 }
 
 html,

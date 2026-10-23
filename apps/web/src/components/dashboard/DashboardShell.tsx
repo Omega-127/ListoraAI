@@ -21,6 +21,7 @@ import { Bell } from "../animate-ui/icons/bell";
 import { cn } from "../../lib/cn";
 import { focus, muted } from "../../lib/styles";
 import { useAuth } from "../../context/AuthContext";
+import ThemeTogglerDemo from "../ThemeToggler";
 import type { UserRole } from "../../lib/api";
 
 const NAV: {
@@ -286,6 +287,8 @@ function ShellChrome() {
               <Bell size={16} animateOnHover />
               <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-[var(--primary)]" />
             </NavLink>
+
+            <ThemeTogglerDemo />
           </div>
         </header>
         <main className="flex-1 px-4 py-6 md:px-8 md:py-8">

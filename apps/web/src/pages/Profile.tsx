@@ -2,46 +2,13 @@ import { useState, useEffect } from "react";
 import { Building2, MapPin, Phone, Clock, Calendar, Check, Save, RotateCcw, Lock, ShieldAlert } from "lucide-react";
 import { cn } from "../lib/cn";
 import { focus, muted } from "../lib/styles";
-<<<<<<< HEAD
 import { useAuth } from "../context/AuthContext";
-
-
-interface BusinessProfileData {
-  name: string;
-  address: string;
-  phone: string;
-  regularHours: Record<string, string>;
-  holidayHours: Record<string, string>;
-}
-
-const INITIAL_PROFILE: BusinessProfileData = {
-  name: "Brew & Bloom Café",
-  address: "42 Maple Street, Springfield, IL 62701",
-  phone: "+15550102234",
-  regularHours: {
-    monday: "07:00-18:00",
-    tuesday: "07:00-18:00",
-    wednesday: "07:00-18:00",
-    thursday: "07:00-18:00",
-    friday: "07:00-20:00",
-    saturday: "08:00-20:00",
-    sunday: "09:00-16:00",
-  },
-  holidayHours: {
-    "2026-12-25": "closed",
-    "2026-01-01": "closed",
-    "2026-07-04": "08:00-14:00",
-  },
-};
-=======
 import {
-  getStoredUser,
   getBusinessProfile,
   updateBusinessProfile,
   DEFAULT_BUSINESS_PROFILE,
   type BusinessProfileData,
 } from "../lib/api";
->>>>>>> b4fe29c13321435da516c49fd19f3574272ef7c3
 
 const DAYS_OF_WEEK = [
   { key: "monday", label: "Monday" },
@@ -125,14 +92,9 @@ export default function Profile() {
     }
   };
 
-<<<<<<< HEAD
   const { user } = useAuth();
-  const isAdmin = user?.role === "ADMIN";
-=======
-  const user = getStoredUser();
-  // Allow ADMIN or default session to edit/save canonical profile smoothly
+  // Allow ADMIN or OPERATOR to edit/save canonical profile
   const isAdmin = !user || user.role === "ADMIN" || user.role === "OPERATOR";
->>>>>>> b4fe29c13321435da516c49fd19f3574272ef7c3
 
   const handleReset = async () => {
     if (!isAdmin) return;

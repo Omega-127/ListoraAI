@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactElement, type ReactNode } from "
 import { Link } from "react-router-dom";
 import { focus } from "../lib/styles";
 import { useAuth } from "../context/AuthContext";
+import ThemeTogglerDemo from "../components/ThemeToggler";
 import { Sparkles, ShieldCheck, CheckCircle2, ArrowRight, Database, RefreshCw, Bot, Lock } from "lucide-react";
 
 
@@ -712,6 +713,7 @@ export default function Landing() {
               </Link>
             </>
           )}
+          <ThemeTogglerDemo />
         </nav>
       </header>
 
