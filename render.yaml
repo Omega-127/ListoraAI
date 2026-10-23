@@ -28,7 +28,7 @@ services:
       - key: ANTHROPIC_API_KEY
         sync: false
       - key: SESSION_SECRET
-        sync: false
+        generateValue: true
       - key: OWNER_EMAIL
         value: owner@example.com
       - key: OWNER_PASSWORD_HASH
