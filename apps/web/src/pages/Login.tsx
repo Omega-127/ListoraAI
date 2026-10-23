@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthShell, fieldClass, labelClass, primaryBtnClass } from "../components/AuthShell";
 import { login, type UserRole } from "../lib/api";
 import { focus, muted } from "../lib/styles";
-import { ShieldCheck, UserCheck, Eye } from "lucide-react";
+import { UserCheck, Eye } from "lucide-react";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -91,15 +91,7 @@ export default function Login() {
           <p className={`text-[11px] font-medium uppercase tracking-wider mb-2 ${muted}`}>
             Quick Demo Role Login:
           </p>
-          <div className="grid grid-cols-3 gap-1.5 text-xs">
-            <button
-              type="button"
-              onClick={() => fillDemo("ADMIN")}
-              className="flex items-center justify-center gap-1.5 rounded border border-white/10 bg-white/5 py-1.5 px-2 hover:bg-white/15 transition-colors"
-            >
-              <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-              <span>Admin</span>
-            </button>
+          <div className="grid grid-cols-2 gap-1.5 text-xs">
             <button
               type="button"
               onClick={() => fillDemo("OPERATOR")}
