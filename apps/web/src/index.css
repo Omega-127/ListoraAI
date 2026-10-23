@@ -2,13 +2,78 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #0a0a0a;
+/* Base: Dark Mode (Default) */
+:root,
+.dark,
+html.dark,
+[data-theme="dark"] {
+  --background: #09090b;
   --foreground: #fafafa;
-  --muted-foreground: #a3a3a3;
+  --card: #121214;
+  --card-hover: #18181b;
+  --card-border: rgba(255, 255, 255, 0.1);
+  --muted: #1e1e24;
+  --muted-foreground: #a1a1aa;
   --border: rgba(255, 255, 255, 0.1);
-  --primary: #d4d4d4;
-  --primary-foreground: #171717;
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --primary: #fafafa;
+  --primary-foreground: #09090b;
+  --sidebar: #0d0d0f;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-accent: rgba(255, 255, 255, 0.06);
+  --input: rgba(255, 255, 255, 0.1);
+  --input-bg: rgba(0, 0, 0, 0.4);
+  --hover-overlay: rgba(255, 255, 255, 0.05);
+  --active-overlay: rgba(255, 255, 255, 0.1);
+  color-scheme: dark;
+}
+
+/* Light Mode: ONLY applies when dark is NOT present */
+html.light:not(.dark),
+html[data-theme="light"]:not(.dark),
+html:not(.dark):not([data-theme="dark"]) {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-hover: #f1f5f9;
+  --card-border: rgba(15, 23, 42, 0.08);
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --border: rgba(15, 23, 42, 0.1);
+  --border-subtle: rgba(15, 23, 42, 0.05);
+  --primary: #0f172a;
+  --primary-foreground: #ffffff;
+  --sidebar: #ffffff;
+  --sidebar-border: rgba(15, 23, 42, 0.08);
+  --sidebar-accent: rgba(15, 23, 42, 0.05);
+  --input: rgba(15, 23, 42, 0.12);
+  --input-bg: #ffffff;
+  --hover-overlay: rgba(15, 23, 42, 0.04);
+  --active-overlay: rgba(15, 23, 42, 0.08);
+  color-scheme: light;
+}
+
+/* Force dark mode whenever .dark class is added on html */
+html.dark {
+  --background: #09090b !important;
+  --foreground: #fafafa !important;
+  --card: #121214 !important;
+  --card-hover: #18181b !important;
+  --card-border: rgba(255, 255, 255, 0.1) !important;
+  --muted: #1e1e24 !important;
+  --muted-foreground: #a1a1aa !important;
+  --border: rgba(255, 255, 255, 0.1) !important;
+  --border-subtle: rgba(255, 255, 255, 0.05) !important;
+  --primary: #fafafa !important;
+  --primary-foreground: #09090b !important;
+  --sidebar: #0d0d0f !important;
+  --sidebar-border: rgba(255, 255, 255, 0.08) !important;
+  --sidebar-accent: rgba(255, 255, 255, 0.06) !important;
+  --input: rgba(255, 255, 255, 0.1) !important;
+  --input-bg: rgba(0, 0, 0, 0.4) !important;
+  --hover-overlay: rgba(255, 255, 255, 0.05) !important;
+  --active-overlay: rgba(255, 255, 255, 0.1) !important;
+  color-scheme: dark !important;
 }
 
 html,
@@ -23,6 +88,70 @@ body {
   background: var(--background);
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
+}
+
+/* View Transition Root Animation Support */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none !important;
+  mix-blend-mode: normal !important;
+}
+
+::view-transition-old(root) {
+  z-index: 1 !important;
+}
+
+::view-transition-new(root) {
+  z-index: 9999 !important;
+}
+
+/* Light mode overrides for legacy hardcoded dark utilities */
+html.light:not(.dark) .bg-\[\#0d0d0d\]\/80,
+html.light:not(.dark) .bg-\[\#0d0d0d\]\/90,
+html.light:not(.dark) .bg-\[\#0d0d0d\],
+html.light:not(.dark) .bg-\[\#121212\],
+html.light:not(.dark) .bg-\[\#111111\],
+html.light:not(.dark) .bg-\[\#070707\] {
+  background-color: var(--card) !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+}
+
+html.light:not(.dark) .bg-black\/40,
+html.light:not(.dark) .bg-black\/30 {
+  background-color: var(--muted) !important;
+}
+
+html.light:not(.dark) .bg-white\/5,
+html.light:not(.dark) .bg-white\/10 {
+  background-color: rgba(15, 23, 42, 0.05) !important;
+}
+
+html.light:not(.dark) .hover\:bg-white\/5:hover,
+html.light:not(.dark) .hover\:bg-white\/10:hover,
+html.light:not(.dark) .hover\:bg-white\/15:hover {
+  background-color: rgba(15, 23, 42, 0.06) !important;
+}
+
+html.light:not(.dark) .text-neutral-200,
+html.light:not(.dark) .text-neutral-300 {
+  color: var(--foreground) !important;
+}
+
+html.light:not(.dark) .text-neutral-400 {
+  color: var(--muted-foreground) !important;
+}
+
+html.light:not(.dark) .border-white\/10,
+html.light:not(.dark) .border-white\/20,
+html.light:not(.dark) .border-white\/25 {
+  border-color: var(--border) !important;
+}
+
+html.light:not(.dark) input.bg-black\/40,
+html.light:not(.dark) textarea.bg-black\/40 {
+  background-color: #ffffff !important;
+  color: var(--foreground) !important;
+  border-color: rgba(15, 23, 42, 0.15) !important;
 }
 
 @keyframes auth-enter {

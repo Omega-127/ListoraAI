@@ -21,61 +21,86 @@ const INITIAL_LOGS: AuditEvent[] = [
     eventType: "PROPOSAL_APPROVED",
     actor: "owner",
     actorEmail: "sarvesh@listora.ai",
-    timestamp: "2026-10-20 18:45:12",
-    summary: "Approved update proposal for phone number on mockMapsA",
+    timestamp: "2026-10-23 18:45:12",
+    summary: "Approved update proposal for phone number on Google Maps (India)",
     payload: {
       proposalId: "prop-1",
-      platform: "mockMapsA",
+      platform: "Google Maps (India)",
+      connectionMode: "DEMO",
       field: "phone",
-      value: "+15550102234",
+      value: "+918041234567",
+      requiresManualAction: false,
     },
   },
   {
     id: "aud-002",
-    eventType: "AGENT_TOOL_CALL",
-    actor: "agent",
-    timestamp: "2026-10-20 18:30:04",
-    summary: "Agent executed compareFields tool on mockMapsB listing snapshot",
+    eventType: "UPDATE_BLOCKED",
+    actor: "system",
+    timestamp: "2026-10-23 18:32:10",
+    summary: "Mappls (MapmyIndia) listing sync blocked: Public API is read-only",
     payload: {
-      tool: "compareFields",
-      listingId: "lst-b",
-      mismatchesFound: 2,
-      model: "claude-3-5-sonnet",
+      platform: "Mappls (MapmyIndia)",
+      connectionMode: "LIVE",
+      field: "hours",
+      outcome: "BLOCKED",
+      reason: "Official Mappls public REST tier does not support automated listing edits. Manual business portal sync required.",
+      requiresManualAction: true,
     },
   },
   {
     id: "aud-003",
-    eventType: "UPDATE_APPLIED",
+    eventType: "AGENT_TOOL_CALL",
     actor: "agent",
-    timestamp: "2026-10-20 18:00:29",
-    summary: "Dispatched API update for holiday hours on mockMapsA",
+    timestamp: "2026-10-23 18:30:04",
+    summary: "Agent executed compareFields tool across Google Maps, Mappls, and Justdial",
     payload: {
-      endpoint: "PUT /api/v1/mock/maps-a/profile",
-      statusCode: 200,
-      latencyMs: 142,
+      tool: "compareFields",
+      platforms: ["Google Maps (India)", "Mappls (MapmyIndia)", "Justdial (India)"],
+      fieldsChecked: ["name", "address", "phone", "regularHours", "holidayHours"],
+      mismatchesFound: 3,
+      model: "grok-beta",
     },
   },
   {
     id: "aud-004",
-    eventType: "PROFILE_UPDATED",
-    actor: "owner",
-    actorEmail: "sarvesh@listora.ai",
-    timestamp: "2026-10-20 16:12:00",
-    summary: "Updated canonical operating schedule for Saturday hours",
+    eventType: "POLICY_RESTRICTION",
+    actor: "system",
+    timestamp: "2026-10-23 18:15:20",
+    summary: "Justdial (India) holiday hours update flagged for merchant verification",
     payload: {
-      previous: "08:00-18:00",
-      next: "08:00-20:00",
+      platform: "Justdial (India)",
+      connectionMode: "LIVE",
+      field: "holidayHours",
+      outcome: "BLOCKED",
+      policy: "Public holiday operating schedule policy lock prevents automated edits without verified merchant PIN confirmation.",
+      requiresManualAction: true,
     },
   },
   {
     id: "aud-005",
-    eventType: "SCHEDULED_RECHECK",
-    actor: "system",
-    timestamp: "2026-10-20 12:00:00",
-    summary: "Background cron rechecked 3 connected platforms for discrepancies",
+    eventType: "UPDATE_APPLIED",
+    actor: "agent",
+    timestamp: "2026-10-23 18:00:29",
+    summary: "Dispatched API update for holiday hours on Google Maps (India)",
     payload: {
-      platformsChecked: ["mockMapsA", "mockMapsB", "mockDirectoryC"],
-      syncDurationMs: 412,
+      platform: "Google Maps (India)",
+      connectionMode: "DEMO",
+      endpoint: "PATCH /api/v1/mock/google-maps-india/listing_001",
+      statusCode: 200,
+      latencyMs: 142,
+      verificationResult: "VERIFIED",
+    },
+  },
+  {
+    id: "aud-006",
+    eventType: "PROFILE_UPDATED",
+    actor: "owner",
+    actorEmail: "sarvesh@listora.ai",
+    timestamp: "2026-10-23 16:12:00",
+    summary: "Updated canonical operating schedule for Indiranagar location",
+    payload: {
+      previous: "08:00-22:00",
+      next: "07:00-22:00",
     },
   },
 ];
@@ -124,19 +149,19 @@ export default function Audit() {
     switch (actor) {
       case "owner":
         return (
-          <span className="inline-flex items-center gap-1 rounded bg-blue-500/10 px-2 py-0.5 text-[11px] font-medium text-blue-400 border border-blue-500/20">
+          <span className="inline-flex items-center gap-1 rounded bg-blue-500/10 px-2 py-0.5 text-[11px] font-medium text-blue-700 dark:text-blue-400 border border-blue-500/20">
             <User className="h-3 w-3" /> Owner
           </span>
         );
       case "agent":
         return (
-          <span className="inline-flex items-center gap-1 rounded bg-purple-500/10 px-2 py-0.5 text-[11px] font-medium text-purple-400 border border-purple-500/20">
+          <span className="inline-flex items-center gap-1 rounded bg-purple-500/10 px-2 py-0.5 text-[11px] font-medium text-purple-700 dark:text-purple-400 border border-purple-500/20">
             <Bot className="h-3 w-3" /> Agent
           </span>
         );
       case "system":
         return (
-          <span className="inline-flex items-center gap-1 rounded bg-neutral-800 px-2 py-0.5 text-[11px] font-medium text-neutral-300 border border-neutral-700">
+          <span className="inline-flex items-center gap-1 rounded bg-black/5 dark:bg-neutral-800 px-2 py-0.5 text-[11px] font-medium text-[var(--foreground)] border border-[var(--border)]">
             <Server className="h-3 w-3" /> System
           </span>
         );
@@ -164,7 +189,7 @@ export default function Audit() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className={cn(
-              "w-full rounded-lg border border-[var(--border)] bg-[#0d0d0d]/80 pl-9 pr-3 py-2 text-xs text-[var(--foreground)] outline-none focus:border-neutral-400",
+              "w-full rounded-lg border border-[var(--border)] bg-[var(--card)] pl-9 pr-3 py-2 text-xs text-[var(--foreground)] outline-none focus:border-neutral-400 shadow-sm",
               focus
             )}
           />
@@ -175,7 +200,9 @@ export default function Audit() {
             onClick={() => setFilterActor("all")}
             className={cn(
               "rounded-md px-3 py-1.5 text-xs font-medium transition-colors border border-[var(--border)]",
-              filterActor === "all" ? "bg-white/10 text-white" : "text-[var(--muted-foreground)] hover:text-white"
+              filterActor === "all"
+                ? "bg-[var(--primary)] text-[var(--primary-foreground)] shadow-sm"
+                : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/5"
             )}
           >
             All Actors
@@ -185,7 +212,9 @@ export default function Audit() {
             onClick={() => setFilterActor("owner")}
             className={cn(
               "rounded-md px-3 py-1.5 text-xs font-medium transition-colors border border-[var(--border)]",
-              filterActor === "owner" ? "bg-white/10 text-white" : "text-[var(--muted-foreground)] hover:text-white"
+              filterActor === "owner"
+                ? "bg-[var(--primary)] text-[var(--primary-foreground)] shadow-sm"
+                : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/5"
             )}
           >
             Owner
@@ -195,7 +224,9 @@ export default function Audit() {
             onClick={() => setFilterActor("agent")}
             className={cn(
               "rounded-md px-3 py-1.5 text-xs font-medium transition-colors border border-[var(--border)]",
-              filterActor === "agent" ? "bg-white/10 text-white" : "text-[var(--muted-foreground)] hover:text-white"
+              filterActor === "agent"
+                ? "bg-[var(--primary)] text-[var(--primary-foreground)] shadow-sm"
+                : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/5"
             )}
           >
             Agent
@@ -205,7 +236,9 @@ export default function Audit() {
             onClick={() => setFilterActor("system")}
             className={cn(
               "rounded-md px-3 py-1.5 text-xs font-medium transition-colors border border-[var(--border)]",
-              filterActor === "system" ? "bg-white/10 text-white" : "text-[var(--muted-foreground)] hover:text-white"
+              filterActor === "system"
+                ? "bg-[var(--primary)] text-[var(--primary-foreground)] shadow-sm"
+                : "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/5"
             )}
           >
             System
@@ -214,7 +247,7 @@ export default function Audit() {
       </div>
 
       {/* Accordion Audit Entries */}
-      <div className="rounded-xl border border-[var(--border)] bg-[#0d0d0d]/80 overflow-hidden">
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-sm overflow-hidden">
         <Accordion.Root defaultValue={["aud-001"]} className="divide-y divide-[var(--border)]">
           {filtered.length === 0 ? (
             <div className="p-8 text-center text-sm text-[var(--muted-foreground)]">
@@ -226,32 +259,32 @@ export default function Audit() {
                 <Accordion.Header>
                   <Accordion.Trigger
                     className={cn(
-                      "flex w-full items-center justify-between p-4 text-left hover:bg-white/[0.02] transition-colors",
+                      "flex w-full items-center justify-between p-4 text-left hover:bg-black/5 dark:hover:bg-white/[0.02] transition-colors",
                       focus
                     )}
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                       <div className="flex items-center gap-2">
                         {getActorBadge(log.actor)}
-                        <span className="font-mono text-xs font-semibold text-neutral-300">
+                        <span className="font-mono text-xs font-semibold text-[var(--foreground)]">
                           {log.eventType}
                         </span>
                       </div>
                       <span className="text-xs text-[var(--foreground)]">{log.summary}</span>
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
-                      <span className="font-mono text-[11px] text-neutral-500">{log.timestamp}</span>
-                      <ChevronRight className="h-4 w-4 text-neutral-500 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+                      <span className="font-mono text-[11px] text-[var(--muted-foreground)]">{log.timestamp}</span>
+                      <ChevronRight className="h-4 w-4 text-[var(--muted-foreground)] transition-transform duration-200 group-data-[state=open]:rotate-90" />
                     </div>
                   </Accordion.Trigger>
                 </Accordion.Header>
-                <Accordion.Panel className="bg-black/40 px-4 pb-4 pt-1">
-                  <div className="rounded-lg border border-[var(--border)] bg-black/60 p-3">
-                    <div className="flex items-center justify-between pb-2 mb-2 border-b border-neutral-800 text-[11px] text-neutral-400">
+                <Accordion.Panel className="bg-slate-50 dark:bg-black/40 px-4 pb-4 pt-1">
+                  <div className="rounded-lg border border-[var(--border)] bg-white dark:bg-black/60 p-3 shadow-sm">
+                    <div className="flex items-center justify-between pb-2 mb-2 border-b border-[var(--border)] text-[11px] text-[var(--muted-foreground)]">
                       <span>Event Payload (JSON Schema)</span>
                       {log.actorEmail && <span>Initiator: {log.actorEmail}</span>}
                     </div>
-                    <pre className="font-mono text-[11px] text-neutral-300 overflow-x-auto">
+                    <pre className="font-mono text-[11px] text-[var(--foreground)] overflow-x-auto">
                       {JSON.stringify(log.payload, null, 2)}
                     </pre>
                   </div>

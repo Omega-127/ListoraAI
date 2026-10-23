@@ -5,13 +5,16 @@ export type ListingSnapshot = {
   platform: string;
   label: string;
   writable: boolean;
+  connectionMode?: "LIVE" | "DEMO";
   values: {
     name: string;
+    address: string;
     phone: string;
     hours: string;
     holiday: string;
   };
   mismatchCount: number;
+  fieldStatuses?: Record<string, "ok" | "difference" | "missing">;
 };
 
 export type MismatchRow = {
@@ -23,6 +26,7 @@ export type MismatchRow = {
   listingValue: string | null;
   kind: MismatchKind;
   explanation: string;
+  isMissing?: boolean;
 };
 
 export type AlertItem = {
@@ -49,68 +53,86 @@ export function buildDashboardSnapshot(profile: {
   regularHours: Record<string, string>;
   holidayHours: Record<string, string>;
 }): DashboardSnapshot {
-  const profileName = profile.name || "Brew & Bloom Café";
-  const profilePhone = profile.phone || "+15550102234";
-  const formattedProfileHours = profile.regularHours?.monday ? `Mon-Fri ${profile.regularHours.monday}` : "Mon–Sat 7–5";
+  const profileName = profile.name || "The Bombay Roastery & Café";
+  const profilePhone = profile.phone || "+918041234567";
+  const formattedProfileHours = profile.regularHours?.monday ? `Mon-Fri ${profile.regularHours.monday}` : "Mon–Sat 07:00-22:00";
   const holidayEntry = Object.entries(profile.holidayHours || {})[0];
-  const profileHoliday = holidayEntry ? `${holidayEntry[1] === "closed" ? "Closed" : "Open"} ${holidayEntry[0]}` : "Closed Dec 25";
+  const profileHoliday = holidayEntry ? `${holidayEntry[1] === "closed" ? "Closed" : "Open"} ${holidayEntry[0]}` : "Closed Jan 26";
+
+  const profileAddress = profile.address || "Plot 742, 12th Main Road, HAL 2nd Stage, Indiranagar, Bengaluru, Karnataka 560038";
 
   const mismatches: MismatchRow[] = [
     {
       id: "mm-1",
       listingId: "lst-a",
-      platform: "Maps A",
+      platform: "Google Maps (India)",
       field: "Hours",
       profileValue: formattedProfileHours,
-      listingValue: "Mon–Fri 8–4",
+      listingValue: "Mon–Fri 8–20",
       kind: "outdated",
-      explanation: `Listing hours differ from approved profile (${formattedProfileHours}). Customers will see incorrect open hours.`,
+      isMissing: false,
+      explanation: `Listing hours differ from approved profile (${formattedProfileHours}). Customers visiting in Indiranagar will see incorrect open hours.`,
     },
     {
       id: "mm-2",
       listingId: "lst-a",
-      platform: "Maps A",
+      platform: "Google Maps (India)",
       field: "Holiday",
       profileValue: profileHoliday,
-      listingValue: "Open Dec 25",
+      listingValue: "Open Jan 26",
       kind: "conflicting",
-      explanation: `Holiday hours contradict canonical profile target (${profileHoliday}). Search engines penalize temporary hours drift.`,
+      isMissing: false,
+      explanation: `Holiday hours contradict canonical profile target (${profileHoliday}). Search engines penalize temporary Republic Day hours drift.`,
     },
     {
       id: "mm-3",
       listingId: "lst-b",
-      platform: "Maps B",
+      platform: "Mappls (MapmyIndia)",
       field: "Phone",
       profileValue: profilePhone,
-      listingValue: "555 0124",
+      listingValue: "080 4123 4567",
       kind: "outdated",
-      explanation: `Listed number rings elsewhere instead of canonical (${profilePhone}). Maps B is read-only, so changes require a manual block record.`,
+      isMissing: false,
+      explanation: `Listed number lacks international E.164 prefix (+91). Mappls is read-only for public API tier, so changes require a partner block record.`,
     },
     {
       id: "mm-4",
       listingId: "lst-b",
-      platform: "Maps B",
+      platform: "Mappls (MapmyIndia)",
       field: "Name",
       profileValue: profileName,
-      listingValue: profileName.includes(" ") ? profileName.split(" ").slice(0, 2).join(" ") : profileName,
+      listingValue: "Bombay Roastery",
       kind: "needs_review",
-      explanation: `Short trade name vs registered legal name (${profileName}) — human verification recommended before submission.`,
+      isMissing: false,
+      explanation: `Short trade name vs registered legal trade name (${profileName}) — human verification recommended before submission.`,
     },
     {
       id: "mm-5",
-      listingId: "lst-c",
-      platform: "Directory C",
+      listingId: "lst-b",
+      platform: "Mappls (MapmyIndia)",
       field: "Holiday",
       profileValue: profileHoliday,
-      listingValue: "Open Dec 25",
+      listingValue: null,
       kind: "missing",
-      explanation: `Directory C still advertises outdated holiday hours that no longer match the kitchen schedule (${profileHoliday}).`,
+      isMissing: true,
+      explanation: `Holiday operating schedule is missing on Mappls. Customers cannot verify whether your store is open or closed during Republic Day.`,
+    },
+    {
+      id: "mm-6",
+      listingId: "lst-c",
+      platform: "Justdial (India)",
+      field: "Holiday",
+      profileValue: profileHoliday,
+      listingValue: "Open Jan 26",
+      kind: "conflicting",
+      isMissing: false,
+      explanation: `Justdial still advertises open hours for Republic Day that contradict your closed schedule (${profileHoliday}).`,
     },
   ];
 
-  const totalEligible = 9;
+  const totalEligible = 15; // 5 fields * 3 platforms
   const mismatchCount = mismatches.length;
-  const matching = Math.max(1, totalEligible - mismatchCount + 2);
+  const matching = Math.max(1, totalEligible - mismatchCount);
   const score = Math.round((matching / totalEligible) * 100);
 
   return {
@@ -122,62 +144,96 @@ export function buildDashboardSnapshot(profile: {
     listings: [
       {
         id: "lst-a",
-        platform: "mockMapsA",
-        label: "Maps A",
+        platform: "googleMaps",
+        label: "Google Maps (India)",
         writable: true,
+        connectionMode: "DEMO",
         values: {
           name: profileName,
-          phone: "(555) 010-2234",
-          hours: "Mon–Fri 8–4",
-          holiday: "Open Dec 25",
+          address: "Plot 742, 12th Main Rd, HAL 2nd Stage, Bangalore",
+          phone: "080 4123 4567",
+          hours: "Mon–Fri 8–20",
+          holiday: "Open Jan 26",
         },
         mismatchCount: 2,
+        fieldStatuses: {
+          name: "ok",
+          address: "ok",
+          phone: "difference",
+          hours: "difference",
+          holiday: "difference",
+        },
       },
       {
         id: "lst-b",
-        platform: "mockMapsB",
-        label: "Maps B",
+        platform: "mappls",
+        label: "Mappls (MapmyIndia)",
         writable: false,
+        connectionMode: "DEMO",
         values: {
-          name: profileName.includes(" ") ? profileName.split(" ").slice(0, -1).join(" ") || profileName : profileName,
-          phone: "555 0124",
-          hours: "Mon–Sat 7–5",
-          holiday: "—",
+          name: "Bombay Roastery",
+          address: "Plot 742, 12th Main Road, Indiranagar, Bengaluru",
+          phone: "080 4123 4567",
+          hours: "Mon–Sat 07:00-20:00",
+          holiday: "— (Not Set)",
         },
-        mismatchCount: 2,
+        mismatchCount: 3,
+        fieldStatuses: {
+          name: "difference",
+          address: "ok",
+          phone: "difference",
+          hours: "difference",
+          holiday: "missing",
+        },
       },
       {
         id: "lst-c",
-        platform: "mockDirectoryC",
-        label: "Directory C",
+        platform: "justdial",
+        label: "Justdial (India)",
         writable: true,
+        connectionMode: "DEMO",
         values: {
           name: profileName,
+          address: profileAddress,
           phone: profilePhone,
           hours: formattedProfileHours,
-          holiday: "Open Dec 25",
+          holiday: "Open Jan 26",
         },
         mismatchCount: 1,
+        fieldStatuses: {
+          name: "ok",
+          address: "ok",
+          phone: "ok",
+          hours: "ok",
+          holiday: "difference",
+        },
       },
     ],
     mismatches,
     alerts: [
-      { id: "a1", tone: "warn", text: `${mismatchCount} mismatches detected against ${profileName}.` },
-      { id: "a2", tone: "blocked", text: "Maps B is read-only — phone changes will be blocked." },
+      { id: "a1", tone: "warn", text: `${mismatchCount} discrepancies detected across Google Maps, Mappls, and Justdial.` },
+      { id: "a2", tone: "blocked", text: "Mappls (MapmyIndia) is read-only — phone changes will be logged as blocked." },
       { id: "a3", tone: "info", text: "3 sync proposals are waiting for your approval." },
     ],
   };
 }
 
 export const DEMO_DASHBOARD: DashboardSnapshot = buildDashboardSnapshot({
-  name: "Brew & Bloom Café",
-  address: "42 Maple Street, Springfield, IL 62701",
-  phone: "+15550102234",
+  name: "The Bombay Roastery & Café",
+  address: "Plot 742, 12th Main Road, HAL 2nd Stage, Indiranagar, Bengaluru, Karnataka 560038",
+  phone: "+918041234567",
   regularHours: {
-    monday: "07:00-18:00",
+    monday: "07:00-22:00",
+    tuesday: "07:00-22:00",
+    wednesday: "07:00-22:00",
+    thursday: "07:00-22:00",
+    friday: "07:00-23:00",
+    saturday: "08:00-23:00",
+    sunday: "08:00-22:00",
   },
   holidayHours: {
-    "2026-12-25": "closed",
+    "2026-01-26": "closed",
+    "2026-08-15": "closed",
   },
 });
 

@@ -17,21 +17,23 @@ async function main() {
     update: {},
     create: {
       id: 'profile-seed-001',
-      name: 'Brew & Bloom Café',
-      address: '42 Maple Street, Springfield, IL 62701',
-      phone: '+15550102234',
+      name: 'The Bombay Roastery & Café',
+      address: 'Plot 742, 12th Main Road, HAL 2nd Stage, Indiranagar, Bengaluru, Karnataka 560038',
+      phone: '+918041234567',
       regularHours: {
-        monday: '07:00-18:00',
-        tuesday: '07:00-18:00',
-        wednesday: '07:00-18:00',
-        thursday: '07:00-18:00',
-        friday: '07:00-20:00',
-        saturday: '08:00-20:00',
-        sunday: '09:00-16:00',
+        monday: '07:00-22:00',
+        tuesday: '07:00-22:00',
+        wednesday: '07:00-22:00',
+        thursday: '07:00-22:00',
+        friday: '07:00-23:00',
+        saturday: '08:00-23:00',
+        sunday: '08:00-22:00',
       },
       holidayHours: {
-        '2026-12-25': 'closed',
-        '2026-01-01': 'closed',
+        '2026-01-26': 'closed', // Republic Day
+        '2026-08-15': 'closed', // Independence Day
+        '2026-10-02': 'closed', // Gandhi Jayanti
+        '2026-11-08': 'closed', // Diwali
       },
     },
   });
@@ -45,19 +47,19 @@ async function main() {
       platform: 'mockMapsA',
       externalId: 'listing_001',
       values: {
-        name: 'Brew & Bloom Café',
-        address: '42 Maple Street, Springfield, IL 62701',
-        phone: '(555) 010-2234',
+        name: 'The Bombay Roastery & Café',
+        address: 'Plot 742, 12th Main Road, HAL 2nd Stage, Indiranagar, Bengaluru, Karnataka 560038',
+        phone: '080 4123 4567',
         regularHours: {
-          monday: '07:00-18:00',
-          tuesday: '07:00-18:00',
-          wednesday: '07:00-18:00',
-          thursday: '07:00-18:00',
-          friday: '07:00-20:00',
+          monday: '08:00-20:00',
+          tuesday: '08:00-20:00',
+          wednesday: '08:00-20:00',
+          thursday: '08:00-20:00',
+          friday: '08:00-20:00',
           saturday: '08:00-20:00',
-          sunday: '09:00-16:00',
+          sunday: '08:00-20:00',
         },
-        holidayHours: { '2026-12-25': 'Open Dec 25' },
+        holidayHours: { '2026-01-26': 'Open Jan 26' },
       },
       fetchedAt: new Date(),
     },
@@ -70,10 +72,10 @@ async function main() {
       platform: 'mockMapsB',
       externalId: 'listing_002',
       values: {
-        name: 'Brew & Bloom Café',
-        address: '42 Maple St, Springfield, IL 62701',
-        phone: '(555) 010-2234',
-        regularHours: 'Mon–Sat 7–5',
+        name: 'Bombay Roastery',
+        address: 'Plot 742, 12th Main Rd, HAL 2nd Stage, Bengaluru, Karnataka 560038',
+        phone: '080 4123 4567',
+        regularHours: 'Mon–Sat 07:00-20:00',
         holidayHours: {},
       },
       fetchedAt: new Date(),
@@ -87,24 +89,24 @@ async function main() {
       platform: 'mockDirectoryC',
       externalId: 'listing_003',
       values: {
-        name: 'Bella Cucina (Downtown)',
-        address: '42 Maple St Suite B',
-        phone: '555-010-2234',
+        name: 'The Bombay Roastery (Indiranagar)',
+        address: 'Plot 742, 12th Main Rd, HAL 2nd Stage, Bangalore 560038',
+        phone: '+918041234567',
         regularHours: {
-          monday: '7am-6pm',
-          tuesday: '7am-6pm',
-          wednesday: '7am-6pm',
-          thursday: '7am-6pm',
-          friday: '7am-8pm',
-          saturday: '8am-8pm',
-          sunday: '9am-4pm',
+          monday: '07:00-22:00',
+          tuesday: '07:00-22:00',
+          wednesday: '07:00-22:00',
+          thursday: '07:00-22:00',
+          friday: '07:00-23:00',
+          saturday: '08:00-23:00',
+          sunday: '08:00-22:00',
         },
-        holidayHours: { '2026-12-25': 'closed' },
+        holidayHours: { '2026-01-26': 'Open Jan 26' },
       },
       fetchedAt: new Date(),
     },
   });
-  console.log('✅ Listings seeded: mockMapsA, mockMapsB, mockDirectoryC');
+  console.log('✅ Listings seeded: Google Maps (India), Mappls (MapmyIndia), Justdial (India)');
 
   // 3. Upsert initial mismatches and proposals
   const seedProposals = [
@@ -113,63 +115,63 @@ async function main() {
       listingId: listingMapsA.id,
       platform: 'mockMapsA',
       field: 'phone',
-      oldValue: '(555) 010-2234',
-      newValue: '+15550102234',
+      oldValue: '080 4123 4567',
+      newValue: '+918041234567',
       status: 'PENDING_APPROVAL' as const,
       kind: 'OUTDATED' as const,
-      reason: 'Standardize formatting to E.164 canonical telephone protocol.',
+      reason: 'Standardize formatting to E.164 canonical telephone protocol (+918041234567).',
     },
     {
       id: 'prop-2',
       listingId: listingMapsB.id,
       platform: 'mockMapsB',
       field: 'regularHours',
-      oldValue: 'Mon–Sat 7–5',
+      oldValue: 'Mon–Sat 07:00-20:00',
       newValue: {
-        monday: '07:00-18:00',
-        tuesday: '07:00-18:00',
-        wednesday: '07:00-18:00',
-        thursday: '07:00-18:00',
-        friday: '07:00-20:00',
-        saturday: '08:00-20:00',
-        sunday: '09:00-16:00',
+        monday: '07:00-22:00',
+        tuesday: '07:00-22:00',
+        wednesday: '07:00-22:00',
+        thursday: '07:00-22:00',
+        friday: '07:00-23:00',
+        saturday: '08:00-23:00',
+        sunday: '08:00-22:00',
       },
       status: 'PENDING_APPROVAL' as const,
       kind: 'CONFLICTING' as const,
-      reason: 'Saturday and Sunday operating schedules contradict approved hours.',
+      reason: 'Weekend and evening operating schedules on Mappls contradict approved canonical hours.',
     },
     {
       id: 'prop-3',
       listingId: listingDirC.id,
       platform: 'mockDirectoryC',
       field: 'name',
-      oldValue: 'Bella Cucina (Downtown)',
-      newValue: 'Brew & Bloom Café',
+      oldValue: 'The Bombay Roastery (Indiranagar)',
+      newValue: 'The Bombay Roastery & Café',
       status: 'PENDING_APPROVAL' as const,
       kind: 'CONFLICTING' as const,
-      reason: 'Removes unauthorized location qualifier to align with legal branding.',
+      reason: 'Removes local modifier to align with legal branding on Justdial.',
     },
     {
       id: 'prop-4',
       listingId: listingMapsA.id,
       platform: 'mockMapsA',
       field: 'holidayHours',
-      oldValue: 'Open Dec 25',
-      newValue: { '2026-12-25': 'closed' },
+      oldValue: 'Open Jan 26',
+      newValue: { '2026-01-26': 'closed' },
       status: 'APPROVED' as const,
       kind: 'CONFLICTING' as const,
-      reason: 'Store is marked closed on Christmas Day in canonical profile.',
+      reason: 'Store is marked closed on Republic Day in canonical profile.',
     },
     {
       id: 'prop-5',
       listingId: listingDirC.id,
       platform: 'mockDirectoryC',
       field: 'address',
-      oldValue: '42 Maple St Suite B',
-      newValue: '42 Maple Street, Springfield, IL 62701',
+      oldValue: 'Plot 742, 12th Main Rd, HAL 2nd Stage, Bangalore 560038',
+      newValue: 'Plot 742, 12th Main Road, HAL 2nd Stage, Indiranagar, Bengaluru, Karnataka 560038',
       status: 'REJECTED' as const,
       kind: 'NEEDS_REVIEW' as const,
-      reason: 'Suite unit discrepancy flagged as unsafe without human verification.',
+      reason: 'Address abbreviation discrepancy flagged for review before Justdial sync.',
     },
   ];
 
@@ -207,12 +209,66 @@ async function main() {
   }
   console.log('✅ Initial proposals and mismatches seeded (prop-1 to prop-5)');
 
-  // 4. Record seed event in audit log
+  // 4. Seed initial verified customer reviews for publicity and ratings
+  try {
+    const existingCount = await (prisma as any).review.count();
+    if (existingCount === 0) {
+      await (prisma as any).review.createMany({
+        data: [
+          {
+            authorName: 'Rohan Sharma',
+            authorEmail: 'rohan.s@gmail.com',
+            rating: 5,
+            accuracyScore: 5,
+            reliabilityScore: 5,
+            comment: 'Checked their opening hours on Google Maps and arrived at 07:15 AM — open exactly on time! Seamless experience.',
+            verified: true,
+            createdAt: new Date(Date.now() - 1000 * 60 * 60 * 18),
+          },
+          {
+            authorName: 'Priya Venkatesh',
+            authorEmail: 'priya.v@outlook.com',
+            rating: 5,
+            accuracyScore: 5,
+            reliabilityScore: 5,
+            comment: 'Direct phone number listed on Justdial connected right to the manager for reservation. Highly reliable business info!',
+            verified: true,
+            createdAt: new Date(Date.now() - 1000 * 60 * 60 * 42),
+          },
+          {
+            authorName: 'Arjun Nair',
+            authorEmail: 'arjun.nair@techcorp.in',
+            rating: 5,
+            accuracyScore: 5,
+            reliabilityScore: 4,
+            comment: 'Address on Mappls guided our cab right to the doorstep in Indiranagar. Great to see perfectly verified business listings.',
+            verified: true,
+            createdAt: new Date(Date.now() - 1000 * 60 * 60 * 96),
+          },
+          {
+            authorName: 'Ananya Deshmukh',
+            authorEmail: 'ananya.d@gmail.com',
+            rating: 4,
+            accuracyScore: 4,
+            reliabilityScore: 5,
+            comment: 'Holiday hours were accurately noted for Republic Day. Saved us from making a wasted trip.',
+            verified: true,
+            createdAt: new Date(Date.now() - 1000 * 60 * 60 * 140),
+          },
+        ],
+      });
+      console.log('✅ Initial customer reviews seeded (5★ rating showcase)');
+    }
+  } catch (err: any) {
+    console.log('ℹ️ Review model not yet synced, skipping review seed:', err.message);
+  }
+
+  // 5. Record seed event in audit log
   await prisma.auditLog.create({
     data: {
       eventType: 'SEED',
       actor: 'system',
-      payload: { message: 'Database seeded with sample business profile, listings, mismatches, and proposals.' },
+      payload: { message: 'Database seeded with sample business profile, listings, mismatches, proposals, and customer reviews.' },
     },
   });
 

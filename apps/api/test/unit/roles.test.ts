@@ -11,8 +11,8 @@ describe('Role-Based Access Control (RBAC)', () => {
   });
 
   it('allows access when user has the required role', () => {
-    const middleware = requireRole('ADMIN', 'OPERATOR');
-    const req = { user: { email: 'admin@listora.ai', role: 'ADMIN' } } as Request;
+    const middleware = requireRole('OPERATOR');
+    const req = { user: { email: 'operator@listora.ai', role: 'OPERATOR' } } as Request;
     const res = {} as Response;
     const next = vi.fn() as unknown as NextFunction;
 
@@ -21,7 +21,7 @@ describe('Role-Based Access Control (RBAC)', () => {
   });
 
   it('rejects access with 403 when user lacks the required role', () => {
-    const middleware = requireRole('ADMIN');
+    const middleware = requireRole('OPERATOR');
     const req = { user: { email: 'viewer@listora.ai', role: 'VIEWER' } } as Request;
     const jsonMock = vi.fn();
     const statusMock = vi.fn().mockReturnValue({ json: jsonMock });
@@ -39,10 +39,6 @@ describe('Role-Based Access Control (RBAC)', () => {
   });
 
   it('retrieves default demo accounts with respective roles', async () => {
-    const admin = await findUserByEmail('admin@listora.ai');
-    expect(admin).not.toBeNull();
-    expect(admin?.role).toBe('ADMIN');
-
     const operator = await findUserByEmail('operator@listora.ai');
     expect(operator).not.toBeNull();
     expect(operator?.role).toBe('OPERATOR');
@@ -54,10 +50,10 @@ describe('Role-Based Access Control (RBAC)', () => {
 
   it('lists registered workspace users', async () => {
     const users = await listUsers();
-    expect(users.length).toBeGreaterThanOrEqual(3);
+    expect(users.length).toBeGreaterThanOrEqual(2);
     const roles = users.map((u) => u.role);
-    expect(roles).toContain('ADMIN');
     expect(roles).toContain('OPERATOR');
     expect(roles).toContain('VIEWER');
+    expect(roles).not.toContain('ADMIN');
   });
 });

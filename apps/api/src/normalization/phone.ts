@@ -7,13 +7,30 @@ import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 /**
  * Normalizes a phone string to E.164.
- * Uses 'US' as the default country code when the number has no country prefix.
+ * Uses 'IN' as default country code, falling back to 'US' or 'GB'.
  */
-export function normalizePhone(raw: string, defaultCountry: 'US' | 'GB' = 'US'): string | null {
+export function normalizePhone(raw: string, defaultCountry: 'IN' | 'US' | 'GB' = 'US'): string | null {
   if (!raw || typeof raw !== 'string') return null;
-  const parsed = parsePhoneNumberFromString(raw.trim(), defaultCountry);
-  if (!parsed || !parsed.isPossible()) return null;
-  return parsed.format('E.164');
+  const trimmed = raw.trim();
+
+  if (trimmed.startsWith('+')) {
+    const parsed = parsePhoneNumberFromString(trimmed);
+    if (parsed && parsed.isPossible()) return parsed.format('E.164');
+  }
+
+  if (trimmed.startsWith('0')) {
+    const parsedIn = parsePhoneNumberFromString(trimmed, 'IN');
+    if (parsedIn && parsedIn.isPossible()) return parsedIn.format('E.164');
+  }
+
+  const parsed = parsePhoneNumberFromString(trimmed, defaultCountry);
+  if (parsed && parsed.isPossible()) return parsed.format('E.164');
+
+  const fallbackCountry = defaultCountry === 'US' ? 'IN' : 'US';
+  const fallback = parsePhoneNumberFromString(trimmed, fallbackCountry);
+  if (fallback && fallback.isPossible()) return fallback.format('E.164');
+
+  return null;
 }
 
 /**

@@ -37,7 +37,7 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
  * Triggers the AI agent to investigate mismatches and create proposals.
  * MUST be registered before /:id routes.
  */
-router.post('/analyze', requireRole('ADMIN', 'OPERATOR'), async (req: Request, res: Response, next: NextFunction) => {
+router.post('/analyze', requireRole('OPERATOR'), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { mismatchIds, useStrongModel } = req.body as {
       mismatchIds?: string[];
@@ -56,7 +56,7 @@ router.post('/analyze', requireRole('ADMIN', 'OPERATOR'), async (req: Request, r
  */
 router.post(
   '/',
-  requireRole('ADMIN', 'OPERATOR'),
+  requireRole('OPERATOR'),
   validate({ body: CreateProposalSchema }),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -83,7 +83,7 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-router.post('/:id/approve', requireRole('ADMIN', 'OPERATOR'), async (req: Request, res: Response, next: NextFunction) => {
+router.post('/:id/approve', requireRole('OPERATOR'), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const updated = await approveProposal(req.params.id, req.user!.email);
     res.json(updated);
@@ -92,7 +92,7 @@ router.post('/:id/approve', requireRole('ADMIN', 'OPERATOR'), async (req: Reques
   }
 });
 
-router.post('/:id/reject', requireRole('ADMIN', 'OPERATOR'), async (req: Request, res: Response, next: NextFunction) => {
+router.post('/:id/reject', requireRole('OPERATOR'), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const updated = await rejectProposal(req.params.id, req.user!.email);
     res.json(updated);

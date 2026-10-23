@@ -15,7 +15,19 @@ const mapsA = createMockMapsAApp();
 const mapsB = createMockMapsBApp();
 const directoryC = createMockDirectoryCApp();
 
-// Mount under standard prefixes so any caller configuration succeeds
+// Mount Indian Platforms
+app.use('/google-maps-india', mapsA);
+app.use('/google-maps', mapsA);
+app.use('/googleMaps', mapsA);
+
+app.use('/mappls-india', mapsB);
+app.use('/mappls', mapsB);
+app.use('/mapmyindia', mapsB);
+
+app.use('/justdial-india', directoryC);
+app.use('/justdial', directoryC);
+
+// Mount under standard legacy prefixes so any caller configuration succeeds
 app.use('/mock-maps-a', mapsA);
 app.use('/maps-a', mapsA);
 app.use('/mockMapsA', mapsA);
@@ -30,14 +42,27 @@ app.use('/mockDirectoryC', directoryC);
 
 // Health check for Render
 app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', service: 'mock-platforms' });
+  res.json({ status: 'ok', service: 'mock-platforms', region: 'IN' });
 });
 
 app.listen(PORT, () => {
-  console.info(`[mock-platforms] Listening on http://localhost:${PORT}`);
-  console.info(`  /mock-maps-a & /maps-a         → mockMapsA  (read-write)`);
-  console.info(`  /mock-maps-b & /maps-b         → mockMapsB  (read-only)`);
-  console.info(`  /mock-directory-c & /directory-c → mockDirectoryC (holiday-block)`);
+  console.info(`[platforms-india] Listening on http://localhost:${PORT}`);
+  console.info(`  /google-maps-india  → Google Maps (India) (read-write)`);
+  console.info(`  /mappls-india       → Mappls / MapmyIndia  (read-only)`);
+  console.info(`  /justdial-india     → Justdial (India)     (holiday-sync)`);
+
+  if (process.env.NODE_ENV === 'production') {
+    const externalUrl = process.env.RENDER_EXTERNAL_URL;
+    if (externalUrl) {
+      setInterval(async () => {
+        try {
+          await fetch(`${externalUrl}/health`);
+        } catch {
+          // ignore
+        }
+      }, 13 * 60 * 1000);
+    }
+  }
 });
 
 process.on('unhandledRejection', (reason) => {

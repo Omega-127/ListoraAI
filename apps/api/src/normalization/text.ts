@@ -35,6 +35,22 @@ const ABBREVIATIONS: Record<string, string> = {
   '\\btx\\b': 'texas',
   '\\bfl\\b': 'florida',
   '\\bwa\\b': 'washington',
+  // Indian address & state abbreviations
+  '\\bbangalore\\b': 'bengaluru',
+  '\\bka\\b': 'karnataka',
+  '\\bmh\\b': 'maharashtra',
+  '\\bdl\\b': 'delhi',
+  '\\btn\\b': 'tamil nadu',
+  '\\bts\\b': 'telangana',
+  '\\bcr\\b\\.?': 'cross',
+  '\\bmn\\b\\.?': 'main',
+  '\\blyt\\b\\.?': 'layout',
+  '\\bsec\\b\\.?': 'sector',
+  '\\bextn\\b\\.?': 'extension',
+  '\\bext\\b\\.?': 'extension',
+  '\\bflr\\b\\.?': 'floor',
+  '\\bgrnd\\b\\.?': 'ground',
+  '\\bblk\\b\\.?': 'block',
   // cafe / café
   'caf[eé]': 'cafe',
   // ampersand

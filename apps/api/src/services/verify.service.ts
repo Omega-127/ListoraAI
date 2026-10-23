@@ -11,15 +11,18 @@ import { recordAudit } from './audit.service';
 import { AppError } from '../middleware/errorHandler';
 import { phonesMatch } from '../normalization/phone';
 import { textsMatch } from '../normalization/text';
-import { hoursMatch } from '../normalization/hours';
+import { hoursMatch, holidaysMatch } from '../normalization/hours';
 
 function valuesMatch(field: string, expected: unknown, observed: unknown): boolean {
   if (expected === null && observed === null) return true;
   if (expected === null || observed === null) return false;
 
   if (field === 'phone') return phonesMatch(String(expected), String(observed));
-  if (field === 'regularHours' || field === 'holidayHours') {
+  if (field === 'regularHours') {
     return hoursMatch(expected as Record<string, string>, observed as Record<string, string>);
+  }
+  if (field === 'holidayHours') {
+    return holidaysMatch(expected, observed);
   }
   return textsMatch(String(expected), String(observed));
 }
@@ -30,25 +33,32 @@ function valuesMatch(field: string, expected: unknown, observed: unknown): boole
 export async function verifyProposal(proposalId: string) {
   const proposal = await prisma.proposal.findUnique({
     where: { id: proposalId },
-    include: { mismatch: { include: { listing: true } } },
+    include: {
+      mismatch: { include: { listing: true } },
+      updateResults: { orderBy: { createdAt: 'desc' }, take: 1 },
+    },
   });
 
   if (!proposal) throw new AppError(404, `Proposal ${proposalId} not found`);
 
   const { platform, field, newValue } = proposal;
   const externalId = proposal.mismatch.listing.externalId;
-
-  const result = await fetchListing(platform, externalId);
+  const lastUpdate = proposal.updateResults[0];
 
   let status: 'VERIFIED' | 'PENDING' | 'FAILED' | 'BLOCKED' = 'PENDING';
   let observedValue: unknown = null;
 
-  if (!result.success) {
-    status = 'FAILED';
+  if (lastUpdate?.outcome === 'BLOCKED') {
+    status = 'BLOCKED';
   } else {
-    const values = result.data as Record<string, unknown>;
-    observedValue = values[field];
-    status = valuesMatch(field, newValue, observedValue) ? 'VERIFIED' : 'FAILED';
+    const result = await fetchListing(platform, externalId);
+    if (!result.success) {
+      status = 'FAILED';
+    } else {
+      const values = result.data as Record<string, unknown>;
+      observedValue = values[field];
+      status = valuesMatch(field, newValue, observedValue) ? 'VERIFIED' : 'FAILED';
+    }
   }
 
   const verification = await prisma.verification.create({

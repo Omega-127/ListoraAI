@@ -1,20 +1,22 @@
 import { useEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { focus } from "../lib/styles";
+import { useAuth } from "../context/AuthContext";
+import ThemeTogglerDemo from "../components/ThemeToggler";
 import { Sparkles, ShieldCheck, CheckCircle2, ArrowRight, Database, RefreshCw, Bot, Lock } from "lucide-react";
 
 
 type Outcome = "verified" | "blocked";
 const rows: { platform: string; field: string; before: string; after: string; outcome: Outcome }[] = [
-  { platform: "Maps A", field: "Hours", before: "Mon–Fri 8–4", after: "Mon–Sat 7–5", outcome: "verified" },
-  { platform: "Maps B", field: "Phone", before: "555 0124", after: "555 0124", outcome: "blocked" },
-  { platform: "Directory C", field: "Holiday", before: "Open Dec 25", after: "Closed Dec 25", outcome: "verified" },
+  { platform: "Google Maps (India)", field: "Hours", before: "Mon–Fri 8–20", after: "Mon–Sat 07:00-22:00", outcome: "verified" },
+  { platform: "Mappls (MapmyIndia)", field: "Phone", before: "080 4123 4567", after: "080 4123 4567", outcome: "blocked" },
+  { platform: "Justdial (India)", field: "Holiday", before: "Open Jan 26", after: "Closed Jan 26", outcome: "verified" },
 ];
 
 const chip: Record<string, string> = {
-  mismatch: "text-[#a3a3a3] bg-white/10",
-  verified: "text-[#10b981] bg-[#10b981]/10",
-  blocked: "text-[#a3a3a3] bg-white/10",
+  mismatch: "text-amber-800 bg-amber-500/15 dark:text-[#a3a3a3] dark:bg-white/10",
+  verified: "text-emerald-700 bg-emerald-500/15 dark:text-[#10b981] dark:bg-[#10b981]/10",
+  blocked: "text-neutral-700 bg-neutral-200 dark:text-[#a3a3a3] dark:bg-white/10",
 };
 
 const phrases = ["Your business hours", "Your phone number", "Your address", "Your holiday hours"];
@@ -55,7 +57,7 @@ const smooth = (a: number, b: number, x: number) => { const t = clamp((x - a) / 
 
 function Card({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="flex h-full flex-col rounded-xl border border-[var(--border)] bg-[#0d0d0d] p-4 text-sm">
+    <div className="flex h-full flex-col rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 text-sm shadow-sm">
       <p className={`text-xs ${muted}`}>{label}</p>
       <div className="flex flex-1 flex-col justify-center">{children}</div>
     </div>
@@ -87,15 +89,15 @@ function FormatBody() {
       <div className="flex items-center justify-between">
         <span id="fmt" className="text-xs">Ignore formatting</span>
         <button role="switch" aria-checked={on} aria-labelledby="fmt" onClick={() => setOn((v) => !v)}
-          className={`relative h-5 w-9 rounded-full transition-colors duration-300 motion-reduce:transition-none ${on ? "bg-[var(--primary)]" : "bg-white/15"} ${focus}`}>
-          <span className={`absolute left-0.5 top-0.5 h-4 w-4 rounded-full transition-transform duration-300 motion-reduce:transition-none ${ease} ${on ? "translate-x-4 bg-[#171717]" : "bg-[#fafafa]"}`} />
+          className={`relative h-5 w-9 rounded-full transition-colors duration-300 motion-reduce:transition-none ${on ? "bg-[var(--primary)]" : "bg-black/15 dark:bg-white/15"} ${focus}`}>
+          <span className={`absolute left-0.5 top-0.5 h-4 w-4 rounded-full transition-transform duration-300 motion-reduce:transition-none ${ease} ${on ? "translate-x-4 bg-white dark:bg-[#171717]" : "bg-neutral-800 dark:bg-[#fafafa]"}`} />
         </button>
       </div>
       <ul className="mt-3 text-xs">
-        {[["Maps A", "(415) 555-0142", on], ["Maps B", "(415) 555-0124", false]].map(([n, v, ok]) => (
+        {[["Google Maps", "+91 80 4123 4567", on], ["Mappls", "080 4123 4567", false]].map(([n, v, ok]) => (
           <li key={String(n)} className="flex items-center justify-between gap-2 border-t border-[var(--border)] py-2">
             <span>{n}</span><span className="tabular-nums">{v}</span>
-            <Pill tone={ok ? "text-[#10b981] bg-[#10b981]/10" : "text-[#a3a3a3] bg-white/10"}>{ok ? "Match" : "Mismatch"}</Pill>
+            <Pill tone={ok ? "text-emerald-700 bg-emerald-500/15 dark:text-[#10b981] dark:bg-[#10b981]/10" : "text-amber-800 bg-amber-500/15 dark:text-[#a3a3a3] dark:bg-white/10"}>{ok ? "Match" : "Mismatch"}</Pill>
           </li>
         ))}
       </ul>
@@ -103,27 +105,27 @@ function FormatBody() {
   );
 }
 
-const sims = [["Maps A", "Mon–Fri 8–4", "Mon–Sat 7–5"], ["Maps B", "555 0124", "555 0142"], ["Directory C", "Open Dec 25", "Closed Dec 25"]];
+const sims = [["Google Maps", "Mon–Fri 8–20", "Mon–Sat 07:00-22:00"], ["Mappls", "080 4123 4567", "+91 80 4123 4567"], ["Justdial", "Open Jan 26", "Closed Jan 26"]];
 function PreviewBody() {
   const [tab, setTab] = useState(0);
   return (
     <>
-      <div role="tablist" className="relative grid grid-cols-3 rounded-lg bg-white/5 p-0.5 text-xs">
-        <span aria-hidden="true" className={`absolute inset-y-0.5 left-0.5 w-[calc(33.333%-2px)] rounded-md bg-white/10 transition-transform duration-300 motion-reduce:transition-none ${ease}`} style={{ transform: `translateX(${tab * 100}%)` }} />
+      <div role="tablist" className="relative grid grid-cols-3 rounded-lg bg-black/5 dark:bg-white/5 p-0.5 text-xs">
+        <span aria-hidden="true" className={`absolute inset-y-0.5 left-0.5 w-[calc(33.333%-2px)] rounded-md bg-white dark:bg-white/10 shadow-sm transition-transform duration-300 motion-reduce:transition-none ${ease}`} style={{ transform: `translateX(${tab * 100}%)` }} />
         {sims.map(([n], k) => (
-          <button key={n} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={`relative py-1.5 font-medium ${tab === k ? "" : muted} ${focus}`}>{n}</button>
+          <button key={n} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={`relative py-1.5 font-medium ${tab === k ? "text-[var(--foreground)]" : muted} ${focus}`}>{n}</button>
         ))}
       </div>
       <div role="tabpanel" className="mt-3 text-xs">
         <p className={muted}>If you approve</p>
-        <p className="tabular-nums line-through decoration-white/30">{sims[tab][1]}</p>
+        <p className="tabular-nums line-through decoration-black/30 dark:decoration-white/30">{sims[tab][1]}</p>
         <p className="text-sm font-medium tabular-nums">{sims[tab][2]}</p>
       </div>
     </>
   );
 }
 
-const log = [["Maps A hours", "Approved 9:12. Re-check confirmed Mon–Sat 7–5."], ["Maps B phone", "Approved 9:12. Platform is read-only, so it was blocked."], ["Directory C holiday", "Approved 9:13. Re-check is still pending."]];
+const log = [["Google Maps hours", "Approved 9:12. Re-check confirmed Mon–Sat 07:00-22:00."], ["Mappls phone", "Approved 9:12. Platform is read-only, so it was blocked."], ["Justdial holiday", "Approved 9:13. Re-check is still pending."]];
 function HistoryBody() {
   const [open, setOpen] = useState(0);
   return (
@@ -149,10 +151,10 @@ function ApprovalBody() {
   return (
     <>
       <ul className="text-xs">
-        {["Maps A hours", "Directory C holiday", "Maps B phone"].map((l, k) => (
+        {["Google Maps hours", "Justdial holiday", "Mappls phone"].map((l, k) => (
           <li key={l} className="flex items-center gap-2 py-1.5">
             <button role="checkbox" aria-checked={c[k]} aria-label={l} onClick={() => setC((v) => v.map((x, j) => (j === k ? !x : x)))}
-              className={`grid h-4 w-4 place-items-center rounded border transition-colors duration-200 motion-reduce:transition-none ${c[k] ? "border-transparent bg-[var(--primary)] text-[#171717]" : "border-white/25"} ${focus}`}>
+              className={`grid h-4 w-4 place-items-center rounded border transition-colors duration-200 motion-reduce:transition-none ${c[k] ? "border-transparent bg-[var(--primary)] text-[var(--primary-foreground)]" : "border-black/25 dark:border-white/25"} ${focus}`}>
               <svg viewBox="0 0 16 16" className="h-3 w-3" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray={1} strokeDashoffset={c[k] ? 0 : 1} className="transition-[stroke-dashoffset] duration-300 motion-reduce:transition-none" /></svg>
             </button>
             {l}
@@ -187,19 +189,19 @@ function HolidayBody() {
       <div role="radiogroup" aria-label="Dec 25 hours" className="text-xs">
         {holiday.map((h, k) => (
           <button key={h} role="radio" aria-checked={v === k} onClick={() => setV(k)} className={`flex w-full items-center gap-2 py-1 ${focus}`}>
-            <span className={`grid h-4 w-4 place-items-center rounded-full border ${v === k ? "border-[var(--primary)]" : "border-white/25"}`}>
+            <span className={`grid h-4 w-4 place-items-center rounded-full border ${v === k ? "border-[var(--primary)]" : "border-black/25 dark:border-white/25"}`}>
               <span className={`h-2 w-2 rounded-full bg-[var(--primary)] transition-transform duration-200 motion-reduce:transition-none ${v === k ? "scale-100" : "scale-0"}`} />
             </span>
             {h}
           </button>
         ))}
       </div>
-      <p className={`mt-1 text-xs ${muted}`}>{v === 2 ? "Directory C says Open 9–5. It matches." : "Directory C says Open 9–5. Conflict."}</p>
+      <p className={`mt-1 text-xs ${muted}`}>{v === 2 ? "Justdial says Open 9–5. It matches." : "Justdial says Open 9–5. Conflict."}</p>
     </>
   );
 }
 
-const toasts = ["2 mismatches need review", "Maps B blocked the update", "Re-check finished"];
+const toasts = ["2 mismatches need review", "Mappls blocked the update", "Re-check finished"];
 function AlertsBody() {
   const [i, setI] = useState(0);
   useEffect(() => {
@@ -210,7 +212,7 @@ function AlertsBody() {
   return (
     <div className="relative h-11">
       {toasts.map((t, k) => (
-        <div key={t} className={`absolute inset-0 flex items-center rounded-lg bg-white/10 px-3 text-xs transition-[transform,opacity] duration-500 motion-reduce:transition-none ${ease} ${k === i ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"}`}>{t}</div>
+        <div key={t} className={`absolute inset-0 flex items-center rounded-lg bg-black/5 dark:bg-white/10 px-3 text-xs border border-[var(--border)] transition-[transform,opacity] duration-500 motion-reduce:transition-none ${ease} ${k === i ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"}`}>{t}</div>
       ))}
     </div>
   );
@@ -227,7 +229,7 @@ function RecheckBody() {
   return (
     <>
       <div className="flex items-center justify-between text-xs"><span>Re-checking 3 listings</span><span className="tabular-nums">{shown}%</span></div>
-      <div className="mt-2 h-1.5 rounded-full bg-white/10"><div className="h-full rounded-full bg-[var(--primary)]" style={{ width: `${shown}%` }} /></div>
+      <div className="mt-2 h-1.5 rounded-full bg-black/10 dark:bg-white/10"><div className="h-full rounded-full bg-[var(--primary)]" style={{ width: `${shown}%` }} /></div>
     </>
   );
 }
@@ -245,7 +247,7 @@ function StatusBody() {
       <div className="grid grid-cols-4 gap-2">
         {statuses.map(([n, , d], k) => (
           <button key={n} aria-label={n} aria-pressed={s === k} onClick={() => setS(k)}
-            className={`grid aspect-square place-items-center rounded-lg border transition-[transform,background-color] duration-200 hover:scale-105 motion-reduce:transition-none ${s === k ? "border-transparent bg-white/15" : "border-[var(--border)]"} ${focus}`}>
+            className={`grid aspect-square place-items-center rounded-lg border transition-[transform,background-color] duration-200 hover:scale-105 motion-reduce:transition-none ${s === k ? "border-transparent bg-black/10 dark:bg-white/15 text-[var(--foreground)]" : "border-[var(--border)] text-[var(--muted-foreground)]"} ${focus}`}>
             <svg viewBox="0 0 20 20" className="h-5 w-5" aria-hidden="true">
               {k === 1 && <circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" strokeWidth="1.6" />}
               <path d={d} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -486,11 +488,11 @@ function HowItWorks() {
             return (
               <div
                 key={s.step}
-                className="group relative flex flex-col justify-between rounded-2xl border border-[var(--border)] bg-[#0d0d0d] p-6 transition-all duration-300 hover:border-white/20 hover:bg-[#121212]"
+                className="group relative flex flex-col justify-between rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 transition-all duration-300 shadow-sm hover:border-black/20 dark:hover:border-white/20 hover:shadow-md"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-mono text-2xl font-bold tracking-tight text-white/40 group-hover:text-white/80 transition-colors">
+                    <span className="font-mono text-2xl font-bold tracking-tight text-neutral-400 dark:text-white/40 group-hover:text-[var(--foreground)] transition-colors">
                       {s.step}
                     </span>
                     <span
@@ -501,11 +503,11 @@ function HowItWorks() {
                   </div>
 
                   <div className="mt-6 flex items-center gap-3">
-                    <div className="grid h-10 w-10 place-items-center rounded-xl bg-white/5 border border-white/10 text-white">
+                    <div className="grid h-10 w-10 place-items-center rounded-xl bg-black/5 dark:bg-white/5 border border-[var(--border)] text-[var(--foreground)]">
                       <Icon className="h-5 w-5" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-white tracking-tight">{s.title}</h3>
+                      <h3 className="font-semibold text-[var(--foreground)] tracking-tight">{s.title}</h3>
                       <p className="text-xs text-[var(--muted-foreground)]">{s.subtitle}</p>
                     </div>
                   </div>
@@ -515,8 +517,8 @@ function HowItWorks() {
                   </p>
                 </div>
 
-                <div className="mt-6 flex items-center gap-2 border-t border-[var(--border)] pt-4 text-xs font-medium text-white/70">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                <div className="mt-6 flex items-center gap-2 border-t border-[var(--border)] pt-4 text-xs font-medium text-[var(--muted-foreground)]">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 dark:text-emerald-400" />
                   <span>Enforced by built-in security guardrails</span>
                 </div>
               </div>
@@ -525,10 +527,10 @@ function HowItWorks() {
         </div>
 
         {/* Guardrail callout banner */}
-        <div className="mt-8 rounded-2xl border border-white/10 bg-gradient-to-r from-white/[0.03] to-white/[0.01] p-6 md:p-8">
+        <div className="mt-8 rounded-2xl border border-[var(--border)] bg-black/[0.02] dark:bg-gradient-to-r dark:from-white/[0.03] dark:to-white/[0.01] p-6 md:p-8">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="space-y-1">
-              <h4 className="text-base font-semibold text-white flex items-center gap-2">
+              <h4 className="text-base font-semibold text-[var(--foreground)] flex items-center gap-2">
                 <Lock className="h-4 w-4 text-[var(--primary)]" />
                 The Zero-Bypass Guarantee
               </h4>
@@ -551,13 +553,15 @@ function HowItWorks() {
 }
 
 function Footer() {
+  const { isAuthenticated, logout } = useAuth();
+
   return (
-    <footer className="border-t border-[var(--border)] bg-[#070707] text-[var(--muted-foreground)]">
+    <footer className="border-t border-[var(--border)] bg-slate-50 dark:bg-[#070707] text-[var(--muted-foreground)]">
       <div className="mx-auto max-w-6xl px-6 py-16 md:px-[8vw]">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-5">
           {/* Brand info */}
           <div className="lg:col-span-2 space-y-4">
-            <Link to="/" className={`inline-block text-xl font-bold tracking-tight text-white ${focus}`}>
+            <Link to="/" className={`inline-block text-xl font-bold tracking-tight text-[var(--foreground)] ${focus}`}>
               ListoraAI
             </Link>
             <p className="text-sm leading-relaxed max-w-[36ch]">
@@ -568,57 +572,57 @@ function Footer() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-              <span className="text-xs font-medium text-emerald-400">All Platforms Monitored & Operational</span>
+              <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">All Platforms Monitored & Operational</span>
             </div>
           </div>
 
           {/* Product links */}
           <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-wider text-white">Product</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-[var(--foreground)]">Product</p>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
+                <Link to="/dashboard" className="hover:text-[var(--foreground)] transition-colors">Dashboard</Link>
               </li>
               <li>
-                <Link to="/dashboard/profile" className="hover:text-white transition-colors">Business Profile</Link>
+                <Link to="/dashboard/profile" className="hover:text-[var(--foreground)] transition-colors">Business Profile</Link>
               </li>
               <li>
-                <Link to="/dashboard/approvals" className="hover:text-white transition-colors">Approvals Queue</Link>
+                <Link to="/dashboard/approvals" className="hover:text-[var(--foreground)] transition-colors">Approvals Queue</Link>
               </li>
               <li>
-                <Link to="/dashboard/report" className="hover:text-white transition-colors">Before/After Report</Link>
+                <Link to="/dashboard/report" className="hover:text-[var(--foreground)] transition-colors">Before/After Report</Link>
               </li>
               <li>
-                <Link to="/dashboard/score" className="hover:text-white transition-colors">Consistency Score</Link>
+                <Link to="/dashboard/score" className="hover:text-[var(--foreground)] transition-colors">Consistency Score</Link>
               </li>
             </ul>
           </div>
 
           {/* Core capabilities */}
           <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-wider text-white">Platform</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-[var(--foreground)]">Platform</p>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="#how-it-works" className="hover:text-white transition-colors">How it works</a>
+                <a href="#how-it-works" className="hover:text-[var(--foreground)] transition-colors">How it works</a>
               </li>
               <li>
-                <a href="#features" className="hover:text-white transition-colors">Live checks demo</a>
+                <a href="#features" className="hover:text-[var(--foreground)] transition-colors">Live checks demo</a>
               </li>
               <li>
-                <Link to="/dashboard/users" className="hover:text-white transition-colors">Multi-User Roles (RBAC)</Link>
+                <Link to="/dashboard/users" className="hover:text-[var(--foreground)] transition-colors">Multi-User Roles (RBAC)</Link>
               </li>
               <li>
-                <Link to="/dashboard/alerts" className="hover:text-white transition-colors">Alerts & Reminders</Link>
+                <Link to="/dashboard/alerts" className="hover:text-[var(--foreground)] transition-colors">Alerts & Reminders</Link>
               </li>
               <li>
-                <Link to="/dashboard/audit" className="hover:text-white transition-colors">Audit Trail Logs</Link>
+                <Link to="/dashboard/audit" className="hover:text-[var(--foreground)] transition-colors">Audit Trail Logs</Link>
               </li>
             </ul>
           </div>
 
           {/* Technology & Guardrails */}
           <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-wider text-white">Technology</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-[var(--foreground)]">Technology</p>
             <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-1.5">
                 <span>Claude 3.5 Sonnet & Haiku</span>
@@ -643,10 +647,25 @@ function Footer() {
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-[var(--border)] pt-8 text-xs sm:flex-row">
           <p>© {new Date().getFullYear()} ListoraAI Inc. All rights reserved.</p>
           <div className="flex flex-wrap items-center gap-6">
-            <Link to="/login" className="hover:text-white transition-colors">Sign In</Link>
-            <Link to="/register" className="hover:text-white transition-colors">Register</Link>
-            <a href="#how-it-works" className="hover:text-white transition-colors">Documentation</a>
-            <span className="font-mono text-[10px] text-white/30">v1.0.0-orchestrated</span>
+            {isAuthenticated ? (
+              <>
+                <Link to="/dashboard" className="hover:text-[var(--foreground)] transition-colors">Dashboard</Link>
+                <button
+                  type="button"
+                  onClick={() => logout()}
+                  className="hover:text-[var(--foreground)] transition-colors cursor-pointer"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="hover:text-[var(--foreground)] transition-colors">Sign In</Link>
+                <Link to="/register" className="hover:text-[var(--foreground)] transition-colors">Register</Link>
+              </>
+            )}
+            <a href="#how-it-works" className="hover:text-[var(--foreground)] transition-colors">Documentation</a>
+            <span className="font-mono text-[10px] text-[var(--muted-foreground)] opacity-50">v1.0.0-orchestrated</span>
           </div>
         </div>
       </div>
@@ -655,6 +674,7 @@ function Footer() {
 }
 
 export default function Landing() {
+  const { isAuthenticated, logout } = useAuth();
   const [applied, setApplied] = useState(false);
   const matched = applied ? 8 : 6;
 
@@ -665,21 +685,52 @@ export default function Landing() {
         <nav className="flex items-center gap-6 text-sm text-[var(--muted-foreground)]">
           <a href="#features" className={`hover:text-[var(--foreground)] ${focus}`}>Features</a>
           <a href="#how-it-works" className={`hover:text-[var(--foreground)] ${focus}`}>How it works</a>
-          <Link to="/login" className={`hover:text-[var(--foreground)] ${focus}`}>Log in</Link>
-          <Link
-            to="/register"
-            className={`hidden sm:inline-flex rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] px-3 py-1.5 text-xs font-medium hover:brightness-110 ${focus}`}
-          >
-            Get started
+          <Link to="/rate" className={`hover:text-[var(--foreground)] ${focus} flex items-center gap-1 font-medium text-amber-600 dark:text-amber-400`}>
+            ★ Reviews & Rating
           </Link>
+          {isAuthenticated ? (
+            <div className="flex items-center gap-3">
+              <Link
+                to="/dashboard"
+                className={`inline-flex items-center gap-1.5 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] px-3 py-1.5 text-xs font-medium hover:brightness-110 ${focus}`}
+              >
+                <span>Dashboard</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+              <button
+                type="button"
+                onClick={() => logout()}
+                className={`text-xs hover:text-[var(--foreground)] transition-colors cursor-pointer ${focus}`}
+              >
+                Sign out
+              </button>
+            </div>
+          ) : (
+            <>
+              <Link to="/login" className={`hover:text-[var(--foreground)] ${focus}`}>Log in</Link>
+              <Link
+                to="/register"
+                className={`hidden sm:inline-flex rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] px-3 py-1.5 text-xs font-medium hover:brightness-110 ${focus}`}
+              >
+                Get started
+              </Link>
+            </>
+          )}
+          <ThemeTogglerDemo />
         </nav>
       </header>
 
       <section className="px-6 pt-16 md:pt-24 pb-24 flex flex-col items-center text-center">
-        <a href="#how-it-works" className={`inline-flex items-center gap-2 rounded-full border border-[var(--border)] px-3 py-1 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] ${focus}`}>
-          <span className="rounded-full bg-white/10 px-2 text-xs text-[var(--foreground)]">New</span>
-          Checks holiday hours & temporary closures
-        </a>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <a href="#how-it-works" className={`inline-flex items-center gap-2 rounded-full border border-[var(--border)] px-3 py-1 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] ${focus}`}>
+            <span className="rounded-full bg-black/5 dark:bg-white/10 px-2 text-xs text-[var(--foreground)]">New</span>
+            Checks holiday hours & temporary closures
+          </a>
+          <Link to="/rate" className={`inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-700 dark:text-amber-300 hover:brightness-110 transition-all ${focus}`}>
+            <Sparkles className="h-3 w-3" />
+            4.9/5 ⭐ Top-Rated Publicity Active
+          </Link>
+        </div>
 
         <h1
           aria-label="Your business hours, phone number, address and holiday hours should match everywhere."
@@ -693,16 +744,28 @@ export default function Landing() {
         </p>
 
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link to="/register" className={`rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] font-medium px-5 py-2.5 ${focus}`}>Check my listings</Link>
-          <a href="#how-it-works" className={`rounded-lg border border-[var(--border)] font-medium px-5 py-2.5 hover:bg-white/5 ${focus}`}>See how it works</a>
+          {isAuthenticated ? (
+            <Link
+              to="/dashboard"
+              className={`inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] font-medium px-5 py-2.5 hover:brightness-110 ${focus}`}
+            >
+              <span>Open Dashboard</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          ) : (
+            <Link to="/register" className={`rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] font-medium px-5 py-2.5 ${focus}`}>
+              Check my listings
+            </Link>
+          )}
+          <a href="#how-it-works" className={`rounded-lg border border-[var(--border)] font-medium px-5 py-2.5 hover:bg-black/5 dark:hover:bg-white/5 ${focus}`}>See how it works</a>
         </div>
 
-        <div className="mt-16 w-full max-w-2xl rounded-xl border border-[var(--border)] text-left">
+        <div className="mt-16 w-full max-w-2xl rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-sm text-left">
           <div className="flex items-center justify-between gap-4 px-5 py-4 border-b border-[var(--border)]">
-            <p className="text-sm text-[var(--muted-foreground)]">Approved: Mon–Sat 7–5, 555 0142, closed Dec 25</p>
+            <p className="text-sm text-[var(--muted-foreground)]">Approved: Mon–Sat 07:00-22:00, +91 80 4123 4567, closed Jan 26</p>
             <button
               onClick={() => setApplied((v) => !v)}
-              className={`shrink-0 rounded-lg border border-[var(--border)] px-3 py-1.5 text-sm font-medium hover:bg-white/5 ${focus}`}
+              className={`shrink-0 rounded-lg border border-[var(--border)] px-3 py-1.5 text-sm font-medium hover:bg-black/5 dark:hover:bg-white/5 ${focus}`}
             >
               {applied ? "Start over" : "Approve changes"}
             </button>
@@ -711,8 +774,8 @@ export default function Landing() {
             {rows.map((r) => {
               const status = applied ? r.outcome : "mismatch";
               return (
-                <li key={r.platform} className="grid grid-cols-[1fr_auto] md:grid-cols-[9rem_5rem_1fr_auto] items-center gap-x-4 gap-y-1 px-5 py-4 border-b border-[var(--border)] last:border-b-0">
-                  <span className="font-medium">{r.platform}</span>
+                <li key={r.platform} className="grid grid-cols-[1fr_auto] md:grid-cols-[11rem_5rem_1fr_auto] items-center gap-x-4 gap-y-1 px-5 py-4 border-b border-[var(--border)] last:border-b-0">
+                  <span className="font-medium text-xs sm:text-sm">{r.platform}</span>
                   <span className="text-sm text-[var(--muted-foreground)] md:order-none order-3">{r.field}</span>
                   <span className="tabular-nums md:order-none order-4 col-span-2 md:col-span-1">{applied ? r.after : r.before}</span>
                   <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors duration-300 motion-reduce:transition-none ${chip[status]}`}>
@@ -723,7 +786,7 @@ export default function Landing() {
             })}
           </ul>
           <p className="px-5 py-3 border-t border-[var(--border)] text-sm text-[var(--muted-foreground)]" aria-live="polite">
-            {matched} of 9 checked fields match. {applied && "Maps B doesn’t allow edits, so its phone number is left as it is."}
+            {matched} of 9 checked fields match. {applied && "Mappls (MapmyIndia) requires verified enterprise tier credentials for direct API writes, so its phone number is left as it is."}
           </p>
         </div>
       </section>

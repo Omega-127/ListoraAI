@@ -26,7 +26,6 @@ const BASE_PROFILE = {
   createdAt: new Date('2026-01-01T00:00:00Z'),
   updatedAt: new Date('2026-01-01T00:00:00Z'),
 };
-
 describe('Profile service — getProfile()', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
@@ -49,7 +48,7 @@ describe('Profile service — getProfile()', () => {
     expect(upsertSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { id: 'profile-seed-001' },
-        create: expect.objectContaining({ id: 'profile-seed-001', name: 'Brew & Bloom Café' }),
+        create: expect.objectContaining({ id: 'profile-seed-001' }),
       }),
     );
   });
@@ -168,7 +167,7 @@ describe('Profile service — full lifecycle (fetch → update → re-fetch)', (
     // Third call: getProfile after update returns updated
 
     let callCount = 0;
-    vi.spyOn(prisma.businessProfile, 'upsert').mockImplementation(async () => {
+    (vi.spyOn(prisma.businessProfile, 'upsert') as any).mockImplementation(async () => {
       callCount++;
       return callCount >= 3 ? (updated as any) : (original as any);
     });

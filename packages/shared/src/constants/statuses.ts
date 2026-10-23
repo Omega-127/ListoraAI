@@ -76,11 +76,40 @@ export const UPDATE_OUTCOMES = {
 export type UpdateOutcome = (typeof UPDATE_OUTCOME)[keyof typeof UPDATE_OUTCOME];
 export type UpdateOutcomeValue = (typeof UPDATE_OUTCOMES)[keyof typeof UPDATE_OUTCOMES];
 
-// Multi-user roles
+// Multi-user roles (strictly OWNER and VIEWER user-facing roles)
 export const USER_ROLES = {
-  ADMIN: 'ADMIN',
-  OPERATOR: 'OPERATOR',
+  OWNER: 'OWNER',
+  OPERATOR: 'OWNER',
+  ADMIN: 'OWNER',
   VIEWER: 'VIEWER',
 } as const;
 
-export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
+export type UserRole = 'OWNER' | 'VIEWER';
+
+// Platform connection & synchronization statuses
+export const PLATFORM_CONNECTION_STATUS = {
+  CONNECTED: 'CONNECTED',
+  NOT_CONNECTED: 'NOT_CONNECTED',
+  DEMO_MODE: 'DEMO_MODE',
+  CONNECTION_FAILED: 'CONNECTION_FAILED',
+} as const;
+
+export type PlatformConnectionStatus = (typeof PLATFORM_CONNECTION_STATUS)[keyof typeof PLATFORM_CONNECTION_STATUS];
+
+export const PLATFORM_MODE = {
+  LIVE: 'LIVE',
+  DEMO: 'DEMO',
+} as const;
+
+export type PlatformMode = (typeof PLATFORM_MODE)[keyof typeof PLATFORM_MODE];
+
+export const PLATFORM_SYNC_STATUS = {
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  UPDATING: 'UPDATING',
+  VERIFIED: 'VERIFIED',
+  FAILED: 'FAILED',
+  BLOCKED: 'BLOCKED',
+  DEMO_ONLY: 'DEMO_ONLY',
+} as const;
+
+export type PlatformSyncStatus = (typeof PLATFORM_SYNC_STATUS)[keyof typeof PLATFORM_SYNC_STATUS];

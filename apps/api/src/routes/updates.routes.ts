@@ -11,7 +11,7 @@ const ApplySchema = z.object({
 });
 
 /** POST /api/v1/updates — apply approved proposals */
-router.post('/', requireRole('ADMIN', 'OPERATOR'), validate({ body: ApplySchema }), async (req, res, next) => {
+router.post('/', requireRole('OPERATOR'), validate({ body: ApplySchema }), async (req, res, next) => {
   try {
     const { proposalId } = req.body as z.infer<typeof ApplySchema>;
 

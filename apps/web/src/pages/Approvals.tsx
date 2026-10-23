@@ -27,29 +27,45 @@ export type ProposalItem = {
   createdAt: string;
 };
 
+export function formatPlatformName(platform: string): string {
+  const map: Record<string, string> = {
+    mockMapsA: "Google Maps (India)",
+    googleMaps: "Google Maps (India)",
+    "google-maps-india": "Google Maps (India)",
+    mockMapsB: "Mappls (MapmyIndia)",
+    mappls: "Mappls (MapmyIndia)",
+    "mappls-india": "Mappls (MapmyIndia)",
+    mockDirectoryC: "Justdial (India)",
+    justdial: "Justdial (India)",
+    "justdial-india": "Justdial (India)",
+  };
+  return map[platform] || platform;
+}
+
 function createProposalsForProfile(profile: any): ProposalItem[] {
-  const profileName = profile?.name || "Brew & Bloom Café";
-  const profilePhone = profile?.phone || "+15550102234";
-  const formattedHours = profile?.regularHours?.monday ? `Mon-Fri ${profile.regularHours.monday}` : "Mon–Fri 07:00-18:00, Sat 08:00-20:00, Sun 09:00-16:00";
+  const profileName = profile?.name || "The Bombay Roastery & Café";
+  const profilePhone = profile?.phone || "+918041234567";
+  const profileAddress = profile?.address || "Plot 742, 12th Main Road, HAL 2nd Stage, Indiranagar, Bengaluru, Karnataka 560038";
+  const formattedHours = profile?.regularHours?.monday ? `Mon-Fri ${profile.regularHours.monday}` : "Mon–Fri 07:00-22:00, Sat 08:00-23:00, Sun 08:00-22:00";
 
   return [
     {
       id: "prop-1",
-      platform: "mockMapsA",
+      platform: "Google Maps (India)",
       field: "phone",
-      oldValue: "(555) 010-2234",
+      oldValue: "080 4123 4567",
       newValue: profilePhone,
       status: "PENDING_APPROVAL",
       confidence: 99,
-      reason: `Standardize telephone to canonical international E.164 protocol (${profilePhone}).`,
+      reason: `Standardize telephone to canonical international E.164 protocol (${profilePhone}) with India country code (+91).`,
       riskLevel: "low",
       createdAt: "10 mins ago",
     },
     {
       id: "prop-2",
-      platform: "mockMapsB",
+      platform: "Mappls (MapmyIndia)",
       field: "hours",
-      oldValue: "Mon–Sat 7–5",
+      oldValue: "Mon–Fri 8–20",
       newValue: formattedHours,
       status: "PENDING_APPROVAL",
       confidence: 96,
@@ -59,37 +75,37 @@ function createProposalsForProfile(profile: any): ProposalItem[] {
     },
     {
       id: "prop-3",
-      platform: "mockDirectoryC",
+      platform: "Justdial (India)",
       field: "name",
-      oldValue: `${profileName} (Downtown)`,
+      oldValue: `${profileName} (Indiranagar)`,
       newValue: profileName,
       status: "PENDING_APPROVAL",
       confidence: 92,
-      reason: `Standardizes listing to match registered trade name (${profileName}).`,
+      reason: `Standardizes listing to match registered trade name (${profileName}) without local modifier.`,
       riskLevel: "high",
       createdAt: "1 hour ago",
     },
     {
       id: "prop-4",
-      platform: "mockMapsA",
+      platform: "Google Maps (India)",
       field: "holidayHours",
-      oldValue: "Open Dec 25",
+      oldValue: "Open Jan 26",
       newValue: "closed",
       status: "APPROVED",
       confidence: 98,
-      reason: "Store is marked closed on Christmas Day in canonical profile.",
+      reason: "Store is marked closed on Republic Day (2026-01-26) in canonical business profile.",
       riskLevel: "low",
       createdAt: "3 hours ago",
     },
     {
       id: "prop-5",
-      platform: "mockDirectoryC",
+      platform: "Justdial (India)",
       field: "address",
-      oldValue: "42 Maple St Suite B",
-      newValue: profile?.address || "42 Maple Street, Springfield, IL 62701",
+      oldValue: "Plot 742, 12th Main Rd, HAL 2nd Stage, Bangalore 560038",
+      newValue: profileAddress,
       status: "REJECTED",
       confidence: 84,
-      reason: "Suite unit discrepancy flagged as unsafe without human verification.",
+      reason: "Address abbreviation discrepancy flagged for manual verification before directory dispatch.",
       riskLevel: "high",
       createdAt: "Yesterday",
     },
@@ -172,7 +188,7 @@ export default function Approvals() {
         if (data && Array.isArray(data) && data.length > 0 && !cancelled) {
           const mapped: ProposalItem[] = data.map((item: any) => ({
             id: item.id,
-            platform: item.platform || "mockMapsA",
+            platform: formatPlatformName(item.platform || "googleMaps"),
             field: item.field,
             oldValue: typeof item.oldValue === "object" ? JSON.stringify(item.oldValue) : String(item.oldValue ?? "N/A"),
             newValue: typeof item.newValue === "object" ? JSON.stringify(item.newValue) : String(item.newValue ?? ""),
@@ -274,12 +290,12 @@ export default function Approvals() {
       </div>
 
       {applySummary && (
-        <div className="flex items-center justify-between gap-2 rounded-lg border border-emerald-500/30 bg-emerald-950/20 p-4 text-xs text-emerald-300">
+        <div className="flex items-center justify-between gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-4 text-xs text-emerald-800 dark:text-emerald-300">
           <div className="flex items-center gap-2">
-            <Check className="h-4 w-4 text-emerald-400 shrink-0" />
+            <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
             <span>{applySummary}</span>
           </div>
-          <Link to="/dashboard/report" className="underline font-medium hover:text-white shrink-0">
+          <Link to="/dashboard/report" className="underline font-medium hover:text-[var(--foreground)] shrink-0">
             View Before/After Report →
           </Link>
         </div>
@@ -287,10 +303,10 @@ export default function Approvals() {
 
 
       {isViewer && (
-        <div className="flex items-center gap-2.5 rounded-lg border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-xs text-blue-300">
-          <Eye className="h-4 w-4 shrink-0 text-blue-400" />
+        <div className="flex items-center gap-2.5 rounded-lg border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-xs text-blue-800 dark:text-blue-300">
+          <Eye className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
           <span>
-            <strong>Viewer Role (Read-Only):</strong> You can inspect all proposed diffs, risk calculations, and agent rationales. Approval and rejection actions require an <strong>Operator</strong> or <strong>Admin</strong> role.
+            <strong>Viewer Role (Read-Only):</strong> You can inspect all proposed diffs, risk calculations, and agent rationales. Approval and rejection actions require an <strong>Operator</strong> role.
           </span>
         </div>
       )}
@@ -298,12 +314,12 @@ export default function Approvals() {
 
       {/* Tabs Filter */}
       <Tabs.Root value={filter} onValueChange={setFilter} className="flex flex-col gap-4">
-        <Tabs.List className="inline-flex gap-1 rounded-lg border border-[var(--border)] bg-black/40 p-1 self-start">
+        <Tabs.List className="inline-flex gap-1 rounded-lg border border-[var(--border)] bg-black/5 dark:bg-black/40 p-1 self-start">
           <Tabs.Tab
             value="all"
             className={cn(
               "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-              filter === "all" ? "bg-white/10 text-[var(--foreground)]" : muted,
+              filter === "all" ? "bg-white dark:bg-white/10 text-[var(--foreground)] shadow-sm" : muted,
               focus
             )}
           >
@@ -313,7 +329,7 @@ export default function Approvals() {
             value="pending"
             className={cn(
               "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-              filter === "pending" ? "bg-white/10 text-[var(--foreground)]" : muted,
+              filter === "pending" ? "bg-white dark:bg-white/10 text-[var(--foreground)] shadow-sm" : muted,
               focus
             )}
           >
@@ -323,7 +339,7 @@ export default function Approvals() {
             value="approved"
             className={cn(
               "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-              filter === "approved" ? "bg-white/10 text-[var(--foreground)]" : muted,
+              filter === "approved" ? "bg-white dark:bg-white/10 text-[var(--foreground)] shadow-sm" : muted,
               focus
             )}
           >
@@ -333,7 +349,7 @@ export default function Approvals() {
             value="rejected"
             className={cn(
               "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-              filter === "rejected" ? "bg-white/10 text-[var(--foreground)]" : muted,
+              filter === "rejected" ? "bg-white dark:bg-white/10 text-[var(--foreground)] shadow-sm" : muted,
               focus
             )}
           >
@@ -345,32 +361,32 @@ export default function Approvals() {
       {/* Proposal Cards List */}
       <div className="flex flex-col gap-3">
         {filtered.length === 0 ? (
-          <div className="rounded-xl border border-[var(--border)] bg-[#0d0d0d]/80 p-8 text-center">
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-8 text-center shadow-sm">
             <p className={muted}>No proposals match the current filter.</p>
           </div>
         ) : (
           filtered.map((item) => (
             <div
               key={item.id}
-              className="rounded-xl border border-[var(--border)] bg-[#0d0d0d]/80 p-4 sm:p-5 transition-colors hover:border-white/20"
+              className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 sm:p-5 transition-colors hover:border-[var(--border-strong)] shadow-sm"
             >
               <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                 <div className="flex-1 space-y-3">
                   <div className="flex flex-wrap items-center gap-2 text-xs">
-                    <span className="font-semibold uppercase tracking-wider text-neutral-300">
-                      {item.platform}
+                    <span className="font-semibold uppercase tracking-wider text-[var(--foreground)]">
+                      {formatPlatformName(item.platform)}
                     </span>
                     <span className="text-[var(--border)]">•</span>
-                    <span className="capitalize font-medium text-neutral-400">
-                      Field: <span className="text-neutral-200">{item.field}</span>
+                    <span className="capitalize font-medium text-[var(--muted-foreground)]">
+                      Field: <span className="text-[var(--foreground)] font-semibold">{item.field}</span>
                     </span>
                     <span className="text-[var(--border)]">•</span>
                     <span
                       className={cn(
                         "rounded px-1.5 py-0.5 text-[10px] font-medium tracking-wide uppercase",
-                        item.riskLevel === "low" && "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
-                        item.riskLevel === "medium" && "bg-amber-500/10 text-amber-400 border border-amber-500/20",
-                        item.riskLevel === "high" && "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                        item.riskLevel === "low" && "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
+                        item.riskLevel === "medium" && "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20",
+                        item.riskLevel === "high" && "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20"
                       )}
                     >
                       {item.riskLevel} risk
@@ -379,28 +395,28 @@ export default function Approvals() {
                   </div>
 
                   {/* Diff View */}
-                  <div className="grid gap-2 sm:grid-cols-2 rounded-lg border border-[var(--border)] bg-black/40 p-3">
+                  <div className="grid gap-2 sm:grid-cols-2 rounded-lg border border-[var(--border)] bg-slate-50 dark:bg-black/40 p-3">
                     <div>
-                      <p className="text-[11px] font-medium uppercase tracking-wider text-rose-400/80 mb-1">
+                      <p className="text-[11px] font-medium uppercase tracking-wider text-rose-600 dark:text-rose-400/80 mb-1">
                         Current Listing Value
                       </p>
-                      <p className="text-xs font-mono text-neutral-300 break-all bg-rose-950/20 p-2 rounded border border-rose-900/30">
+                      <p className="text-xs font-mono text-rose-800 dark:text-neutral-300 break-all bg-rose-50 dark:bg-rose-950/20 p-2 rounded border border-rose-200 dark:border-rose-900/30">
                         {item.oldValue || "—"}
                       </p>
                     </div>
                     <div>
-                      <p className="text-[11px] font-medium uppercase tracking-wider text-emerald-400/80 mb-1">
+                      <p className="text-[11px] font-medium uppercase tracking-wider text-emerald-700 dark:text-emerald-400/80 mb-1">
                         Proposed Replacement
                       </p>
-                      <p className="text-xs font-mono text-emerald-300 break-all bg-emerald-950/20 p-2 rounded border border-emerald-900/30">
+                      <p className="text-xs font-mono text-emerald-800 dark:text-emerald-300 break-all bg-emerald-50 dark:bg-emerald-950/20 p-2 rounded border border-emerald-200 dark:border-emerald-900/30">
                         {item.newValue}
                       </p>
                     </div>
                   </div>
 
                   <p className={`text-xs ${muted}`}>
-                    <Sparkles className="inline-block h-3 w-3 mr-1 text-neutral-400" />
-                    <span className="text-neutral-300 font-medium">Agent rationale:</span> {item.reason}
+                    <Sparkles className="inline-block h-3 w-3 mr-1 text-[var(--muted-foreground)]" />
+                    <span className="text-[var(--foreground)] font-medium">Agent rationale:</span> {item.reason}
                   </p>
                 </div>
 

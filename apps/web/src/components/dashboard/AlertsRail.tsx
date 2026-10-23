@@ -2,9 +2,9 @@ import type { AlertItem } from "../../lib/dashboard-data";
 import { cn } from "../../lib/cn";
 
 const TONE: Record<AlertItem["tone"], string> = {
-  warn: "border-[#fbbf24]/25 bg-[#fbbf24]/5 text-[#fbbf24]",
-  blocked: "border-white/15 bg-white/5 text-[var(--muted-foreground)]",
-  info: "border-[#60a5fa]/25 bg-[#60a5fa]/5 text-[#60a5fa]",
+  warn: "border-amber-500/30 bg-amber-500/10 text-amber-800 dark:text-[#fbbf24]",
+  blocked: "border-black/10 dark:border-white/15 bg-black/5 dark:bg-white/5 text-[var(--foreground)]",
+  info: "border-blue-500/30 bg-blue-500/10 text-blue-800 dark:text-[#60a5fa]",
 };
 
 export function AlertsRail({ alerts }: { alerts: AlertItem[] }) {
