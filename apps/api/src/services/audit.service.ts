@@ -8,7 +8,7 @@ import type { Prisma } from '@prisma/client';
 
 import { logger } from '../utils/logger';
 
-export type AuditActor = 'owner' | 'agent' | 'system';
+export type AuditActor = 'owner' | 'agent' | 'system' | 'viewer';
 
 export async function recordAudit(eventType: string, actor: AuditActor, payload: Record<string, unknown>) {
   try {
