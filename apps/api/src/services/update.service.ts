@@ -35,6 +35,25 @@ export async function applyProposal(proposalId: string) {
 
   const updateResult = await patchListing(platform, externalId, patchFields);
 
+  if (updateResult.outcome === 'SUCCESS') {
+    try {
+      const currentListing = proposal.mismatch.listing;
+      const currentValues = (currentListing.values as Record<string, any>) || {};
+      await prisma.listing.update({
+        where: { id: currentListing.id },
+        data: {
+          values: { ...currentValues, [field]: proposal.newValue },
+        },
+      });
+      await prisma.mismatch.update({
+        where: { id: proposal.mismatchId },
+        data: { resolved: true },
+      });
+    } catch (e) {
+      logger.warn('Failed to update local listing/mismatch after successful platform patch', { error: e });
+    }
+  }
+
   const stored = await prisma.updateResult.create({
     data: {
       proposalId,

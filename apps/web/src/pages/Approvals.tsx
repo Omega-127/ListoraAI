@@ -6,13 +6,15 @@ import { cn } from "../lib/cn";
 import { focus, muted } from "../lib/styles";
 import {
   getStoredUser,
-  approveProposal,
-  rejectProposal,
-  applyUpdates,
   getProposals,
-  verifyUpdates,
   getBusinessProfile,
 } from "../lib/api";
+import {
+  approveProposalAction,
+  rejectProposalAction,
+  applyAllApprovedAction,
+  syncProposalsFromBackend,
+} from "../lib/proposals-store";
 
 export type ProposalItem = {
   id: string;
@@ -134,22 +136,14 @@ export default function Approvals() {
     setProposals((prev) =>
       prev.map((p) => (p.id === id ? { ...p, status: "APPROVED" as const } : p))
     );
-    try {
-      await approveProposal(id);
-    } catch {
-      // ignore
-    }
+    await approveProposalAction(id);
   };
 
   const handleReject = async (id: string) => {
     setProposals((prev) =>
       prev.map((p) => (p.id === id ? { ...p, status: "REJECTED" as const } : p))
     );
-    try {
-      await rejectProposal(id);
-    } catch {
-      // ignore
-    }
+    await rejectProposalAction(id);
   };
 
   const user = getStoredUser();
@@ -163,7 +157,7 @@ export default function Approvals() {
       prev.map((p) => (p.status === "PENDING_APPROVAL" ? { ...p, status: "APPROVED" as const } : p))
     );
     for (const id of pendingIds) {
-      await approveProposal(id).catch(() => {});
+      await approveProposalAction(id);
     }
     setBatchActionRunning(false);
   };
@@ -172,14 +166,17 @@ export default function Approvals() {
     let cancelled = false;
     async function loadBackendProposals() {
       try {
-        const profile = await getBusinessProfile();
+        const [profile, statuses] = await Promise.all([
+          getBusinessProfile(),
+          syncProposalsFromBackend(),
+        ]);
         if (!cancelled && profile) {
           setProposals((prev) => {
             const dynamic = createProposalsForProfile(profile);
             const statusMap = new Map(prev.map((p) => [p.id, p.status]));
             return dynamic.map((d) => ({
               ...d,
-              status: statusMap.get(d.id) || d.status,
+              status: (statuses[d.id] as any) || statusMap.get(d.id) || d.status,
             }));
           });
         }
@@ -192,7 +189,7 @@ export default function Approvals() {
             field: item.field,
             oldValue: typeof item.oldValue === "object" ? JSON.stringify(item.oldValue) : String(item.oldValue ?? "N/A"),
             newValue: typeof item.newValue === "object" ? JSON.stringify(item.newValue) : String(item.newValue ?? ""),
-            status: item.status,
+            status: (statuses[item.id] as any) || item.status,
             confidence: 96,
             reason: item.mismatch?.explanation || "AI conflict orchestrator detected discrepancy with verified business profile.",
             riskLevel: item.field === "name" ? "high" : item.field === "hours" ? "medium" : "low",
@@ -224,11 +221,26 @@ export default function Approvals() {
         });
       }
     };
+
+    const handleProposalsChange = (e: Event) => {
+      const custom = e as CustomEvent;
+      if (custom.detail?.all) {
+        setProposals((prev) =>
+          prev.map((p) => {
+            const st = custom.detail.all[p.id];
+            return st ? { ...p, status: st } : p;
+          })
+        );
+      }
+    };
+
     window.addEventListener("listora_profile_updated", handleProfileChange);
+    window.addEventListener("listora_proposals_updated", handleProposalsChange);
 
     return () => {
       cancelled = true;
       window.removeEventListener("listora_profile_updated", handleProfileChange);
+      window.removeEventListener("listora_proposals_updated", handleProposalsChange);
     };
   }, []);
 
@@ -237,11 +249,8 @@ export default function Approvals() {
     setApplying(true);
     setApplySummary(null);
     try {
-      await applyUpdates();
-      await verifyUpdates().catch(() => {});
-      setApplySummary(
-        `Updates dispatched to connected platforms. Mock Maps A: SUCCESS (verified), Mock Maps B: BLOCKED (platform is read-only).`
-      );
+      const res = await applyAllApprovedAction();
+      setApplySummary(res.summary);
     } finally {
       setApplying(false);
     }

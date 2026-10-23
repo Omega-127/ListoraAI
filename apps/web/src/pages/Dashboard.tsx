@@ -16,8 +16,11 @@ import {
   getBusinessProfile,
   type AgentAnalysisResponse,
 } from "../lib/api";
+import {
+  approveProposalAction,
+  syncProposalsFromBackend,
+} from "../lib/proposals-store";
 import { Sparkles, ArrowRight, Bot, Lock } from "lucide-react";
-
 
 export default function Dashboard() {
   const [data, setData] = useState(DEMO_DASHBOARD);
@@ -28,17 +31,21 @@ export default function Dashboard() {
 
   useEffect(() => {
     let cancelled = false;
-    async function syncProfile() {
+
+    async function loadFullDashboard() {
       try {
-        const profile = await getBusinessProfile();
+        const [profile, statuses] = await Promise.all([
+          getBusinessProfile(),
+          syncProposalsFromBackend(),
+        ]);
         if (!cancelled && profile) {
-          setData(buildDashboardSnapshot(profile));
+          setData(buildDashboardSnapshot(profile, statuses));
         }
       } catch {
         // ignore
       }
     }
-    syncProfile();
+    loadFullDashboard();
 
     const handleProfileChange = (e: Event) => {
       const custom = e as CustomEvent;
@@ -46,11 +53,23 @@ export default function Dashboard() {
         setData(buildDashboardSnapshot(custom.detail));
       }
     };
+
+    const handleProposalsChange = (e: Event) => {
+      const custom = e as CustomEvent;
+      getBusinessProfile().then((profile) => {
+        if (!cancelled && profile) {
+          setData(buildDashboardSnapshot(profile, custom.detail?.all));
+        }
+      });
+    };
+
     window.addEventListener("listora_profile_updated", handleProfileChange);
+    window.addEventListener("listora_proposals_updated", handleProposalsChange);
 
     return () => {
       cancelled = true;
       window.removeEventListener("listora_profile_updated", handleProfileChange);
+      window.removeEventListener("listora_proposals_updated", handleProposalsChange);
     };
   }, []);
 
@@ -62,6 +81,16 @@ export default function Dashboard() {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
+      return next;
+    });
+  }
+
+  async function handleApproveMismatch(id: string) {
+    if (isViewer) return;
+    await approveProposalAction(id);
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
       return next;
     });
   }
@@ -81,18 +110,15 @@ export default function Dashboard() {
       setData((d) => ({ ...d, recheckProgress: step }));
     }
 
-    // Live re-compute with current profile and refresh state
-    const currentProfile = await getBusinessProfile();
-    const freshSnapshot = buildDashboardSnapshot(currentProfile);
-
-    // Give a tangible, lively update: simulate verified scan improvements
-    const improvedMatching = Math.min(freshSnapshot.eligible, freshSnapshot.matching + 1);
-    const improvedScore = Math.round((improvedMatching / freshSnapshot.eligible) * 100);
+    // Live re-compute with current profile and proposal states
+    const [currentProfile, statuses] = await Promise.all([
+      getBusinessProfile(),
+      syncProposalsFromBackend(),
+    ]);
+    const freshSnapshot = buildDashboardSnapshot(currentProfile, statuses);
 
     setData({
       ...freshSnapshot,
-      matching: improvedMatching,
-      score: improvedScore,
       recheckProgress: 100,
       alerts: [
         { id: "a-fresh", tone: "info", text: `Listings scanned & re-verified for ${currentProfile.name}. All provider probes active.` },
@@ -114,7 +140,6 @@ export default function Dashboard() {
       setAgentResult(res);
 
       if (res.output?.fields) {
-        // Update mismatch explanations in local state
         setData((prev) => ({
           ...prev,
           pendingApprovals: prev.pendingApprovals + (res.proposalsCreated || 1),
@@ -218,9 +243,18 @@ export default function Dashboard() {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <p className={`text-xs font-medium uppercase tracking-wider ${muted}`}>Queue</p>
-              <p className="mt-1 text-2xl font-semibold tracking-tight tabular-nums">
-                {data.pendingApprovals}{" "}
-                <span className={`text-base font-medium ${muted}`}>pending approvals</span>
+              <div className="mt-1 flex items-baseline gap-2">
+                <span className="text-2xl font-semibold tracking-tight tabular-nums">
+                  {data.pendingApprovals}
+                </span>
+                <span className={`text-sm font-medium ${muted}`}>
+                  {data.pendingApprovals === 1 ? "pending approval" : "pending approvals"}
+                </span>
+              </div>
+              <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1 font-medium">
+                {data.approvedCount > 0
+                  ? `✓ ${data.approvedCount} approved change${data.approvedCount > 1 ? "s" : ""} applied to listings`
+                  : "All changes require explicit human sign-off"}
               </p>
             </div>
             <Link
@@ -230,7 +264,7 @@ export default function Dashboard() {
                 focus,
               )}
             >
-              Open approvals
+              Open approvals ({data.pendingApprovals})
             </Link>
           </div>
           <Progress.Root
@@ -261,7 +295,12 @@ export default function Dashboard() {
         <ListingsGrid listings={data.listings} />
       </section>
 
-      <MismatchPanel mismatches={data.mismatches} selected={selected} onToggle={toggle} />
+      <MismatchPanel
+        mismatches={data.mismatches}
+        selected={selected}
+        onToggle={toggle}
+        onApproveMismatch={handleApproveMismatch}
+      />
     </div>
   );
 }

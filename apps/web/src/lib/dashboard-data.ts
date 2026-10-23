@@ -1,3 +1,5 @@
+import { getStoredProposalStatuses, type ProposalStatus } from "./proposals-store";
+
 export type MismatchKind = "missing" | "outdated" | "conflicting" | "needs_review";
 
 export type ListingSnapshot = {
@@ -11,6 +13,7 @@ export type ListingSnapshot = {
     hours: string;
     holiday: string;
   };
+  updatedFields?: string[];
   mismatchCount: number;
 };
 
@@ -23,6 +26,8 @@ export type MismatchRow = {
   listingValue: string | null;
   kind: MismatchKind;
   explanation: string;
+  status: "pending" | "approved" | "rejected" | "applied";
+  proposalId?: string;
 };
 
 export type AlertItem = {
@@ -36,24 +41,44 @@ export type DashboardSnapshot = {
   matching: number;
   eligible: number;
   pendingApprovals: number;
+  approvedCount: number;
   listings: ListingSnapshot[];
   mismatches: MismatchRow[];
   alerts: AlertItem[];
   recheckProgress: number;
 };
 
-export function buildDashboardSnapshot(profile: {
-  name: string;
-  address: string;
-  phone: string;
-  regularHours: Record<string, string>;
-  holidayHours: Record<string, string>;
-}): DashboardSnapshot {
+export function buildDashboardSnapshot(
+  profile: {
+    name: string;
+    address: string;
+    phone: string;
+    regularHours: Record<string, string>;
+    holidayHours: Record<string, string>;
+  },
+  statusesOverride?: Record<string, ProposalStatus>
+): DashboardSnapshot {
+  const statuses = statusesOverride || getStoredProposalStatuses();
+
+  const isApproved = (id: string) => statuses[id] === "APPROVED" || statuses[id] === "APPLIED";
+  const isRejected = (id: string) => statuses[id] === "REJECTED";
+
   const profileName = profile.name || "The Bombay Roastery & Café";
   const profilePhone = profile.phone || "+918041234567";
-  const formattedProfileHours = profile.regularHours?.monday ? `Mon-Fri ${profile.regularHours.monday}` : "Mon–Sat 07:00-22:00";
+  const formattedProfileHours = profile.regularHours?.monday
+    ? `Mon-Fri ${profile.regularHours.monday}`
+    : "Mon–Sat 07:00-22:00";
   const holidayEntry = Object.entries(profile.holidayHours || {})[0];
-  const profileHoliday = holidayEntry ? `${holidayEntry[1] === "closed" ? "Closed" : "Open"} ${holidayEntry[0]}` : "Closed Jan 26";
+  const profileHoliday = holidayEntry
+    ? `${holidayEntry[1] === "closed" ? "Closed" : "Open"} ${holidayEntry[0]}`
+    : "Closed Jan 26";
+
+  // Check status for each known conflict
+  const mm1Approved = isApproved("mm-1") || isApproved("prop-2");
+  const mm2Approved = isApproved("mm-2") || isApproved("prop-4");
+  const mm3Approved = isApproved("mm-3") || isApproved("prop-1");
+  const mm4Approved = isApproved("mm-4") || isApproved("prop-3");
+  const mm5Approved = isApproved("mm-5");
 
   const mismatches: MismatchRow[] = [
     {
@@ -62,9 +87,13 @@ export function buildDashboardSnapshot(profile: {
       platform: "Google Maps (India)",
       field: "Hours",
       profileValue: formattedProfileHours,
-      listingValue: "Mon–Fri 8–20",
+      listingValue: mm1Approved ? formattedProfileHours : "Mon–Fri 8–20",
       kind: "outdated",
-      explanation: `Listing hours differ from approved profile (${formattedProfileHours}). Customers visiting in Indiranagar will see incorrect open hours.`,
+      status: mm1Approved ? "approved" : isRejected("mm-1") ? "rejected" : "pending",
+      proposalId: "prop-2",
+      explanation: mm1Approved
+        ? "✓ Approved change: Operating hours synchronized with canonical profile."
+        : `Listing hours differ from approved profile (${formattedProfileHours}). Customers visiting in Indiranagar will see incorrect open hours.`,
     },
     {
       id: "mm-2",
@@ -72,9 +101,13 @@ export function buildDashboardSnapshot(profile: {
       platform: "Google Maps (India)",
       field: "Holiday",
       profileValue: profileHoliday,
-      listingValue: "Open Jan 26",
+      listingValue: mm2Approved ? profileHoliday : "Open Jan 26",
       kind: "conflicting",
-      explanation: `Holiday hours contradict canonical profile target (${profileHoliday}). Search engines penalize temporary Republic Day hours drift.`,
+      status: mm2Approved ? "approved" : isRejected("mm-2") ? "rejected" : "pending",
+      proposalId: "prop-4",
+      explanation: mm2Approved
+        ? "✓ Approved change: Store marked closed on Republic Day."
+        : `Holiday hours contradict canonical profile target (${profileHoliday}). Search engines penalize temporary Republic Day hours drift.`,
     },
     {
       id: "mm-3",
@@ -82,9 +115,13 @@ export function buildDashboardSnapshot(profile: {
       platform: "Mappls (MapmyIndia)",
       field: "Phone",
       profileValue: profilePhone,
-      listingValue: "080 4123 4567",
+      listingValue: mm3Approved ? profilePhone : "080 4123 4567",
       kind: "outdated",
-      explanation: `Listed number lacks international E.164 prefix (+91). Mappls is read-only for public API tier, so changes require a partner block record.`,
+      status: mm3Approved ? "approved" : isRejected("mm-3") ? "rejected" : "pending",
+      proposalId: "prop-1",
+      explanation: mm3Approved
+        ? "✓ Approved change: Standardized to international E.164 (+91) format."
+        : `Listed number lacks international E.164 prefix (+91). Mappls is read-only for public API tier, so changes require a partner block record.`,
     },
     {
       id: "mm-4",
@@ -92,9 +129,13 @@ export function buildDashboardSnapshot(profile: {
       platform: "Mappls (MapmyIndia)",
       field: "Name",
       profileValue: profileName,
-      listingValue: "Bombay Roastery",
+      listingValue: mm4Approved ? profileName : "Bombay Roastery",
       kind: "needs_review",
-      explanation: `Short trade name vs registered legal trade name (${profileName}) — human verification recommended before submission.`,
+      status: mm4Approved ? "approved" : isRejected("mm-4") ? "rejected" : "pending",
+      proposalId: "prop-3",
+      explanation: mm4Approved
+        ? "✓ Approved change: Brand trade name aligned with registered legal trade name."
+        : `Short trade name vs registered legal trade name (${profileName}) — human verification recommended before submission.`,
     },
     {
       id: "mm-5",
@@ -102,22 +143,70 @@ export function buildDashboardSnapshot(profile: {
       platform: "Justdial (India)",
       field: "Holiday",
       profileValue: profileHoliday,
-      listingValue: "Open Jan 26",
+      listingValue: mm5Approved ? profileHoliday : "Open Jan 26",
       kind: "missing",
-      explanation: `Justdial still advertises open hours for Republic Day that contradict your closed schedule (${profileHoliday}).`,
+      status: mm5Approved ? "approved" : isRejected("mm-5") ? "rejected" : "pending",
+      proposalId: "prop-4",
+      explanation: mm5Approved
+        ? "✓ Approved change: Justdial schedule aligned to closed for Republic Day."
+        : `Justdial still advertises open hours for Republic Day that contradict your closed schedule (${profileHoliday}).`,
     },
   ];
 
+  const activeMismatches = mismatches.filter((m) => m.status === "pending");
+  const approvedMismatches = mismatches.filter((m) => m.status === "approved" || m.status === "applied");
+
+  // Track updated fields on each listing
+  const lstAUpdatedFields: string[] = [];
+  if (mm1Approved) lstAUpdatedFields.push("Hours");
+  if (mm2Approved) lstAUpdatedFields.push("Holiday");
+
+  const lstBUpdatedFields: string[] = [];
+  if (mm3Approved) lstBUpdatedFields.push("Phone");
+  if (mm4Approved) lstBUpdatedFields.push("Name");
+
+  const lstCUpdatedFields: string[] = [];
+  if (mm5Approved) lstCUpdatedFields.push("Holiday");
+
+  const lstAMismatches = [!mm1Approved, !mm2Approved].filter(Boolean).length;
+  const lstBMismatches = [!mm3Approved, !mm4Approved].filter(Boolean).length;
+  const lstCMismatches = [!mm5Approved].filter(Boolean).length;
+
   const totalEligible = 9;
-  const mismatchCount = mismatches.length;
-  const matching = Math.max(1, totalEligible - mismatchCount + 2);
-  const score = Math.round((matching / totalEligible) * 100);
+  const activeCount = activeMismatches.length;
+  const matching = Math.max(1, totalEligible - activeCount);
+  const score = Math.min(100, Math.round((matching / totalEligible) * 100));
+
+  const pendingApprovals = activeCount;
+  const approvedCount = approvedMismatches.length;
+
+  const alerts: AlertItem[] = [];
+  if (approvedCount > 0) {
+    alerts.push({
+      id: "a-approved",
+      tone: "info",
+      text: `${approvedCount} proposal${approvedCount > 1 ? "s" : ""} approved — listing data updated on dashboard and ready for dispatch.`,
+    });
+  }
+  if (activeCount > 0) {
+    alerts.push({
+      id: "a1",
+      tone: "warn",
+      text: `${activeCount} active mismatch${activeCount > 1 ? "es" : ""} awaiting review against ${profileName}.`,
+    });
+  }
+  alerts.push({
+    id: "a2",
+    tone: "blocked",
+    text: "Mappls (MapmyIndia) is read-only — approved updates require partner export.",
+  });
 
   return {
     score,
     matching,
     eligible: totalEligible,
-    pendingApprovals: 3,
+    pendingApprovals,
+    approvedCount,
     recheckProgress: 0,
     listings: [
       {
@@ -127,11 +216,12 @@ export function buildDashboardSnapshot(profile: {
         writable: true,
         values: {
           name: profileName,
-          phone: "080 4123 4567",
-          hours: "Mon–Fri 8–20",
-          holiday: "Open Jan 26",
+          phone: "+918041234567",
+          hours: mm1Approved ? formattedProfileHours : "Mon–Fri 8–20",
+          holiday: mm2Approved ? profileHoliday : "Open Jan 26",
         },
-        mismatchCount: 2,
+        updatedFields: lstAUpdatedFields,
+        mismatchCount: lstAMismatches,
       },
       {
         id: "lst-b",
@@ -139,12 +229,13 @@ export function buildDashboardSnapshot(profile: {
         label: "Mappls (MapmyIndia)",
         writable: false,
         values: {
-          name: "Bombay Roastery",
-          phone: "080 4123 4567",
-          hours: "Mon–Sat 07:00-20:00",
+          name: mm4Approved ? profileName : "Bombay Roastery",
+          phone: mm3Approved ? profilePhone : "080 4123 4567",
+          hours: mm1Approved ? formattedProfileHours : "Mon–Sat 07:00-20:00",
           holiday: "—",
         },
-        mismatchCount: 2,
+        updatedFields: lstBUpdatedFields,
+        mismatchCount: lstBMismatches,
       },
       {
         id: "lst-c",
@@ -155,17 +246,14 @@ export function buildDashboardSnapshot(profile: {
           name: profileName,
           phone: profilePhone,
           hours: formattedProfileHours,
-          holiday: "Open Jan 26",
+          holiday: mm5Approved ? profileHoliday : "Open Jan 26",
         },
-        mismatchCount: 1,
+        updatedFields: lstCUpdatedFields,
+        mismatchCount: lstCMismatches,
       },
     ],
     mismatches,
-    alerts: [
-      { id: "a1", tone: "warn", text: `${mismatchCount} mismatches detected against ${profileName}.` },
-      { id: "a2", tone: "blocked", text: "Mappls (MapmyIndia) is read-only — phone changes will be logged as blocked." },
-      { id: "a3", tone: "info", text: "3 sync proposals are waiting for your approval." },
-    ],
+    alerts,
   };
 }
 
@@ -187,7 +275,6 @@ export const DEMO_DASHBOARD: DashboardSnapshot = buildDashboardSnapshot({
     "2026-08-15": "closed",
   },
 });
-
 
 export const KIND_LABEL: Record<MismatchKind, string> = {
   missing: "Missing",

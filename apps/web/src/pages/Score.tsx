@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TrendingUp } from "lucide-react";
 import { Progress } from "@animate-ui/react/primitives/base-ui/progress";
 import { cn } from "../lib/cn";
 import { muted } from "../lib/styles";
+import { getStoredProposalStatuses, type ProposalStatus } from "../lib/proposals-store";
 
 type FieldScore = {
   field: string;
@@ -22,79 +23,111 @@ type PlatformScore = {
   lastVerified: string;
 };
 
-const FIELD_SCORES: FieldScore[] = [
-  {
-    field: "phone",
-    label: "Phone Number",
-    score: 67,
-    matching: 2,
-    eligible: 3,
-    description: "Evaluated using E.164 canonical normalization across mock platforms.",
-  },
-  {
-    field: "name",
-    label: "Business Name",
-    score: 67,
-    matching: 2,
-    eligible: 3,
-    description: "Evaluates exact match against legal registered canonical name.",
-  },
-  {
-    field: "hours",
-    label: "Regular Hours",
-    score: 33,
-    matching: 1,
-    eligible: 3,
-    description: "Checks weekday and weekend operating schedules in 24h normalized time.",
-  },
-  {
-    field: "holidayHours",
-    label: "Holiday Hours",
-    score: 100,
-    matching: 2,
-    eligible: 2,
-    description: "Validates scheduled holiday closures and temporary override dates.",
-  },
-  {
-    field: "address",
-    label: "Physical Address",
-    score: 100,
-    matching: 3,
-    eligible: 3,
-    description: "Evaluates street number, street name, city, state, and postal code accuracy.",
-  },
-];
+function computeScores(statuses: Record<string, ProposalStatus>) {
+  const isApproved = (id: string) => statuses[id] === "APPROVED" || statuses[id] === "APPLIED";
 
-const PLATFORM_SCORES: PlatformScore[] = [
-  {
-    platform: "googleMaps",
-    name: "Google Maps (India)",
-    score: 85,
-    writable: true,
-    status: "needs_attention",
-    lastVerified: "14 mins ago",
-  },
-  {
-    platform: "mappls",
-    name: "Mappls (MapmyIndia)",
-    score: 67,
-    writable: false,
-    status: "needs_attention",
-    lastVerified: "28 mins ago",
-  },
-  {
-    platform: "justdial",
-    name: "Justdial (India)",
-    score: 100,
-    writable: true,
-    status: "healthy",
-    lastVerified: "1 hour ago",
-  },
-];
+  const mm1Approved = isApproved("mm-1") || isApproved("prop-2"); // Hours
+  const mm2Approved = isApproved("mm-2") || isApproved("prop-4"); // Google Maps Holiday
+  const mm3Approved = isApproved("mm-3") || isApproved("prop-1"); // Phone
+  const mm4Approved = isApproved("mm-4") || isApproved("prop-3"); // Name
+  const mm5Approved = isApproved("mm-5"); // Justdial Holiday
+
+  const phoneMatching = 2 + (mm3Approved ? 1 : 0);
+  const nameMatching = 2 + (mm4Approved ? 1 : 0);
+  const hoursMatching = 1 + (mm1Approved ? 1 : 0);
+  const holidayMatching = 1 + (mm2Approved ? 1 : 0);
+
+  const fields: FieldScore[] = [
+    {
+      field: "phone",
+      label: "Phone Number",
+      score: Math.round((phoneMatching / 3) * 100),
+      matching: phoneMatching,
+      eligible: 3,
+      description: "Evaluated using E.164 canonical normalization across connected platforms.",
+    },
+    {
+      field: "name",
+      label: "Business Name",
+      score: Math.round((nameMatching / 3) * 100),
+      matching: nameMatching,
+      eligible: 3,
+      description: "Evaluates exact match against legal registered canonical name.",
+    },
+    {
+      field: "hours",
+      label: "Operating Hours",
+      score: Math.round((hoursMatching / 2) * 100),
+      matching: hoursMatching,
+      eligible: 2,
+      description: "Checks weekday and weekend opening/closing time consistency.",
+    },
+    {
+      field: "holidayHours",
+      label: "Holiday Hours",
+      score: Math.round((holidayMatching / 2) * 100),
+      matching: holidayMatching,
+      eligible: 2,
+      description: "Validates scheduled holiday closures and temporary override dates.",
+    },
+    {
+      field: "address",
+      label: "Physical Address",
+      score: 100,
+      matching: 3,
+      eligible: 3,
+      description: "Evaluates street number, street name, city, state, and postal code accuracy.",
+    },
+  ];
+
+  const mapsScore = Math.round(((2 + (mm1Approved ? 1 : 0) + (mm2Approved ? 1 : 0)) / 4) * 100);
+  const mapplsScore = Math.round(((1 + (mm3Approved ? 1 : 0) + (mm4Approved ? 1 : 0)) / 3) * 100);
+  const justdialScore = Math.round(((3 + (mm5Approved ? 1 : 0)) / 4) * 100);
+
+  const platforms: PlatformScore[] = [
+    {
+      platform: "googleMaps",
+      name: "Google Maps (India)",
+      score: mapsScore,
+      writable: true,
+      status: mapsScore === 100 ? "healthy" : "needs_attention",
+      lastVerified: "Just now",
+    },
+    {
+      platform: "mappls",
+      name: "Mappls (MapmyIndia)",
+      score: mapplsScore,
+      writable: false,
+      status: mapplsScore === 100 ? "healthy" : "needs_attention",
+      lastVerified: "Just now",
+    },
+    {
+      platform: "justdial",
+      name: "Justdial (India)",
+      score: justdialScore,
+      writable: true,
+      status: justdialScore === 100 ? "healthy" : "needs_attention",
+      lastVerified: "Just now",
+    },
+  ];
+
+  return { fields, platforms };
+}
 
 export default function Score() {
-  const [fieldScores] = useState<FieldScore[]>(FIELD_SCORES);
-  const [platformScores] = useState<PlatformScore[]>(PLATFORM_SCORES);
+  const [scores, setScores] = useState(() => computeScores(getStoredProposalStatuses()));
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setScores(computeScores(getStoredProposalStatuses()));
+    };
+    window.addEventListener("listora_proposals_updated", handleUpdate);
+    return () => {
+      window.removeEventListener("listora_proposals_updated", handleUpdate);
+    };
+  }, []);
+
+  const { fields: fieldScores, platforms: platformScores } = scores;
 
   // Overall calculations
   const totalEligible = fieldScores.reduce((sum, f) => sum + f.eligible, 0);
@@ -113,7 +146,7 @@ export default function Score() {
         <div className="flex items-center gap-2">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
             <TrendingUp className="h-3.5 w-3.5" />
-            +12% from last cycle
+            Live sync active
           </span>
         </div>
       </div>

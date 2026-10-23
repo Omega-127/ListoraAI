@@ -39,18 +39,35 @@ export function ListingsGrid({ listings }: ListingsGridProps) {
                 ["Hours", listing.values.hours],
                 ["Holiday", listing.values.holiday],
               ] as const
-            ).map(([label, value]) => (
-              <div key={label} className="flex items-baseline justify-between gap-3 border-t border-[var(--border)] pt-2 first:border-t-0 first:pt-0">
-                <dt className={muted}>{label}</dt>
-                <dd className="truncate tabular-nums text-right font-mono max-w-[180px]">{value}</dd>
-              </div>
-            ))}
+            ).map(([label, value]) => {
+              const isUpdated = listing.updatedFields?.includes(label);
+              return (
+                <div key={label} className="flex items-baseline justify-between gap-3 border-t border-[var(--border)] pt-2 first:border-t-0 first:pt-0">
+                  <div className="flex items-center gap-1.5">
+                    <dt className={muted}>{label}</dt>
+                    {isUpdated && (
+                      <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-semibold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                        ✓ Approved
+                      </span>
+                    )}
+                  </div>
+                  <dd
+                    className={cn(
+                      "truncate tabular-nums text-right font-mono max-w-[180px]",
+                      isUpdated ? "text-emerald-700 dark:text-emerald-300 font-medium" : "[var(--foreground)]"
+                    )}
+                  >
+                    {value}
+                  </dd>
+                </div>
+              );
+            })}
           </dl>
 
-          <p className={`mt-4 text-xs ${listing.mismatchCount ? "text-[#fbbf24]" : muted}`}>
+          <p className={cn("mt-4 text-xs font-medium", listing.mismatchCount ? "text-amber-500" : "text-emerald-600 dark:text-emerald-400 flex items-center gap-1")}>
             {listing.mismatchCount
               ? `${listing.mismatchCount} mismatch${listing.mismatchCount === 1 ? "" : "es"}`
-              : "All checked fields match"}
+              : "✓ All checked fields match"}
           </p>
         </article>
       ))}
