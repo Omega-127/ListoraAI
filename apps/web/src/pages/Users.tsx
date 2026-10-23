@@ -1,16 +1,10 @@
 import { useState, useEffect } from "react";
-import { Users as UsersIcon, ShieldCheck, UserCheck, Eye, Check, RefreshCw } from "lucide-react";
+import { Users as UsersIcon, UserCheck, Eye, Check, RefreshCw } from "lucide-react";
 import { listUsers, updateUserRole, getStoredUser, setStoredUser, type UserProfile, type UserRole } from "../lib/api";
 import { cn } from "../lib/cn";
 import { focus, muted } from "../lib/styles";
 
-const ROLE_CONFIG: Record<UserRole, { label: string; tone: string; icon: typeof ShieldCheck; desc: string }> = {
-  ADMIN: {
-    label: "Admin",
-    tone: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-    icon: ShieldCheck,
-    desc: "Full system administration, profile modification, and user management.",
-  },
+const ROLE_CONFIG: Record<UserRole, { label: string; tone: string; icon: typeof UserCheck; desc: string }> = {
   OPERATOR: {
     label: "Operator",
     tone: "bg-amber-500/10 text-amber-400 border-amber-500/20",
@@ -87,8 +81,8 @@ export default function Users() {
     }, 800);
   };
 
-  const activeRole = currentUser?.role || "ADMIN";
-  const isAdmin = activeRole === "ADMIN";
+  const activeRole = currentUser?.role || "OPERATOR";
+  const isOperator = activeRole === "OPERATOR";
 
   return (
     <div className="space-y-6">
@@ -107,7 +101,7 @@ export default function Users() {
         {/* Demo Role Switcher */}
         <div className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[#0d0d0d]/90 p-2 text-xs">
           <span className={`font-medium ${muted}`}>Switch Role:</span>
-          {(["ADMIN", "OPERATOR", "VIEWER"] as UserRole[]).map((r) => (
+          {(["OPERATOR", "VIEWER"] as UserRole[]).map((r) => (
             <button
               key={r}
               type="button"
@@ -141,23 +135,21 @@ export default function Users() {
             <thead>
               <tr className="border-b border-[var(--border)] text-neutral-400">
                 <th className="py-2.5 pr-4 font-medium">Capability</th>
-                <th className="py-2.5 px-4 font-medium text-emerald-400">Admin</th>
                 <th className="py-2.5 px-4 font-medium text-amber-400">Operator</th>
                 <th className="py-2.5 px-4 font-medium text-blue-400">Viewer</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border)]">
               {[
-                { cap: "View Dashboard, Score, Reports & Audit Log", admin: true, op: true, viewer: true },
-                { cap: "Review Mismatches & Run AI Investigator", admin: true, op: true, viewer: false },
-                { cap: "Approve or Reject Sync Proposals", admin: true, op: true, viewer: false },
-                { cap: "Apply Updates to Platforms & Run Verification", admin: true, op: true, viewer: false },
-                { cap: "Edit Canonical Business Profile & Schedules", admin: true, op: false, viewer: false },
-                { cap: "Manage Users & Assign Roles", admin: true, op: false, viewer: false },
+                { cap: "View Dashboard, Score, Reports & Audit Log", op: true, viewer: true },
+                { cap: "Review Mismatches & Run AI Investigator", op: true, viewer: false },
+                { cap: "Approve or Reject Sync Proposals", op: true, viewer: false },
+                { cap: "Apply Updates to Platforms & Run Verification", op: true, viewer: false },
+                { cap: "Edit Canonical Business Profile & Schedules", op: true, viewer: false },
+                { cap: "Manage Users & Assign Roles", op: true, viewer: false },
               ].map((row, idx) => (
                 <tr key={idx} className="hover:bg-white/[0.02]">
                   <td className="py-2.5 pr-4 font-medium text-neutral-300">{row.cap}</td>
-                  <td className="py-2.5 px-4 text-emerald-400">{row.admin ? "✓ Allowed" : "—"}</td>
                   <td className="py-2.5 px-4 text-amber-400">{row.op ? "✓ Allowed" : "— Read Only"}</td>
                   <td className="py-2.5 px-4 text-blue-400">{row.viewer ? "✓ Allowed" : "— Forbidden"}</td>
                 </tr>
@@ -173,7 +165,7 @@ export default function Users() {
           <div>
             <h2 className="text-base font-semibold">Active Workspace Users</h2>
             <p className={`text-xs ${muted}`}>
-              {isAdmin ? "You can change user roles below." : "Viewing only (Admin required to alter user roles)."}
+              {isOperator ? "You can change user roles below." : "Viewing only (Operator required to alter user roles)."}
             </p>
           </div>
           {loading && <RefreshCw className="h-4 w-4 animate-spin text-neutral-400" />}
@@ -205,7 +197,7 @@ export default function Users() {
 
                 {/* Role select dropdown / badge */}
                 <div className="flex items-center gap-2 pl-12 sm:pl-0">
-                  {isAdmin ? (
+                  {isOperator ? (
                     <select
                       value={u.role}
                       onChange={(e) => handleRoleChange(u.id, e.target.value as UserRole)}
@@ -214,7 +206,6 @@ export default function Users() {
                         focus
                       )}
                     >
-                      <option value="ADMIN">Admin (Full Control)</option>
                       <option value="OPERATOR">Operator (Approvals & Sync)</option>
                       <option value="VIEWER">Viewer (Read-Only)</option>
                     </select>

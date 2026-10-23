@@ -290,7 +290,7 @@ export default function Approvals() {
         <div className="flex items-center gap-2.5 rounded-lg border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-xs text-blue-300">
           <Eye className="h-4 w-4 shrink-0 text-blue-400" />
           <span>
-            <strong>Viewer Role (Read-Only):</strong> You can inspect all proposed diffs, risk calculations, and agent rationales. Approval and rejection actions require an <strong>Operator</strong> or <strong>Admin</strong> role.
+            <strong>Viewer Role (Read-Only):</strong> You can inspect all proposed diffs, risk calculations, and agent rationales. Approval and rejection actions require an <strong>Operator</strong> role.
           </span>
         </div>
       )}

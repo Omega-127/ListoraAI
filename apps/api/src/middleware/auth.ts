@@ -1,6 +1,6 @@
 /**
  * Authentication and Role-based Authorization middleware.
- * Verifies HttpOnly JWT session cookie and enforces role permissions (ADMIN, OPERATOR, VIEWER).
+ * Verifies HttpOnly JWT session cookie and enforces role permissions (OPERATOR, VIEWER).
  */
 import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
@@ -42,7 +42,7 @@ export function requireAuth(req: Request, res: Response, next: NextFunction): vo
  * Enforces role-based access control.
  * Must be used after requireAuth.
  *
- * Example: router.post('/approve', requireAuth, requireRole('ADMIN', 'OPERATOR'), handler);
+ * Example: router.post('/approve', requireAuth, requireRole('OPERATOR'), handler);
  */
 export function requireRole(...allowedRoles: UserRole[]) {
   return (req: Request, res: Response, next: NextFunction): void => {

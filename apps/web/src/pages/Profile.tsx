@@ -93,11 +93,11 @@ export default function Profile() {
   };
 
   const user = getStoredUser();
-  // Allow ADMIN or default session to edit/save canonical profile smoothly
-  const isAdmin = !user || user.role === "ADMIN" || user.role === "OPERATOR";
+  // Allow OPERATOR or default session to edit/save canonical profile smoothly
+  const canEdit = !user || user.role === "OPERATOR";
 
   const handleReset = async () => {
-    if (!isAdmin) return;
+    if (!canEdit) return;
     setProfile(DEFAULT_BUSINESS_PROFILE);
     await updateBusinessProfile(DEFAULT_BUSINESS_PROFILE);
   };
@@ -112,7 +112,7 @@ export default function Profile() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {isAdmin ? (
+          {canEdit ? (
             <>
               <button
                 type="button"
@@ -146,11 +146,11 @@ export default function Profile() {
         </div>
       </div>
 
-      {!isAdmin && (
+      {!canEdit && (
         <div className="flex items-center gap-2.5 rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-xs text-amber-300">
           <ShieldAlert className="h-4 w-4 shrink-0 text-amber-400" />
           <span>
-            <strong>Admin Access Required:</strong> You are signed in as an <strong>{user?.role || "Operator"}</strong>. Modifying canonical business information (NAP, regular operating hours, or holiday schedules) is restricted to Administrators.
+            <strong>Operator Access Required:</strong> You are signed in as a <strong>{user?.role || "Viewer"}</strong>. Modifying canonical business information (NAP, regular operating hours, or holiday schedules) is restricted to Operators.
           </span>
         </div>
       )}

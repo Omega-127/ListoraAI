@@ -5,12 +5,12 @@
  *   - Health endpoint (with DB connectivity)
  *   - Auth guards on all protected routes
  *   - POST /auth/login validation and credentials
- *   - Demo user login (admin@listora.ai / password123)
+ *   - Demo user login (operator@listora.ai / password123)
  *   - GET /auth/me with valid session
  *   - POST /auth/logout
  *   - PUT + PATCH /api/v1/profile auth enforcement
  *   - GET /api/v1/profile auth enforcement
- *   - 403 role enforcement on OPERATOR-restricted profile write
+ *   - 403 role enforcement on VIEWER-restricted profile write
  *   - Listings, mismatches, proposals, score, audit, alerts guards
  *   - proposals/analyze route is reachable (not swallowed by /:id)
  *
@@ -113,7 +113,7 @@ describe('POST /auth/login — validation', () => {
   it('returns 401 for wrong password', async () => {
     const res = await request(app)
       .post('/auth/login')
-      .send({ email: 'admin@listora.ai', password: 'wrong-password-xyz' });
+      .send({ email: 'operator@listora.ai', password: 'wrong-password-xyz' });
     expect(res.status).toBe(401);
   });
 });
@@ -122,25 +122,16 @@ describe('POST /auth/login — validation', () => {
 // Demo user login (uses in-memory users, no DB needed)
 // ---------------------------------------------------------------------------
 describe('POST /auth/login — demo users', () => {
-  it('logs in admin@listora.ai with password123 and returns session cookie', async () => {
-    const res = await request(app)
-      .post('/auth/login')
-      .send({ email: 'admin@listora.ai', password: 'password123' });
-
-    expect(res.status).toBe(200);
-    expect(res.body.user).toBeDefined();
-    expect(res.body.user.email).toBe('admin@listora.ai');
-    expect(res.body.user.role).toBe('ADMIN');
-    expect(res.headers['set-cookie']).toBeDefined();
-  });
-
-  it('logs in operator@listora.ai with password123', async () => {
+  it('logs in operator@listora.ai with password123 and returns session cookie', async () => {
     const res = await request(app)
       .post('/auth/login')
       .send({ email: 'operator@listora.ai', password: 'password123' });
 
     expect(res.status).toBe(200);
+    expect(res.body.user).toBeDefined();
+    expect(res.body.user.email).toBe('operator@listora.ai');
     expect(res.body.user.role).toBe('OPERATOR');
+    expect(res.headers['set-cookie']).toBeDefined();
   });
 
   it('logs in viewer@listora.ai with password123', async () => {
@@ -161,15 +152,15 @@ describe('GET /auth/me — with valid session', () => {
     // First login to get the session cookie
     const loginRes = await request(app)
       .post('/auth/login')
-      .send({ email: 'admin@listora.ai', password: 'password123' });
+      .send({ email: 'operator@listora.ai', password: 'password123' });
 
     const cookie = loginRes.headers['set-cookie'];
     expect(loginRes.status).toBe(200);
 
     const meRes = await request(app).get('/auth/me').set('Cookie', cookie);
     expect(meRes.status).toBe(200);
-    expect(meRes.body.user.email).toBe('admin@listora.ai');
-    expect(meRes.body.user.role).toBe('ADMIN');
+    expect(meRes.body.user.email).toBe('operator@listora.ai');
+    expect(meRes.body.user.role).toBe('OPERATOR');
   });
 });
 
@@ -180,7 +171,7 @@ describe('POST /auth/logout', () => {
   it('returns 200 and clears the session cookie', async () => {
     const loginRes = await request(app)
       .post('/auth/login')
-      .send({ email: 'admin@listora.ai', password: 'password123' });
+      .send({ email: 'operator@listora.ai', password: 'password123' });
 
     const cookie = loginRes.headers['set-cookie'];
 
@@ -194,45 +185,45 @@ describe('POST /auth/logout', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Profile — requires ADMIN role
+// Profile — requires OPERATOR role
 // ---------------------------------------------------------------------------
 describe('Profile endpoints — role enforcement', () => {
-  let adminCookie: string;
   let operatorCookie: string;
+  let viewerCookie: string;
 
   beforeAll(async () => {
-    const adminLogin = await request(app)
-      .post('/auth/login')
-      .send({ email: 'admin@listora.ai', password: 'password123' });
-    adminCookie = adminLogin.headers['set-cookie'];
-
     const opLogin = await request(app)
       .post('/auth/login')
       .send({ email: 'operator@listora.ai', password: 'password123' });
     operatorCookie = opLogin.headers['set-cookie'];
+
+    const viewerLogin = await request(app)
+      .post('/auth/login')
+      .send({ email: 'viewer@listora.ai', password: 'password123' });
+    viewerCookie = viewerLogin.headers['set-cookie'];
   });
 
-  it('PUT /api/v1/profile → 403 for OPERATOR role', async () => {
+  it('PUT /api/v1/profile → 403 for VIEWER role', async () => {
     const res = await request(app)
       .put('/api/v1/profile')
-      .set('Cookie', operatorCookie)
+      .set('Cookie', viewerCookie)
       .send({ name: 'Updated Name' });
     expect(res.status).toBe(403);
     expect(res.body.error).toMatch(/Forbidden/i);
   });
 
-  it('PATCH /api/v1/profile → 403 for OPERATOR role', async () => {
+  it('PATCH /api/v1/profile → 403 for VIEWER role', async () => {
     const res = await request(app)
       .patch('/api/v1/profile')
-      .set('Cookie', operatorCookie)
+      .set('Cookie', viewerCookie)
       .send({ name: 'Updated Name' });
     expect(res.status).toBe(403);
   });
 
-  it('PUT /api/v1/profile → 400 for invalid phone when authenticated as ADMIN', async () => {
+  it('PUT /api/v1/profile → 400 for invalid phone when authenticated as OPERATOR', async () => {
     const res = await request(app)
       .put('/api/v1/profile')
-      .set('Cookie', adminCookie)
+      .set('Cookie', operatorCookie)
       .send({ phone: 'not-a-phone-number' });
     // Will be 400 (invalid phone) or 500 (DB not running in test)
     // We test that it does NOT return 401/403 (auth/authz passed)
@@ -245,19 +236,19 @@ describe('Profile endpoints — role enforcement', () => {
 // Proposals /analyze route — must not be swallowed by /:id
 // ---------------------------------------------------------------------------
 describe('POST /api/v1/proposals/analyze — route reachability', () => {
-  let adminCookie: string;
+  let operatorCookie: string;
 
   beforeAll(async () => {
     const loginRes = await request(app)
       .post('/auth/login')
-      .send({ email: 'admin@listora.ai', password: 'password123' });
-    adminCookie = loginRes.headers['set-cookie'];
+      .send({ email: 'operator@listora.ai', password: 'password123' });
+    operatorCookie = loginRes.headers['set-cookie'];
   });
 
   it('is reachable (returns 200, not 404) with valid auth', async () => {
     const res = await request(app)
       .post('/api/v1/proposals/analyze')
-      .set('Cookie', adminCookie)
+      .set('Cookie', operatorCookie)
       .send({});
     // 200 (heuristic mode) or 500 (DB not available) — NOT 404
     expect(res.status).not.toBe(404);

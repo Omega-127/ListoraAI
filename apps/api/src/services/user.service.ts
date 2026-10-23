@@ -17,14 +17,6 @@ export interface UserSummary {
 
 // In-memory demo users for fast testing / prototype demo mode
 const DEMO_USERS: Record<string, { id: string; email: string; name: string; role: UserRole; passwordHash: string }> = {
-  'admin@listora.ai': {
-    id: 'user-admin-demo',
-    email: 'admin@listora.ai',
-    name: 'Admin User',
-    role: 'ADMIN',
-    // Hash for 'password123'
-    passwordHash: '$2a$10$w3qgQ68v1r/tHkJ2LwL1re7Q1EcvB/4vV/GjQW729hL9tZvxEGyve',
-  },
   'operator@listora.ai': {
     id: 'user-operator-demo',
     email: 'operator@listora.ai',
@@ -74,8 +66,8 @@ export async function findUserByEmail(email: string) {
     return {
       id: 'owner-env-user',
       email: env.OWNER_EMAIL,
-      name: 'Owner Admin',
-      role: 'ADMIN' as UserRole,
+      name: 'Business Owner',
+      role: 'OPERATOR' as UserRole,
       passwordHash: env.OWNER_PASSWORD_HASH,
     };
   }

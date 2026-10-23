@@ -78,7 +78,6 @@ export type UpdateOutcomeValue = (typeof UPDATE_OUTCOMES)[keyof typeof UPDATE_OU
 
 // Multi-user roles
 export const USER_ROLES = {
-  ADMIN: 'ADMIN',
   OPERATOR: 'OPERATOR',
   VIEWER: 'VIEWER',
 } as const;

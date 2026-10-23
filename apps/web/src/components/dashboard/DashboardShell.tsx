@@ -12,7 +12,6 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   LogOut,
-  ShieldCheck,
   UserCheck,
   Eye,
 } from "lucide-react";
@@ -39,14 +38,6 @@ const NAV: {
 ];
 
 function RoleBadge({ role }: { role: UserRole }) {
-  if (role === "ADMIN") {
-    return (
-      <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-400">
-        <ShieldCheck className="h-3 w-3" />
-        Admin
-      </span>
-    );
-  }
   if (role === "OPERATOR") {
     return (
       <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-400">
@@ -103,7 +94,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
     navigate("/login");
   };
 
-  const activeRole: UserRole = user?.role || "ADMIN";
+  const activeRole: UserRole = user?.role || "OPERATOR";
 
   return (
     <>
@@ -125,7 +116,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
         <div className="flex items-center justify-between px-2">
           <div className="min-w-0">
             <p className="text-xs font-medium text-neutral-200 truncate">{user?.name || "Active Session"}</p>
-            <p className={`text-[11px] truncate ${muted}`}>{user?.email || "admin@listora.ai"}</p>
+            <p className={`text-[11px] truncate ${muted}`}>{user?.email || "operator@listora.ai"}</p>
           </div>
           <RoleBadge role={activeRole} />
         </div>
@@ -182,7 +173,7 @@ function DesktopSidebar() {
 function ShellChrome() {
   const { toggleSidebar, isMobile, openMobile } = Sidebar.useSidebar();
   const [user] = useState<UserProfile | null>(getStoredUser());
-  const activeRole: UserRole = user?.role || "ADMIN";
+  const activeRole: UserRole = user?.role || "OPERATOR";
 
   return (
     <>

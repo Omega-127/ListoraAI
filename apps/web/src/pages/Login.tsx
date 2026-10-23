@@ -27,10 +27,7 @@ export default function Login() {
   }
 
   function fillDemo(role: UserRole) {
-    if (role === "ADMIN") {
-      setEmail("admin@listora.ai");
-      setPassword("password123");
-    } else if (role === "OPERATOR") {
+    if (role === "OPERATOR") {
       setEmail("operator@listora.ai");
       setPassword("password123");
     } else {
