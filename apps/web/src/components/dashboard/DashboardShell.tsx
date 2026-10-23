@@ -1,4 +1,4 @@
-import { useState, useEffect, type CSSProperties } from "react";
+import { type CSSProperties } from "react";
 import { NavLink, Outlet, Link, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -20,7 +20,8 @@ import * as Sidebar from "@animate-ui/react/primitives/sidebar";
 import { Bell } from "../animate-ui/icons/bell";
 import { cn } from "../../lib/cn";
 import { focus, muted } from "../../lib/styles";
-import { getStoredUser, logout, type UserRole, type UserProfile } from "../../lib/api";
+import { useAuth } from "../../context/AuthContext";
+import type { UserRole } from "../../lib/api";
 
 const NAV: {
   to: string;
@@ -101,18 +102,14 @@ function NavItems({ onNavigate, collapsed }: { onNavigate?: () => void; collapse
 
 function SidebarBody({ onNavigate, collapsed }: { onNavigate?: () => void; collapsed?: boolean }) {
   const navigate = useNavigate();
-  const [user, setUser] = useState<UserProfile | null>(getStoredUser());
-
-  useEffect(() => {
-    setUser(getStoredUser());
-  }, []);
+  const { user, logout } = useAuth();
 
   const handleLogout = async () => {
     await logout();
-    navigate("/login");
+    navigate("/login", { replace: true });
   };
 
-  const activeRole: UserRole = user?.role || "ADMIN";
+  const activeRole: UserRole = user?.role || "VIEWER";
 
   return (
     <>
@@ -247,8 +244,8 @@ function DesktopSidebar() {
 
 function ShellChrome() {
   const { toggleSidebar, isMobile, openMobile, open } = Sidebar.useSidebar();
-  const [user] = useState<UserProfile | null>(getStoredUser());
-  const activeRole: UserRole = user?.role || "ADMIN";
+  const { user } = useAuth();
+  const activeRole: UserRole = user?.role || "VIEWER";
   const isOpen = isMobile ? openMobile : open;
 
   return (

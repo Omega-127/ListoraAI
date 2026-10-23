@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Users as UsersIcon, ShieldCheck, UserCheck, Eye, Check, RefreshCw } from "lucide-react";
-import { listUsers, updateUserRole, getStoredUser, setStoredUser, type UserProfile, type UserRole } from "../lib/api";
+import { listUsers, updateUserRole, type UserProfile, type UserRole } from "../lib/api";
+import { useAuth } from "../context/AuthContext";
 import { cn } from "../lib/cn";
 import { focus, muted } from "../lib/styles";
 
@@ -26,7 +27,7 @@ const ROLE_CONFIG: Record<UserRole, { label: string; tone: string; icon: typeof 
 };
 
 export default function Users() {
-  const [currentUser, setCurrentUser] = useState<UserProfile | null>(getStoredUser());
+  const { user: currentUser, updateUser } = useAuth();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -51,8 +52,7 @@ export default function Users() {
       );
       if (currentUser?.id === userId) {
         const updated = { ...currentUser, role: newRole };
-        setCurrentUser(updated);
-        setStoredUser(updated);
+        updateUser(updated);
       }
       setSuccessMsg(`Role successfully updated to ${newRole}`);
       setTimeout(() => setSuccessMsg(null), 3000);
@@ -63,8 +63,7 @@ export default function Users() {
       );
       if (currentUser?.id === userId) {
         const updated = { ...currentUser, role: newRole };
-        setCurrentUser(updated);
-        setStoredUser(updated);
+        updateUser(updated);
       }
       setSuccessMsg(`Role switched to ${newRole} (Demo mode)`);
       setTimeout(() => setSuccessMsg(null), 3000);
@@ -78,12 +77,10 @@ export default function Users() {
       name: currentUser?.name || "Active User",
       role: newRole,
     };
-    setCurrentUser(updated);
-    setStoredUser(updated);
+    updateUser(updated);
     setSuccessMsg(`Simulating active session as: ${newRole}`);
     setTimeout(() => {
       setSuccessMsg(null);
-      window.location.reload();
     }, 800);
   };
 

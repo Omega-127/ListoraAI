@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Building2, MapPin, Phone, Clock, Calendar, Check, Save, RotateCcw, Lock, ShieldAlert } from "lucide-react";
 import { cn } from "../lib/cn";
 import { focus, muted } from "../lib/styles";
-import { getStoredUser } from "../lib/api";
+import { useAuth } from "../context/AuthContext";
 
 
 interface BusinessProfileData {
@@ -91,7 +91,7 @@ export default function Profile() {
     setTimeout(() => setSaved(false), 3000);
   };
 
-  const user = getStoredUser();
+  const { user } = useAuth();
   const isAdmin = user?.role === "ADMIN";
 
   const handleReset = () => {
