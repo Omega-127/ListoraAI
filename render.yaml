@@ -19,7 +19,9 @@ services:
       - key: PORT
         value: 10000
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: listora-postgres-mho4
+          property: connectionString
       - key: ANTHROPIC_API_KEY
         sync: false
       - key: SESSION_SECRET
