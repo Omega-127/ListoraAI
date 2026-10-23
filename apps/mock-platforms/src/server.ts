@@ -50,6 +50,19 @@ app.listen(PORT, () => {
   console.info(`  /google-maps-india  → Google Maps (India) (read-write)`);
   console.info(`  /mappls-india       → Mappls / MapmyIndia  (read-only)`);
   console.info(`  /justdial-india     → Justdial (India)     (holiday-sync)`);
+
+  if (process.env.NODE_ENV === 'production') {
+    const externalUrl = process.env.RENDER_EXTERNAL_URL;
+    if (externalUrl) {
+      setInterval(async () => {
+        try {
+          await fetch(`${externalUrl}/health`);
+        } catch {
+          // ignore
+        }
+      }, 13 * 60 * 1000);
+    }
+  }
 });
 
 process.on('unhandledRejection', (reason) => {
