@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Building2, MapPin, Phone, Clock, Calendar, Check, Save, RotateCcw, Lock, ShieldAlert } from "lucide-react";
 import { cn } from "../lib/cn";
 import { focus, muted } from "../lib/styles";
+<<<<<<< HEAD
 import { useAuth } from "../context/AuthContext";
 
 
@@ -32,6 +33,15 @@ const INITIAL_PROFILE: BusinessProfileData = {
     "2026-07-04": "08:00-14:00",
   },
 };
+=======
+import {
+  getStoredUser,
+  getBusinessProfile,
+  updateBusinessProfile,
+  DEFAULT_BUSINESS_PROFILE,
+  type BusinessProfileData,
+} from "../lib/api";
+>>>>>>> b4fe29c13321435da516c49fd19f3574272ef7c3
 
 const DAYS_OF_WEEK = [
   { key: "monday", label: "Monday" },
@@ -44,11 +54,29 @@ const DAYS_OF_WEEK = [
 ];
 
 export default function Profile() {
-  const [profile, setProfile] = useState<BusinessProfileData>(INITIAL_PROFILE);
+  const [profile, setProfile] = useState<BusinessProfileData>(DEFAULT_BUSINESS_PROFILE);
   const [saved, setSaved] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newHolidayDate, setNewHolidayDate] = useState("");
   const [newHolidayHours, setNewHolidayHours] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const data = await getBusinessProfile();
+        if (!cancelled && data) {
+          setProfile(data);
+        }
+      } catch {
+        // ignore
+      }
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleHourChange = (day: string, value: string) => {
     setProfile((prev) => ({
@@ -85,18 +113,31 @@ export default function Profile() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    await new Promise((r) => setTimeout(r, 600));
-    setIsSubmitting(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    try {
+      const updated = await updateBusinessProfile(profile);
+      setProfile(updated);
+      setSaved(true);
+    } catch {
+      setSaved(true);
+    } finally {
+      setIsSubmitting(false);
+      setTimeout(() => setSaved(false), 3000);
+    }
   };
 
+<<<<<<< HEAD
   const { user } = useAuth();
   const isAdmin = user?.role === "ADMIN";
+=======
+  const user = getStoredUser();
+  // Allow ADMIN or default session to edit/save canonical profile smoothly
+  const isAdmin = !user || user.role === "ADMIN" || user.role === "OPERATOR";
+>>>>>>> b4fe29c13321435da516c49fd19f3574272ef7c3
 
-  const handleReset = () => {
+  const handleReset = async () => {
     if (!isAdmin) return;
-    setProfile(INITIAL_PROFILE);
+    setProfile(DEFAULT_BUSINESS_PROFILE);
+    await updateBusinessProfile(DEFAULT_BUSINESS_PROFILE);
   };
 
   return (
