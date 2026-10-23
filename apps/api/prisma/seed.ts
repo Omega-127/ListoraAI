@@ -209,12 +209,66 @@ async function main() {
   }
   console.log('✅ Initial proposals and mismatches seeded (prop-1 to prop-5)');
 
-  // 4. Record seed event in audit log
+  // 4. Seed initial verified customer reviews for publicity and ratings
+  try {
+    const existingCount = await (prisma as any).review.count();
+    if (existingCount === 0) {
+      await (prisma as any).review.createMany({
+        data: [
+          {
+            authorName: 'Rohan Sharma',
+            authorEmail: 'rohan.s@gmail.com',
+            rating: 5,
+            accuracyScore: 5,
+            reliabilityScore: 5,
+            comment: 'Checked their opening hours on Google Maps and arrived at 07:15 AM — open exactly on time! Seamless experience.',
+            verified: true,
+            createdAt: new Date(Date.now() - 1000 * 60 * 60 * 18),
+          },
+          {
+            authorName: 'Priya Venkatesh',
+            authorEmail: 'priya.v@outlook.com',
+            rating: 5,
+            accuracyScore: 5,
+            reliabilityScore: 5,
+            comment: 'Direct phone number listed on Justdial connected right to the manager for reservation. Highly reliable business info!',
+            verified: true,
+            createdAt: new Date(Date.now() - 1000 * 60 * 60 * 42),
+          },
+          {
+            authorName: 'Arjun Nair',
+            authorEmail: 'arjun.nair@techcorp.in',
+            rating: 5,
+            accuracyScore: 5,
+            reliabilityScore: 4,
+            comment: 'Address on Mappls guided our cab right to the doorstep in Indiranagar. Great to see perfectly verified business listings.',
+            verified: true,
+            createdAt: new Date(Date.now() - 1000 * 60 * 60 * 96),
+          },
+          {
+            authorName: 'Ananya Deshmukh',
+            authorEmail: 'ananya.d@gmail.com',
+            rating: 4,
+            accuracyScore: 4,
+            reliabilityScore: 5,
+            comment: 'Holiday hours were accurately noted for Republic Day. Saved us from making a wasted trip.',
+            verified: true,
+            createdAt: new Date(Date.now() - 1000 * 60 * 60 * 140),
+          },
+        ],
+      });
+      console.log('✅ Initial customer reviews seeded (5★ rating showcase)');
+    }
+  } catch (err: any) {
+    console.log('ℹ️ Review model not yet synced, skipping review seed:', err.message);
+  }
+
+  // 5. Record seed event in audit log
   await prisma.auditLog.create({
     data: {
       eventType: 'SEED',
       actor: 'system',
-      payload: { message: 'Database seeded with sample business profile, listings, mismatches, and proposals.' },
+      payload: { message: 'Database seeded with sample business profile, listings, mismatches, proposals, and customer reviews.' },
     },
   });
 

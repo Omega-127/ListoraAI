@@ -84,6 +84,8 @@ The hackathon prototype runs against mock listing platforms.
 | **Business Consistency Score** | Shows the share of checked, eligible fields that match the approved profile, with the calculation visible. |
 | **Change History and Audit Log** | Records old and new values, approvals, timestamps, update results, and verification outcomes. |
 | **Smart Alerts and Reminders** | Highlights unresolved mismatches, pending approvals, blocked listings, and failed updates. |
+| **Customer Ratings & Real-Time Impact** | Lets visitors rate listing accuracy with instant feedback on how their review shifts the public trust score (`/rate`). |
+| **Owner Publicity & Embed Badges** | Unlocks shareable "Top-Rated Verified" social marketing cards and embeddable website trust badges (`/dashboard/publicity`, `/badge`). |
 
 ---
 

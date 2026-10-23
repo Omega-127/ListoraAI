@@ -14,12 +14,18 @@ import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Users from "./pages/Users";
+import PublicRating from "./pages/PublicRating";
+import PublicityHub from "./pages/PublicityHub";
+import EmbedBadge from "./pages/EmbedBadge";
 
 export default function App() {
   return (
     <AuthProvider>
       <Routes>
         <Route path="/" element={<Landing />} />
+        <Route path="/rate" element={<PublicRating />} />
+        <Route path="/reviews" element={<PublicRating />} />
+        <Route path="/badge" element={<EmbedBadge />} />
         <Route
           path="/login"
           element={
@@ -49,6 +55,7 @@ export default function App() {
           <Route path="approvals" element={<Approvals />} />
           <Route path="report" element={<Report />} />
           <Route path="score" element={<Score />} />
+          <Route path="publicity" element={<PublicityHub />} />
           <Route path="audit" element={<Audit />} />
           <Route path="alerts" element={<Alerts />} />
           <Route path="users" element={<Users />} />
