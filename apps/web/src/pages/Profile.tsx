@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { Building2, MapPin, Phone, Clock, Calendar, Check, Save, RotateCcw, Lock, ShieldAlert } from "lucide-react";
 import { cn } from "../lib/cn";
 import { focus, muted } from "../lib/styles";
+import { useAuth } from "../context/AuthContext";
 import {
-  getStoredUser,
   getBusinessProfile,
   updateBusinessProfile,
   DEFAULT_BUSINESS_PROFILE,
@@ -92,8 +92,8 @@ export default function Profile() {
     }
   };
 
-  const user = getStoredUser();
-  // Allow ADMIN or default session to edit/save canonical profile smoothly
+  const { user } = useAuth();
+  // Allow ADMIN or OPERATOR to edit/save canonical profile
   const isAdmin = !user || user.role === "ADMIN" || user.role === "OPERATOR";
 
   const handleReset = async () => {

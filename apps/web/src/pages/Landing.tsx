@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { focus } from "../lib/styles";
+import { useAuth } from "../context/AuthContext";
+import ThemeTogglerDemo from "../components/ThemeToggler";
 import { Sparkles, ShieldCheck, CheckCircle2, ArrowRight, Database, RefreshCw, Bot, Lock } from "lucide-react";
 
 
@@ -551,6 +553,8 @@ function HowItWorks() {
 }
 
 function Footer() {
+  const { isAuthenticated, logout } = useAuth();
+
   return (
     <footer className="border-t border-[var(--border)] bg-[#070707] text-[var(--muted-foreground)]">
       <div className="mx-auto max-w-6xl px-6 py-16 md:px-[8vw]">
@@ -643,8 +647,23 @@ function Footer() {
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-[var(--border)] pt-8 text-xs sm:flex-row">
           <p>© {new Date().getFullYear()} ListoraAI Inc. All rights reserved.</p>
           <div className="flex flex-wrap items-center gap-6">
-            <Link to="/login" className="hover:text-white transition-colors">Sign In</Link>
-            <Link to="/register" className="hover:text-white transition-colors">Register</Link>
+            {isAuthenticated ? (
+              <>
+                <Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
+                <button
+                  type="button"
+                  onClick={() => logout()}
+                  className="hover:text-white transition-colors cursor-pointer"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="hover:text-white transition-colors">Sign In</Link>
+                <Link to="/register" className="hover:text-white transition-colors">Register</Link>
+              </>
+            )}
             <a href="#how-it-works" className="hover:text-white transition-colors">Documentation</a>
             <span className="font-mono text-[10px] text-white/30">v1.0.0-orchestrated</span>
           </div>
@@ -655,6 +674,7 @@ function Footer() {
 }
 
 export default function Landing() {
+  const { isAuthenticated, logout } = useAuth();
   const [applied, setApplied] = useState(false);
   const matched = applied ? 8 : 6;
 
@@ -665,13 +685,35 @@ export default function Landing() {
         <nav className="flex items-center gap-6 text-sm text-[var(--muted-foreground)]">
           <a href="#features" className={`hover:text-[var(--foreground)] ${focus}`}>Features</a>
           <a href="#how-it-works" className={`hover:text-[var(--foreground)] ${focus}`}>How it works</a>
-          <Link to="/login" className={`hover:text-[var(--foreground)] ${focus}`}>Log in</Link>
-          <Link
-            to="/register"
-            className={`hidden sm:inline-flex rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] px-3 py-1.5 text-xs font-medium hover:brightness-110 ${focus}`}
-          >
-            Get started
-          </Link>
+          {isAuthenticated ? (
+            <div className="flex items-center gap-3">
+              <Link
+                to="/dashboard"
+                className={`inline-flex items-center gap-1.5 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] px-3 py-1.5 text-xs font-medium hover:brightness-110 ${focus}`}
+              >
+                <span>Dashboard</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+              <button
+                type="button"
+                onClick={() => logout()}
+                className={`text-xs hover:text-[var(--foreground)] transition-colors cursor-pointer ${focus}`}
+              >
+                Sign out
+              </button>
+            </div>
+          ) : (
+            <>
+              <Link to="/login" className={`hover:text-[var(--foreground)] ${focus}`}>Log in</Link>
+              <Link
+                to="/register"
+                className={`hidden sm:inline-flex rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] px-3 py-1.5 text-xs font-medium hover:brightness-110 ${focus}`}
+              >
+                Get started
+              </Link>
+            </>
+          )}
+          <ThemeTogglerDemo />
         </nav>
       </header>
 
@@ -693,7 +735,19 @@ export default function Landing() {
         </p>
 
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link to="/register" className={`rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] font-medium px-5 py-2.5 ${focus}`}>Check my listings</Link>
+          {isAuthenticated ? (
+            <Link
+              to="/dashboard"
+              className={`inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] font-medium px-5 py-2.5 hover:brightness-110 ${focus}`}
+            >
+              <span>Open Dashboard</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          ) : (
+            <Link to="/register" className={`rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] font-medium px-5 py-2.5 ${focus}`}>
+              Check my listings
+            </Link>
+          )}
           <a href="#how-it-works" className={`rounded-lg border border-[var(--border)] font-medium px-5 py-2.5 hover:bg-white/5 ${focus}`}>See how it works</a>
         </div>
 

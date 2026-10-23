@@ -1,4 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import PublicOnlyRoute from "./components/PublicOnlyRoute";
 import DashboardShell from "./components/dashboard/DashboardShell";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
@@ -12,17 +15,35 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Users from "./pages/Users";
 
-
-import { AuthProvider } from "./context/AuthContext";
-
 export default function App() {
   return (
     <AuthProvider>
       <Routes>
         <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<DashboardShell />}>
+        <Route
+          path="/login"
+          element={
+            <PublicOnlyRoute>
+              <Login />
+            </PublicOnlyRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <PublicOnlyRoute>
+              <Register />
+            </PublicOnlyRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardShell />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<Dashboard />} />
           <Route path="profile" element={<Profile />} />
           <Route path="approvals" element={<Approvals />} />
@@ -37,4 +58,3 @@ export default function App() {
     </AuthProvider>
   );
 }
-
