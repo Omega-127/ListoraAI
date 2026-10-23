@@ -12,19 +12,19 @@ export function ListingsGrid({ listings }: ListingsGridProps) {
       {listings.map((listing) => (
         <article
           key={listing.id}
-          className="rounded-xl border border-[var(--border)] bg-[#0d0d0d]/80 p-4"
+          className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 shadow-sm"
         >
           <div className="flex items-start justify-between gap-2">
             <div>
-              <h3 className="font-medium">{listing.label}</h3>
+              <h3 className="font-medium text-[var(--foreground)]">{listing.label}</h3>
               <p className={`mt-0.5 text-xs ${muted}`}>{listing.platform}</p>
             </div>
             <span
               className={cn(
                 "rounded-full px-2 py-0.5 text-[11px] font-medium",
                 listing.writable
-                  ? "bg-[#10b981]/10 text-[#10b981]"
-                  : "bg-white/10 text-[var(--muted-foreground)]",
+                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                  : "bg-black/5 dark:bg-white/10 text-[var(--muted-foreground)] border border-[var(--border)]",
               )}
             >
               {listing.writable ? "Writable" : "Read-only"}

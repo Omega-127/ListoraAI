@@ -11,9 +11,9 @@ export interface ButtonProps
 const variantStyles: Record<NonNullable<ButtonProps["variant"]>, string> = {
   default: "bg-[var(--primary)] text-[var(--primary-foreground)] shadow hover:brightness-110",
   destructive: "bg-red-500 text-white shadow-sm hover:bg-red-600",
-  outline: "border border-[var(--border)] bg-transparent hover:bg-white/10 dark:hover:bg-white/10 light:hover:bg-black/5 text-[var(--foreground)]",
-  secondary: "bg-white/10 text-[var(--foreground)] hover:bg-white/15",
-  ghost: "hover:bg-white/10 text-[var(--foreground)]",
+  outline: "border border-[var(--border)] bg-transparent hover:bg-black/5 dark:hover:bg-white/10 text-[var(--foreground)]",
+  secondary: "bg-black/5 dark:bg-white/10 text-[var(--foreground)] hover:bg-black/10 dark:hover:bg-white/15",
+  ghost: "hover:bg-black/5 dark:hover:bg-white/10 text-[var(--foreground)]",
   link: "text-[var(--primary)] underline-offset-4 hover:underline",
 };
 

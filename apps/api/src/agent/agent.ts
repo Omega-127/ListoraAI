@@ -631,23 +631,41 @@ ${JSON.stringify(targetMismatches, null, 2)}
   while (iterations < MAX_ITERATIONS) {
     iterations++;
 
-    const res = await fetch(`${aiConfig.baseURL}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${aiConfig.apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model,
-        messages,
-        tools: openAITools,
-        temperature: 0.1,
-      }),
-    });
+    let res: Response | null = null;
+    let retries = 0;
+    const maxRetries = 3;
 
-    if (!res.ok) {
-      const errText = await res.text().catch(() => '');
-      throw new Error(`${aiConfig.name} API error (${res.status}): ${errText}`);
+    while (retries <= maxRetries) {
+      res = await fetch(`${aiConfig.baseURL}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${aiConfig.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model,
+          messages,
+          tools: openAITools,
+          temperature: 0.1,
+        }),
+      });
+
+      if (res.status === 429 && retries < maxRetries) {
+        retries++;
+        const errText = await res.text().catch(() => '');
+        const delayMatch = errText.match(/try again in ([\d.]+)s/i);
+        const retryDelaySec = delayMatch ? Math.max(1.5, parseFloat(delayMatch[1]) + 0.5) : 2 * retries;
+        const waitMs = Math.round(retryDelaySec * 1000);
+        logger.warn(`Rate limit 429 from ${aiConfig.name}: waiting ${waitMs}ms before retry ${retries}/${maxRetries}...`);
+        await new Promise((r) => setTimeout(r, waitMs));
+        continue;
+      }
+      break;
+    }
+
+    if (!res || !res.ok) {
+      const errText = await res?.text().catch(() => '') ?? 'No response';
+      throw new Error(`${aiConfig.name} API error (${res?.status ?? 500}): ${errText}`);
     }
 
     const data: any = await res.json();

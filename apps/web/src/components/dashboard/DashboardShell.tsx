@@ -81,9 +81,9 @@ function NavItems({ onNavigate, collapsed }: { onNavigate?: () => void; collapse
               "group relative flex items-center rounded-lg text-sm font-medium transition-all duration-200",
               collapsed ? "justify-center h-10 w-10 mx-auto px-0" : "gap-3 px-3 py-2",
               isActive
-                ? "text-[var(--foreground)] bg-white/10 shadow-sm"
+                ? "text-[var(--foreground)] bg-black/5 dark:bg-white/10 shadow-sm"
                 : muted,
-              !isActive && "hover:text-[var(--foreground)] hover:bg-white/5",
+              !isActive && "hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/5",
               focus,
             )
           }
@@ -125,7 +125,7 @@ function SidebarBody({ onNavigate, collapsed }: { onNavigate?: () => void; colla
             to="/"
             title="ListoraAI Home"
             className={cn(
-              "flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-white/10 text-white font-bold text-sm tracking-wider shadow-sm hover:scale-105 transition-transform",
+              "flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-[var(--border)] text-[var(--foreground)] font-bold text-sm tracking-wider shadow-sm hover:scale-105 transition-transform",
               focus,
             )}
           >
@@ -147,7 +147,7 @@ function SidebarBody({ onNavigate, collapsed }: { onNavigate?: () => void; colla
             Workspace
           </p>
         ) : (
-          <div className="mb-3 h-px w-6 mx-auto bg-white/10" />
+          <div className="mb-3 h-px w-6 mx-auto bg-black/10 dark:bg-white/10" />
         )}
         <NavItems onNavigate={onNavigate} collapsed={collapsed} />
       </div>
@@ -158,7 +158,7 @@ function SidebarBody({ onNavigate, collapsed }: { onNavigate?: () => void; colla
           <>
             <div className="flex items-center justify-between px-2">
               <div className="min-w-0">
-                <p className="text-xs font-medium text-neutral-200 truncate">{user?.name || "Active Session"}</p>
+                <p className="text-xs font-medium text-[var(--foreground)] truncate">{user?.name || "Active Session"}</p>
                 <p className={`text-[11px] truncate ${muted}`}>{user?.email || "admin@listora.ai"}</p>
               </div>
               <RoleBadge role={activeRole} />
@@ -169,7 +169,7 @@ function SidebarBody({ onNavigate, collapsed }: { onNavigate?: () => void; colla
               className={cn(
                 "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium",
                 muted,
-                "hover:text-[var(--foreground)] hover:bg-white/5 transition-colors",
+                "hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors",
                 focus,
               )}
             >
@@ -181,7 +181,7 @@ function SidebarBody({ onNavigate, collapsed }: { onNavigate?: () => void; colla
           <>
             <div
               title={`${user?.name || "User"} (${activeRole})`}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 border border-white/10 text-xs font-semibold text-neutral-200 cursor-default"
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 border border-[var(--border)] text-xs font-semibold text-[var(--foreground)] cursor-default"
             >
               {(user?.name || user?.email || "U").charAt(0).toUpperCase()}
             </div>
@@ -190,7 +190,7 @@ function SidebarBody({ onNavigate, collapsed }: { onNavigate?: () => void; colla
               onClick={handleLogout}
               title="Log out"
               className={cn(
-                "group relative flex h-9 w-9 items-center justify-center rounded-lg text-neutral-400 hover:text-white hover:bg-white/5 transition-colors",
+                "group relative flex h-9 w-9 items-center justify-center rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors",
                 focus,
               )}
             >
@@ -219,7 +219,7 @@ function DesktopSidebar() {
           className="absolute inset-0 bg-black/70 backdrop-blur-sm"
           onClick={() => setOpenMobile(false)}
         />
-        <div className="relative flex h-full w-[16rem] flex-col border-r border-[var(--border)] bg-[#0d0d0d] shadow-2xl">
+        <div className="relative flex h-full w-[16rem] flex-col border-r border-[var(--border)] bg-[var(--sidebar)] shadow-2xl">
           <SidebarBody onNavigate={() => setOpenMobile(false)} collapsed={false} />
         </div>
       </div>
@@ -233,7 +233,7 @@ function DesktopSidebar() {
       <div className={cn("hidden shrink-0 transition-all duration-300 ease-in-out md:block", widthClass)} />
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-30 hidden h-svh border-r border-[var(--border)] bg-[#0d0d0d] transition-all duration-300 ease-in-out md:flex md:flex-col overflow-hidden",
+          "fixed inset-y-0 left-0 z-30 hidden h-svh border-r border-[var(--border)] bg-[var(--sidebar)] transition-all duration-300 ease-in-out md:flex md:flex-col overflow-hidden",
           widthClass,
         )}
       >
@@ -260,7 +260,7 @@ function ShellChrome() {
             aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
             title={isOpen ? "Collapse sidebar (Ctrl+B)" : "Expand sidebar (Ctrl+B)"}
             className={cn(
-              "grid h-9 w-9 place-items-center rounded-lg border border-[var(--border)] hover:bg-white/5 transition-colors cursor-pointer text-neutral-300 hover:text-white",
+              "grid h-9 w-9 place-items-center rounded-lg border border-[var(--border)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer text-[var(--foreground)]",
               focus,
             )}
           >
@@ -279,7 +279,7 @@ function ShellChrome() {
             <NavLink
               to="/dashboard/alerts"
               className={cn(
-                "relative grid h-9 w-9 place-items-center rounded-lg border border-[var(--border)] hover:bg-white/5 transition-colors",
+                "relative grid h-9 w-9 place-items-center rounded-lg border border-[var(--border)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-[var(--foreground)]",
                 focus,
               )}
               aria-label="Alerts"
@@ -304,7 +304,7 @@ export default function DashboardShell() {
     <div className="min-h-svh bg-[var(--background)] text-[var(--foreground)]">
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_70%_45%_at_0%_0%,rgba(255,255,255,0.05),transparent_55%)]"
+        className="pointer-events-none fixed inset-0 dark:bg-[radial-gradient(ellipse_70%_45%_at_0%_0%,rgba(255,255,255,0.05),transparent_55%)] bg-[radial-gradient(ellipse_70%_45%_at_0%_0%,rgba(15,23,42,0.03),transparent_55%)]"
       />
       <Sidebar.Provider
         defaultOpen

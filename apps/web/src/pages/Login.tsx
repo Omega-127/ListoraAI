@@ -99,7 +99,7 @@ export default function Login() {
         </div>
 
         {/* Demo Role Presets */}
-        <div className="rounded-lg border border-[var(--border)] bg-black/40 p-3">
+        <div className="rounded-lg border border-[var(--border)] bg-slate-50 dark:bg-black/40 p-3">
           <p className={`text-[11px] font-medium uppercase tracking-wider mb-2 ${muted}`}>
             Quick Demo Role Login:
           </p>
@@ -107,25 +107,25 @@ export default function Login() {
             <button
               type="button"
               onClick={() => fillDemo("ADMIN")}
-              className="flex items-center justify-center gap-1.5 rounded border border-white/10 bg-white/5 py-1.5 px-2 hover:bg-white/15 transition-colors"
+              className="flex items-center justify-center gap-1.5 rounded border border-[var(--border)] bg-white dark:bg-white/5 py-1.5 px-2 hover:bg-black/5 dark:hover:bg-white/15 transition-colors text-[var(--foreground)] shadow-xs"
             >
-              <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
               <span>Admin</span>
             </button>
             <button
               type="button"
               onClick={() => fillDemo("OPERATOR")}
-              className="flex items-center justify-center gap-1.5 rounded border border-white/10 bg-white/5 py-1.5 px-2 hover:bg-white/15 transition-colors"
+              className="flex items-center justify-center gap-1.5 rounded border border-[var(--border)] bg-white dark:bg-white/5 py-1.5 px-2 hover:bg-black/5 dark:hover:bg-white/15 transition-colors text-[var(--foreground)] shadow-xs"
             >
-              <UserCheck className="h-3.5 w-3.5 text-amber-400" />
+              <UserCheck className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
               <span>Operator</span>
             </button>
             <button
               type="button"
               onClick={() => fillDemo("VIEWER")}
-              className="flex items-center justify-center gap-1.5 rounded border border-white/10 bg-white/5 py-1.5 px-2 hover:bg-white/15 transition-colors"
+              className="flex items-center justify-center gap-1.5 rounded border border-[var(--border)] bg-white dark:bg-white/5 py-1.5 px-2 hover:bg-black/5 dark:hover:bg-white/15 transition-colors text-[var(--foreground)] shadow-xs"
             >
-              <Eye className="h-3.5 w-3.5 text-blue-400" />
+              <Eye className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
               <span>Viewer</span>
             </button>
           </div>
